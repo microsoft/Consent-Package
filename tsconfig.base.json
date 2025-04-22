@@ -19,11 +19,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "paths": {
-      "@open-source-consent/*": [
-        "packages/*/src"
-      ]
-    }
+    "composite": true
   },
   "exclude": [
     "node_modules",

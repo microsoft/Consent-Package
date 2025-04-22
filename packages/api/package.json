@@ -5,11 +5,10 @@
   "type": "module",
   "main": "dist/functions/index.js",
   "scripts": {
-    "build": "tsc && pnpm copy-function-files",
-    "copy-function-files": "cp host.json dist/ && cp local.settings.json dist/ && mkdir -p dist/functions",
+    "build": "tsc",
     "watch": "tsc -w",
     "prestart": "pnpm build",
-    "start": "cd dist && /opt/homebrew/bin/func start",
+    "start": "/opt/homebrew/bin/func start",
     "test": "jest"
   },
   "dependencies": {

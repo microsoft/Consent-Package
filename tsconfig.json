@@ -1,3 +1,11 @@
 {
-  "extends": "./tsconfig.base.json"
+  "files": [],
+  "include": [],
+  "references": [
+    { "path": "./packages/api" },
+    { "path": "./packages/core" },
+    { "path": "./packages/data-adapter-cosmosdb" },
+    { "path": "./packages/data-adapter-interface" },
+    { "path": "./packages/ui" }
+  ]
 } 

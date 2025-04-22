@@ -408,3 +408,5 @@ packages/*/dist/*
 
 # local development settings
 local.settings.json
+
+tsconfig.tsbuildinfo

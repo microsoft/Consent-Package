@@ -1,7 +1,7 @@
 // Import all functions
-import "./standalone";
-import "./createConsent";
+import "./standalone.js";
+import "./createConsent.js";
 
 // Export for build reference
-export * from "./standalone";
-export * from "./createConsent";
+export * from "./standalone.js";
+export * from "./createConsent.js";
