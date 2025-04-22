@@ -18,8 +18,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "composite": true
+    "baseUrl": "."
   },
   "exclude": [
     "node_modules",
