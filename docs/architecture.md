@@ -1,9 +1,9 @@
-# MSR Consent - Architecture Proposal
+# Architecture (WIP)
 
-## Research Findings Summary
+## Background
 
-1.  **Existing Landscape:** Commercial CMPs focus heavily on cookie consent (Usercentrics, Osano, etc.). Open-source options are less common, especially for *medical* data consent's complexities (granularity, proxies, audit). Relevant OSS: `Pryv.io` (privacy focus), `Kairon Consents` (patient-centric). Relevant commercial: `ConsentGrid`, `Osano` (granular features).
-2.  **Gap:** Opportunity exists for a modern, OSS, developer-focused CMP for medical research using React/TS/Azure.
+1.  **Existing Landscape:** Commercial CMPs focus heavily on cookie consent (Usercentrics, Osano, etc.). Open-source options are less common, especially for *medical* data consent (granularity, proxies, audit). Relevant: `Pryv.io` , `Kairon Consents` . Relevant commercial: `ConsentGrid`, `Osano` (granular features).
+2.  **Gap:** Opportunity exists for an OSS, developer-focused CMP for medical research using React/TS/Azure.
 3.  **Key Needs:** Granular data types, proxy consent, age-specific flows, revocation/updates, auditability, extensibility.
 
 ## Proposed Architecture & Structure
@@ -12,11 +12,11 @@ A monorepo structure (`pnpm workspaces`, potentially `bun`?).
 
 ```markdown
 /msr-consent-platform           
-├── LICENSE                     # e.g., MIT or Apache 2.0
+├── LICENSE                     # MIT
 ├── README.md                   # Overview, setup, contribution guide
 ├── package.json                # Monorepo root
 ├── docs/                       
-│   ├── architecture.md         # This file & further details
+│   ├── architecture.md         # A finalized version of this file & further details
 │   ├── api.md                  # API endpoint definitions
 │   ├── customization.md        # Extensibility guide
 │   └── setup.md                # Installation/config guide
@@ -25,8 +25,8 @@ A monorepo structure (`pnpm workspaces`, potentially `bun`?).
 │   │   ├── src/
 │   │   │   ├── index.ts
 │   │   │   ├── types/          # e.g., ConsentRecord, Policy interfaces
-│   │   │   ├── services/       # Business logic (ConsentService, PolicyService) - focus on pure functions where possible
-│   │   │   └── errors/         # Custom error types
+│   │   │   ├── services/       # Business logic (ConsentService, PolicyService)
+│   │   │   └── errors/ 
 │   │   └── package.json
 │   │
 │   ├── api/                    # Backend: Azure Functions (Node.js/TypeScript)
@@ -41,8 +41,8 @@ A monorepo structure (`pnpm workspaces`, potentially `bun`?).
 │   │
 │   ├── ui/                     # Frontend: React/Tailwind UI library & optional demo app
 │   │   ├── src/
-│   │   │   ├── index.ts        # Library entry point
-│   │   │   ├── components/     # Reusable: ConsentForm, ConsentViewer, etc.
+│   │   │   ├── index.ts
+│   │   │   ├── components/
 │   │   │   ├── hooks/          # e.g., useConsentApi, usePolicy
 │   │   │   ├── contexts/       # State management, config provider
 │   │   │   ├── styles/         # Tailwind config, base styles
@@ -79,7 +79,7 @@ A monorepo structure (`pnpm workspaces`, potentially `bun`?).
     // Represents the state of consent for a subject regarding a specific policy
     interface ConsentRecord {
       readonly id: string; 
-      readonly version: number; // For optimistic concurrency
+      readonly version: number; // For optimistic concurrency, audit
       readonly subjectId: string; 
       readonly policyId: string; // Refers to Policy definition/version
       readonly status: 'granted' | 'revoked' | 'superseded';
@@ -90,7 +90,7 @@ A monorepo structure (`pnpm workspaces`, potentially `bun`?).
         readonly userId: string; // ID of the individual providing consent
         readonly proxyDetails?: {
           readonly relationship: string; // e.g., 'parent', 'legal_guardian'
-          readonly subjectAgeGroup: 'under13' | '13-17' | '18+'; // At time of consent
+          readonly subjectAgeGroup: 'under13' | '13-17' | '18+';
         };
       };
       // Use immutable collections if practical, otherwise treat as immutable
@@ -123,7 +123,6 @@ A monorepo structure (`pnpm workspaces`, potentially `bun`?).
 3.  **`packages/core/services/ConsentService.ts`**
     ```typescript
     // Encapsulates core business logic for consent management
-    // Prefer functional style where possible, e.g., functions processing ConsentRecord
     class ConsentService {
       constructor(dataAdapter: IConsentDataAdapter /*, policyService?: IPolicyService */);
       // Input types (e.g., GrantConsentInput) defined in core/types
@@ -175,19 +174,6 @@ A monorepo structure (`pnpm workspaces`, potentially `bun`?).
 *   **Cosmos DB (SQL API):** Flexible NoSQL storage suitable for evolving consent schemas.
 *   **Adapter Pattern:** Decouples `core` logic from specific data storage implementation (`data-adapter-interface`).
 *   **Monorepo:** Centralized management, easier code/type sharing and dependency handling.
-
-## Areas for Further Definition
-
-*   Policy Management Details
-*   Authentication & Authorization Strategy
-*   Auditing Requirements & Implementation
-*   Data Adapter (Cosmos DB) Specifics (Partitioning, Indexing)
-*   Concrete Extensibility Points & Mechanisms
-*   Detailed Error Handling and Propagation Strategy
-*   Comprehensive Testing Strategy (Unit, Integration, E2E)
-*   Deployment Process & Infrastructure Management (IaC?)
-*   Specific Security Threat Mitigations
-*   Detailed Consent Flow Logic (Age, Proxy, Revocation/Update)
 
 ## Development Approach & Timeline
 
