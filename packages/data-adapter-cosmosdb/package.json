@@ -1,0 +1,25 @@
+{
+  "name": "@open-source-consent/data-adapter-cosmosdb",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "test": "jest",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.0.0",
+    "@open-source-consent/core": "workspace:*",
+    "@open-source-consent/data-adapter-interface": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20.0.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  }
+}

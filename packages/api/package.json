@@ -1,0 +1,24 @@
+{
+  "name": "@open-source-consent/api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "dist/functions/index.js",
+  "scripts": {
+    "build": "tsc && pnpm copy-function-files",
+    "copy-function-files": "cp host.json dist/ && cp local.settings.json dist/ && mkdir -p dist/functions",
+    "watch": "tsc -w",
+    "prestart": "pnpm build",
+    "start": "cd dist && /opt/homebrew/bin/func start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.0.0",
+    "@open-source-consent/core": "workspace:*",
+    "@open-source-consent/data-adapter-cosmosdb": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

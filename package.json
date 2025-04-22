@@ -1,0 +1,43 @@
+{
+  "name": "open-source-consent-package",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Open Source Consent Management Platform",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "clean": "pnpm -r exec -- rm -rf dist",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "dev": "pnpm --parallel -r dev"
+  },
+  "keywords": [
+    "consent",
+    "medical",
+    "research",
+    "privacy"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "react": "18"
+      }
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

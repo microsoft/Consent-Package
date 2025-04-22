@@ -1,0 +1,18 @@
+{
+  "name": "@open-source-consent/data-adapter-interface",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@open-source-consent/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
