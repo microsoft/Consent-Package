@@ -1,46 +1,6 @@
 # Open Source Consent Package
 
-A developer-focused Consent Management Platform for medical research using React/TypeScript.
-
-## Project Structure
-
-This is a monorepo managed with pnpm workspaces containing the following packages:
-
-- `@open-source-consent/core`: Core business logic and types
-- `@open-source-consent/data-adapter-interface`: Data storage adapter interface
-- `@open-source-consent/data-adapter-cosmosdb`: Cosmos DB adapter implementation (with mock for local dev)
-- `@open-source-consent/api`: Azure Functions API (coming soon)
-- `@open-source-consent/ui`: React component library (coming soon)
-
-## Local Development Setup
-
-1. Prerequisites:
-   - Node.js >= 18
-   - pnpm >= 8
-
-2. Install dependencies:
-   ```bash
-   pnpm install
-   ```
-
-3. Build all packages:
-   ```bash
-   pnpm build
-   ```
-
-4. Run tests:
-   ```bash
-   pnpm test
-   ```
-
-5. Development mode:
-   ```bash
-   pnpm dev
-   ```
-
-## License
-
-MIT
+WIP
 
 ## Contributing
 
