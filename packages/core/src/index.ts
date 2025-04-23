@@ -1,2 +1,2 @@
-export * from "./types/ConsentRecord";
-export * from "./services/ConsentService";
+export * from "./types/ConsentRecord.js";
+export * from "./services/ConsentService.js";

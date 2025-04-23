@@ -1,4 +1,7 @@
-import { ConsentRecord, IConsentDataAdapter } from "@open-source-consent/core";
+import {
+  ConsentRecord,
+  IConsentDataAdapter,
+} from "@open-source-consent/data-adapter-interface";
 
 export class MockDataAdapter implements IConsentDataAdapter {
   private consents: Map<string, ConsentRecord> = new Map();

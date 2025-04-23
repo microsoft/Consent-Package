@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "lib": [
       "DOM",
       "DOM.Iterable",
@@ -18,7 +18,11 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "preserveSymlinks": true,
+    "paths": {
+      "@open-source-consent/*": ["packages/*/src"]
+    }
   },
   "exclude": [
     "node_modules",

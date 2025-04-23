@@ -2,7 +2,7 @@ import { CosmosClient, Container } from "@azure/cosmos";
 import type {
   ConsentRecord,
   IConsentDataAdapter,
-} from "@open-source-consent/core";
+} from "@open-source-consent/data-adapter-interface";
 
 interface CosmosDBConfig {
   endpoint: string;

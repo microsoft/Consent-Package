@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "./dist",
     "jsx": "react-jsx",
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "module": "NodeNext"
   },
   "include": [
     "src/**/*"

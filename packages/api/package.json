@@ -4,6 +4,17 @@
   "private": true,
   "type": "module",
   "main": "dist/functions/index.js",
+  "module": "dist/functions/index.js",
+  "types": "dist/functions/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/functions/index.d.ts",
+      "import": "./dist/functions/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",

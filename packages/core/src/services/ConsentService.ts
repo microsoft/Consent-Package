@@ -1,4 +1,4 @@
-import type { ConsentRecord } from "../types/ConsentRecord";
+import type { ConsentRecord } from "../types/ConsentRecord.js";
 
 export interface IConsentDataAdapter {
   createConsent(

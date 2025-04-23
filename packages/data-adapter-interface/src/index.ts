@@ -1,5 +1,7 @@
 import type { ConsentRecord } from "@open-source-consent/core";
 
+export type { ConsentRecord };
+
 export interface IConsentDataAdapter {
   createConsent(
     data: Omit<ConsentRecord, "id" | "createdAt" | "updatedAt" | "version">

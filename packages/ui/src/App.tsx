@@ -65,18 +65,12 @@ export default function App() {
           Consent Management Debug UI
         </Typography>
 
-        {status && (
-          <Alert severity={status.type} sx={{ mb: 2 }}>
-            {status.message}
-          </Alert>
-        )}
-
         <Box component="form" onSubmit={handleSubmit}>
           <Stack spacing={3}>
             <TextField
               label="Subject ID"
               value={formData.subjectId}
-              onChange={(e) =>
+              onChange={(e: any) =>
                 setFormData((prev) => ({ ...prev, subjectId: e.target.value }))
               }
               required
@@ -85,7 +79,7 @@ export default function App() {
             <TextField
               label="Policy ID"
               value={formData.policyId}
-              onChange={(e) =>
+              onChange={(e: any) =>
                 setFormData((prev) => ({ ...prev, policyId: e.target.value }))
               }
               required
