@@ -44,22 +44,18 @@
 
 1. Start the Cosmos DB Emulator
    ```bash
-   # For macos
+   # For macOS
+   # as of April 2025, the vnext-preview
+   # version is needed with M2 and newer macs
    docker run \
     --publish 8081:8081 \
     --publish 10250-10255:10250-10255 \
     --name cosmosdb-emulator \
     --detach \
-    mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
+    mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
    ```
 2. The emulator runs at `https://localhost:8081`
 3. Default key is provided in the emulator dashboard
-4. Import the SSL certificate (first time only):
-   ```bash
-   # For macOS:
-   curl -k https://localhost:8081/_explorer/emulator.pem > emulatorcert.crt
-   sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain emulatorcert.crt
-   ```
 
 ### 2. Start Azure Functions
 
@@ -76,9 +72,11 @@
        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
        "FUNCTIONS_WORKER_RUNTIME": "node",
        "CosmosDB_Endpoint": "https://localhost:8081",
-       "CosmosDB_Key": "<your-cosmos-db-emulator-key>",
+       // Note this isn't a real key but the emulator key as described at: https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-develop-emulator
+       "CosmosDB_Key": "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
        "CosmosDB_DatabaseName": "ConsentDB",
-       "CORS_ORIGINS": "http://localhost:5173"
+       "CORS_ORIGINS": "http://localhost:5173",
+       "NODE_TLS_REJECT_UNAUTHORIZED": "0"
      }
    }
    ```
@@ -122,21 +120,14 @@ packages/
 
 ## Common Issues
 
-1. **Cosmos DB Emulator Certificate**: If you see certificate errors, install the emulator's certificate:
-   ```bash
-   # For macOS:
-   curl -k https://localhost:8081/_explorer/emulator.pem > emulatorcert.crt
-   sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain emulatorcert.crt
-   ```
+1. **CORS Issues**: Ensure the CORS_ORIGINS in `local.settings.json` matches your UI origin
 
-2. **CORS Issues**: Ensure the CORS_ORIGINS in `local.settings.json` matches your UI origin
-
-3. **Port Conflicts**: Default ports used:
+2. **Port Conflicts**: Default ports used:
    - UI: 5173
    - Functions: 7071
    - Cosmos DB Emulator: 8081
 
-4. **Azure Functions Core Tools Not Found**: If you see "func command not found" or similar:
+3. **Azure Functions Core Tools Not Found**: If you see "func command not found" or similar:
    ```bash
    # For macOS:
    brew unlink azure-functions-core-tools@4 && brew link azure-functions-core-tools@4
