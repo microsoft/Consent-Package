@@ -77,47 +77,15 @@ A monorepo structure (`pnpm workspaces`, potentially `bun`?).
 1.  **`packages/core/types/ConsentRecord.ts`**
     ```typescript
     // Represents the state of consent for a subject regarding a specific policy
-    interface ConsentRecord {
-      readonly id: string; 
-      readonly version: number; // For optimistic concurrency, audit
-      readonly subjectId: string; 
-      readonly policyId: string; // Refers to Policy definition/version
-      readonly status: 'granted' | 'revoked' | 'superseded';
-      readonly consentedAt: Date;
-      readonly revokedAt?: Date;
-      readonly consenter: {
-        readonly type: 'self' | 'proxy';
-        readonly userId: string; // ID of the individual providing consent
-        readonly proxyDetails?: {
-          readonly relationship: string; // e.g., 'parent', 'legal_guardian'
-          readonly subjectAgeGroup: 'under13' | '13-17' | '18+';
-        };
-      };
-      // Use immutable collections if practical, otherwise treat as immutable
-      readonly grantedScopes: Readonly<Record<string, { grantedAt: Date }>>; // e.g., { "nutrition_log": { grantedAt: ... } }
-      readonly revokedScopes?: Readonly<Record<string, { revokedAt: Date }>>;
-      readonly metadata: {
-        readonly consentMethod: 'digital_form' | 'paper_scan' | 'api_call'; 
-        readonly ipAddress?: string; 
-        readonly userAgent?: string; 
-        // Other audit metadata
-      };
-      readonly createdAt: Date;
-      readonly updatedAt: Date;
-    }
+    // Definition moved to data.md
+    interface ConsentRecord { ... }
     ```
 
 2.  **`packages/data-adapter-interface/src/index.ts`**
     ```typescript
     // Contract for persisting and retrieving consent data
-    interface IConsentDataAdapter {
-      createConsent(data: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt' | 'version'>): Promise<ConsentRecord>;
-      // Use version for optimistic concurrency control during updates
-      updateConsent(id: string, updates: Partial<Omit<ConsentRecord, 'id' | 'createdAt'>>, currentVersion: number): Promise<ConsentRecord>; 
-      findConsentById(id: string): Promise<ConsentRecord | null>;
-      findActiveConsentsBySubject(subjectId: string): Promise<ConsentRecord[]>;
-      // Potentially add methods for querying consent status for specific scopes/subjects
-    }
+    // Definition moved to data.md
+    interface IConsentDataAdapter { ... }
     ```
 
 3.  **`packages/core/services/ConsentService.ts`**
@@ -125,7 +93,7 @@ A monorepo structure (`pnpm workspaces`, potentially `bun`?).
     // Encapsulates core business logic for consent management
     class ConsentService {
       constructor(dataAdapter: IConsentDataAdapter /*, policyService?: IPolicyService */);
-      // Input types (e.g., GrantConsentInput) defined in core/types
+      // Input types (e.g., GrantConsentInput) defined in core/types and documented in data.md
       grantConsent(input: GrantConsentInput): Promise<ConsentRecord>;
       revokeConsent(input: RevokeConsentInput): Promise<ConsentRecord>;
       getConsentDetails(consentId: string): Promise<ConsentRecord | null>;
@@ -153,7 +121,7 @@ A monorepo structure (`pnpm workspaces`, potentially `bun`?).
 5.  **`packages/ui/src/components/ConsentForm.tsx`**
     ```typescript
     interface ConsentFormProps {
-      policyDetails: PolicyDetails; // Structure defined in core/types
+      policyDetails: PolicyDetails; // Structure defined in core/types and documented in data.md
       consentMode: 'initial' | 'update';
       userType: 'self' | 'proxy';
       subjectAgeGroup?: 'under13' | '13-17' | '18+'; // Required for proxy
