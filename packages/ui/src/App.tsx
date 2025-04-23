@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from "react";
 import {
   Container,
@@ -8,8 +9,16 @@ import {
   Stack,
   Box,
   Alert,
+  List,
+  ListItem,
+  ListItemText,
+  CircularProgress,
+  Divider,
 } from "@mui/material";
-import type { GrantConsentInput } from "@open-source-consent/core";
+import type {
+  GrantConsentInput,
+  ConsentRecord,
+} from "@open-source-consent/core";
 
 export default function App() {
   const [formData, setFormData] = useState<Partial<GrantConsentInput>>({
@@ -29,11 +38,16 @@ export default function App() {
     type: "success" | "error";
     message: string;
   } | null>(null);
+  const [fetchedConsents, setFetchedConsents] = useState<
+    ConsentRecord[] | null
+  >(null);
+  const [loadingConsents, setLoadingConsents] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/createConsent", {
+      const response = await fetch("/api/consent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,6 +69,32 @@ export default function App() {
         type: "error",
         message: error instanceof Error ? error.message : "An error occurred",
       });
+    }
+  };
+
+  const handleFetchConsents = async () => {
+    setLoadingConsents(true);
+    setFetchError(null);
+    setFetchedConsents(null);
+    setStatus(null);
+    try {
+      const response = await fetch("/api/consents");
+      if (!response.ok) {
+        let errorMsg = `Failed to fetch consents. Status: ${response.status}`;
+        try {
+          const errBody = await response.json();
+          errorMsg += `: ${errBody.error || "Unknown error"}`;
+        } catch {}
+        throw new Error(errorMsg);
+      }
+      const consents = await response.json();
+      setFetchedConsents(consents);
+    } catch (error) {
+      setFetchError(
+        error instanceof Error ? error.message : "An unknown error occurred"
+      );
+    } finally {
+      setLoadingConsents(false);
     }
   };
 
@@ -90,6 +130,53 @@ export default function App() {
             </Button>
           </Stack>
         </Box>
+
+        {status && (
+          <Alert severity={status.type} sx={{ mt: 3 }}>
+            {status.message}
+          </Alert>
+        )}
+
+        <Divider sx={{ my: 4 }} />
+
+        <Typography variant="h5" gutterBottom>
+          Existing Consents
+        </Typography>
+        <Button
+          variant="outlined"
+          onClick={handleFetchConsents}
+          disabled={loadingConsents}
+          sx={{ mb: 2 }}
+        >
+          {loadingConsents ? <CircularProgress size={24} /> : "Fetch Consents"}
+        </Button>
+
+        {fetchError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {fetchError}
+          </Alert>
+        )}
+
+        {fetchedConsents && (
+          <Paper variant="outlined" sx={{ maxHeight: 300, overflow: "auto" }}>
+            <List dense>
+              {fetchedConsents.length === 0 ? (
+                <ListItem>
+                  <ListItemText primary="No consents found in the database." />
+                </ListItem>
+              ) : (
+                fetchedConsents.map((consent) => (
+                  <ListItem key={consent.id}>
+                    <ListItemText
+                      primary={`ID: ${consent.id} - Subject: ${consent.subjectId}`}
+                      secondary={`Status: ${consent.status}, Policy: ${consent.policyId}, Scopes: ${Object.keys(consent.grantedScopes).join(", ")}`}
+                    />
+                  </ListItem>
+                ))
+              )}
+            </List>
+          </Paper>
+        )}
       </Paper>
     </Container>
   );

@@ -1,17 +1,14 @@
 import { app } from "@azure/functions";
-import { ConsentService, GrantConsentInput } from "@open-source-consent/core";
 import { getInitializedDataAdapter } from "../shared/dataAdapter.js";
 
-app.http("createConsent", {
-  methods: ["POST"],
+app.http("getConsents", {
+  methods: ["GET"],
   authLevel: "anonymous",
-  route: "consent",
+  route: "consents",
   handler: async (request, context) => {
     let dataAdapter;
-    let consentService;
     try {
       dataAdapter = await getInitializedDataAdapter();
-      consentService = new ConsentService(dataAdapter);
     } catch (initError) {
       context.error("Failed to get initialized CosmosDB adapter:", initError);
       return {
@@ -23,19 +20,20 @@ app.http("createConsent", {
     context.log(`Http function processed request for url "${request.url}"`);
 
     try {
-      const body = (await request.json()) as GrantConsentInput;
-      const result = await consentService.grantConsent(body);
-      return { jsonBody: result };
-    } catch (error) {
-      context.error("Error creating consent:", error);
+      const items = await dataAdapter.getAllConsents();
+
       return {
-        status:
-          error instanceof Error && error.message.includes("modified")
-            ? 409
-            : 400,
+        jsonBody: items,
+      };
+    } catch (error) {
+      context.error("Error fetching consents:", error);
+      return {
+        status: 500,
         jsonBody: {
           error:
-            error instanceof Error ? error.message : "Unknown error occurred",
+            error instanceof Error
+              ? error.message
+              : "Failed to retrieve consents",
         },
       };
     }
