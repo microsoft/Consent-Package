@@ -1,6 +1,4 @@
-# Local Development Guide
-
-This guide will help you set up your local development environment for the Open Source Consent Package.
+# Local Development
 
 ## Prerequisites
 
@@ -14,17 +12,11 @@ This guide will help you set up your local development environment for the Open 
 
    # For Windows:
    npm i -g azure-functions-core-tools@4 --unsafe-perm true
-
-   # For Linux:
-   # See https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools
    ```
 4. [Azure Cosmos DB Emulator](https://learn.microsoft.com/en-us/azure/cosmos-db/local-emulator)
    ```bash
    # For macOS:
    brew install --cask azure-cosmos-emulator
-
-   # For Windows:
-   # Download and install from the Microsoft website
    ```
 5. Visual Studio Code (recommended)
 
@@ -52,11 +44,13 @@ This guide will help you set up your local development environment for the Open 
 
 1. Start the Cosmos DB Emulator
    ```bash
-   # For macOS:
-   azure-cosmos-emulator-start
-
-   # For Windows:
-   # Start from the Start Menu
+   # For macos
+   docker run \
+    --publish 8081:8081 \
+    --publish 10250-10255:10250-10255 \
+    --name cosmosdb-emulator \
+    --detach \
+    mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
    ```
 2. The emulator runs at `https://localhost:8081`
 3. Default key is provided in the emulator dashboard
@@ -102,12 +96,7 @@ This guide will help you set up your local development environment for the Open 
    cd packages/ui
    ```
 
-2. Create a `.env.local`:
-   ```
-   VITE_API_BASE_URL=http://localhost:7071/api
-   ```
-
-3. Start the development server:
+2. Start the development server:
    ```bash
    pnpm dev
    ```
@@ -121,7 +110,7 @@ packages/
   ├── data-adapter-interface/    # Data adapter interface
   ├── data-adapter-cosmosdb/     # Cosmos DB implementation
   ├── api/               # Azure Functions API
-  └── ui/               # Debug UI (React + Vite)
+  └── ui/               # Currently just a Debug UI
 ```
 
 ## Development Workflow
@@ -130,29 +119,6 @@ packages/
 2. Run `pnpm build` to rebuild all packages
 3. Start the local development environment as described above
 4. Use the debug UI to test your changes
-
-## Testing
-
-Run tests across all packages:
-```bash
-pnpm test
-```
-
-## Debugging
-
-### VS Code
-
-1. Install the "Azure Functions" extension
-2. Use the provided launch configurations in `.vscode/launch.json`
-3. Set breakpoints in your code
-4. Start debugging (F5)
-
-### Browser DevTools
-
-1. Open browser developer tools
-2. Network tab shows API requests
-3. Console shows client-side logs
-4. React DevTools for component debugging
 
 ## Common Issues
 
@@ -183,6 +149,3 @@ pnpm test
 - `CosmosDB_Key`: Access key
 - `CosmosDB_DatabaseName`: Database name
 - `CORS_ORIGINS`: Allowed origins for CORS
-
-### UI (.env.local)
-- `VITE_API_BASE_URL`: API base URL 
