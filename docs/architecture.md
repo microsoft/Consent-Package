@@ -2,7 +2,7 @@
 
 ## Background
 
-1.  **Existing Landscape:** Commercial Consent Management Platforms (CMPs) focus heavily on cookie consent (Usercentrics, Osano, Segment Consent Manager, etc.). Open-source options are less common, especially for *medical research* data consent (granularity, proxies, audit) where no mature OSS solutions were found. Relevant: `Pryv.io` , `Kairon Consents`. Relevant commercial: `ConsentGrid`, `Osano`.
+1.  **Existing Landscape:** Commercial Consent Management Platforms (CMPs) focus heavily on cookie consent (Usercentrics, Osano, Segment Consent Manager, etc.). Open-source options are less common, especially for *medical research* data consent (granularity, proxies, audit) where no mature Open Source Software (OSS) solutions were found. Relevant: `Pryv.io` , `Kairon Consents`. Relevant commercial: `ConsentGrid`, `Osano`.
 2.  **Gap:** Opportunity exists for an OSS, developer-focused CMP for medical research using Microsoft tools.
 3.  **Key Needs:** Granular data types, proxy consent, age-specific flows, revocation/updates, auditability, extensibility.
 
