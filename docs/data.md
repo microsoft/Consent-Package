@@ -5,7 +5,6 @@
 Represents the state of consent for a specific subject regarding a specific policy version. This is the primary record stored and audited.
 
 ```typescript
-// Found in: packages/core/types/ConsentRecord.ts
 
 interface ConsentRecord {
   readonly id: string; // Unique identifier for the consent record
@@ -30,6 +29,7 @@ interface ConsentRecord {
   readonly revokedScopes?: Readonly<Record<string, { revokedAt: Date }>>; // e.g., { "activity_data": { revokedAt: ... } }
   // Metadata is useful for non-repudiation, can be optional
   readonly metadata: {
+    readonly consentMethod: 'digital_form' | 'paper_form' | '???';
     readonly ipAddress?: string; // IP address associated with digital consent capture
     readonly userAgent?: string; // User agent string associated with digital consent capture
   };
@@ -43,17 +43,18 @@ interface ConsentRecord {
 Represents a specific version of a consent policy document or agreement presented to the user. `PolicyDetails` is a subset or processed version of the full `Policy` structure, tailored for display or specific actions.
 
 ```typescript
-// Conceptual structure
 
 interface Policy {
   readonly id: string; // Unique identifier for this specific policy *version*
   readonly policyGroupId: string; // Identifier linking different versions of the same logical policy
   readonly version: number; // Version number of this policy document
   readonly effectiveDate: Date; // Date when this policy version becomes active
-  readonly title: string; // Human-readable title of the policy
-  readonly description: string; // Brief summary or purpose of the policy
-  readonly contentUrl?: string; // Link to the full policy document (e.g., PDF, HTML)
-  readonly contentText?: string; // Inline text of the policy (alternative or supplement to URL)
+  readonly contentSections: ReadonlyArray<{ // Collection of distinct content sections
+    readonly title: string; // Section title
+    readonly description: string; // Section description
+    readonly contentUrl?: string; // Link to the full content for this section
+    readonly contentText?: string; // Inline content text for this section
+  }>;
   // Defines the data scopes/categories covered by this policy
   readonly availableScopes: Readonly<Array<{
     readonly key: string; // Unique machine-readable key (e.g., 'nutrition_log', 'genomic_data')
@@ -69,8 +70,7 @@ interface Policy {
 }
 
 // Likely a projection or subset of the full Policy, possibly used by UI components
-// Conceptual structure, potentially in: packages/core/types/Policy.ts or packages/ui/src/types.ts
-interface PolicyDetails extends Pick<Policy, 'id' | 'version' | 'title' | 'description' | 'availableScopes'> {
+interface PolicyDetails extends Pick<Policy, 'id' | 'version' | 'contentSections' | 'availableScopes'> {
   // May include additional processed information for display
   // e.g., pre-filtered required scopes
 }
@@ -82,7 +82,6 @@ interface PolicyDetails extends Pick<Policy, 'id' | 'version' | 'title' | 'descr
 Defines the contract (interface) for how consent data is persisted and retrieved. Implementations (like `data-adapter-cosmosdb`) will conform to this interface.
 
 ```typescript
-// Found in: packages/data-adapter-interface/src/index.ts
 
 interface IConsentDataAdapter {
   // Creates a new consent record
@@ -109,7 +108,6 @@ interface IConsentDataAdapter {
 Represents the necessary information required by the `ConsentService` to grant consent.
 
 ```typescript
-// Conceptual structure, likely found in: packages/core/types/inputs.ts
 
 interface GrantConsentInput {
   readonly subjectId: string;
@@ -124,6 +122,7 @@ interface GrantConsentInput {
   };
   readonly grantedScopes: readonly string[]; // Array of scope keys being granted
   readonly metadata: {
+    readonly consentMethod: 'digital_form' | 'paper_form' | '???';
     readonly ipAddress?: string;
     readonly userAgent?: string;
     // Other relevant metadata for this specific grant action
@@ -139,13 +138,26 @@ Represents the necessary information required by the `ConsentService` to revoke 
 
 interface RevokeConsentInput {
   readonly consentRecordId: string; // The ID of the ConsentRecord to modify
-  readonly reason: string; // Optional reason for revocation for audit purposes
+  readonly reason?: string; // 
   readonly revokerUserId: string; // ID of the user performing the revocation
   // Optionally, specify specific scopes to revoke, otherwise the whole record is revoked
   readonly scopesToRevoke?: readonly string[];
   readonly metadata: { // Metadata related to the revocation action
+    readonly revocationMethod?: 'digital_form' | 'paper_form' | '???';
     readonly ipAddress?: string;
     readonly userAgent?: string;
   };
 }
-``` 
+```
+
+### Example App Content Considerations (Common rule informed consent)
+
+- Research purposes
+- Expected duration of the study
+- Research procedures
+- Risks and benefits
+- Confidentiality of records
+- Compensation
+- Contact Information
+
+
