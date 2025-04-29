@@ -1,9 +1,5 @@
-import {
-  CosmosClient,
-  Container,
-  Database,
-  PartitionKeyKind,
-} from "@azure/cosmos";
+import type { Container, Database } from "@azure/cosmos";
+import { CosmosClient, PartitionKeyKind } from "@azure/cosmos";
 import type {
   ConsentRecord,
   IConsentDataAdapter,
@@ -54,6 +50,7 @@ export class CosmosDBDataAdapter implements IConsentDataAdapter {
       },
     });
     this.container = container;
+    // eslint-disable-next-line no-console
     console.log(
       `CosmosDB Adapter initialized: DB='${this.config.databaseName}', Container='${this.config.containerName}'`
     );
@@ -116,7 +113,7 @@ export class CosmosDBDataAdapter implements IConsentDataAdapter {
       const { resource } = await container.item(id).read();
       return resource as ConsentRecord;
     } catch (error) {
-      if ((error as any).code === 404) {
+      if ((error as Error).message.includes("404")) {
         return null;
       }
       throw error;

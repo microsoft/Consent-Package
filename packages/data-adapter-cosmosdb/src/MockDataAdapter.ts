@@ -1,4 +1,4 @@
-import {
+import type {
   ConsentRecord,
   IConsentDataAdapter,
 } from "@open-source-consent/data-adapter-interface";

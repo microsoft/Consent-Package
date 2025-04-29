@@ -410,3 +410,6 @@ packages/*/dist/*
 local.settings.json
 
 tsconfig.tsbuildinfo
+
+# coverage
+coverage/

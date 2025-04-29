@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState } from "react";
+import type { ChangeEvent, useState } from "react";
 import {
   Container,
   Paper,
@@ -20,7 +20,7 @@ import type {
   ConsentRecord,
 } from "@open-source-consent/core";
 
-export default function App() {
+export default function App(): JSX.Element {
   const [formData, setFormData] = useState<Partial<GrantConsentInput>>({
     subjectId: "",
     policyId: "default-policy",
@@ -44,7 +44,7 @@ export default function App() {
   const [loadingConsents, setLoadingConsents] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     try {
       const response = await fetch("/api/consent", {
@@ -72,7 +72,7 @@ export default function App() {
     }
   };
 
-  const handleFetchConsents = async () => {
+  const handleFetchConsents = async (): Promise<void> => {
     setLoadingConsents(true);
     setFetchError(null);
     setFetchedConsents(null);
@@ -110,7 +110,7 @@ export default function App() {
             <TextField
               label="Subject ID"
               value={formData.subjectId}
-              onChange={(e: any) =>
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setFormData((prev) => ({ ...prev, subjectId: e.target.value }))
               }
               required
@@ -119,7 +119,7 @@ export default function App() {
             <TextField
               label="Policy ID"
               value={formData.policyId}
-              onChange={(e: any) =>
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setFormData((prev) => ({ ...prev, policyId: e.target.value }))
               }
               required

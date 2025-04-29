@@ -1,5 +1,6 @@
 import { app } from "@azure/functions";
-import { ConsentService, GrantConsentInput } from "@open-source-consent/core";
+import type { GrantConsentInput } from "@open-source-consent/core";
+import { ConsentService } from "@open-source-consent/core";
 import { getInitializedDataAdapter } from "../shared/dataAdapter.js";
 
 app.http("createConsent", {

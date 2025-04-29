@@ -15,13 +15,15 @@ let initializePromise: Promise<void> | null = null;
  */
 export async function getInitializedDataAdapter(): Promise<CosmosDBDataAdapter> {
   if (!initializePromise) {
+    // eslint-disable-next-line no-console
     console.log("Initializing shared CosmosDB adapter...");
     initializePromise = dataAdapter
       .initialize()
       .then(() => {
+        // eslint-disable-next-line no-console
         console.log("Shared CosmosDB adapter initialized successfully.");
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         console.error("Failed to initialize shared CosmosDB adapter:", err);
         initializePromise = null;
         throw err;
