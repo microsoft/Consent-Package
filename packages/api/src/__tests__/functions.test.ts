@@ -16,12 +16,28 @@ vi.mock("../shared/dataAdapter.js", () => ({
   }),
 }));
 
+const getConsentDetailsMock = vi.fn().mockImplementation((id) => {
+  if (id === "test-consent-id") {
+    return Promise.resolve({ id: "test-consent-id", status: "granted" });
+  }
+  if (id === "not-found") {
+    return Promise.resolve(null);
+  }
+  if (id === "error-id") {
+    return Promise.reject(new Error("Failed to retrieve consent"));
+  }
+  return Promise.resolve({ id, status: "granted" });
+});
+
 vi.mock("@open-source-consent/core", () => ({
-  ConsentService: vi.fn().mockImplementation(() => ({
-    grantConsent: vi
-      .fn()
-      .mockResolvedValue({ id: "new-consent-id", status: "granted" }),
-  })),
+  ConsentService: vi.fn().mockImplementation(() => {
+    return {
+      grantConsent: vi
+        .fn()
+        .mockResolvedValue({ id: "new-consent-id", status: "granted" }),
+      getConsentDetails: getConsentDetailsMock,
+    };
+  }),
 }));
 
 describe("Azure Functions", () => {
@@ -236,6 +252,129 @@ describe("Azure Functions", () => {
       const result = await registeredHandlers.createConsent(request, context);
 
       expect(result.status).toBe(400);
+      expect(result.jsonBody).toEqual({ error: "Unknown error occurred" });
+      expect(context.error).toHaveBeenCalled();
+    });
+  });
+
+  describe("getConsentById function", () => {
+    beforeEach(async () => {
+      vi.resetModules();
+
+      // Mock ConsentService specifically for getConsentById test cases
+      const coreMock = await import("@open-source-consent/core");
+      (coreMock.ConsentService as any).mockImplementation(() => ({
+        getConsentDetails: vi.fn().mockImplementation((id) => {
+          if (id === "test-consent-id") {
+            return Promise.resolve({
+              id: "test-consent-id",
+              status: "granted",
+            });
+          }
+          if (id === "not-found") {
+            return Promise.resolve(null);
+          }
+          if (id === "error-id") {
+            return Promise.reject(new Error("Failed to retrieve consent"));
+          }
+          return Promise.resolve({ id, status: "granted" });
+        }),
+      }));
+
+      // Load the function after setting up the specific mock
+      await import("../functions/getConsentById.js");
+    });
+
+    it("should return consent when valid ID is provided", async () => {
+      const request = {
+        url: "http://localhost/api/consent/test-consent-id",
+        params: { id: "test-consent-id" },
+      };
+      const context = { log: vi.fn(), error: vi.fn() };
+
+      const result = await registeredHandlers.getConsentById(request, context);
+
+      expect(result.jsonBody).toEqual({
+        id: "test-consent-id",
+        status: "granted",
+      });
+    });
+
+    it("should handle database initialization failure", async () => {
+      const dataAdapterMock = await import("../shared/dataAdapter.js");
+      (dataAdapterMock.getInitializedDataAdapter as any).mockRejectedValueOnce(
+        new Error("DB connection failed")
+      );
+
+      const request = {
+        url: "http://localhost/api/consent/test-consent-id",
+        params: { id: "test-consent-id" },
+      };
+      const context = { log: vi.fn(), error: vi.fn() };
+
+      const result = await registeredHandlers.getConsentById(request, context);
+
+      expect(result.status).toBe(500);
+      expect(result.jsonBody).toEqual({ error: "Database connection failed." });
+      expect(context.error).toHaveBeenCalled();
+    });
+
+    it("should handle missing ID parameter", async () => {
+      const request = {
+        url: "http://localhost/api/consent/",
+        params: {},
+      };
+      const context = { log: vi.fn(), error: vi.fn() };
+
+      const result = await registeredHandlers.getConsentById(request, context);
+
+      expect(result.status).toBe(400);
+      expect(result.jsonBody).toEqual({ error: "Consent ID is required" });
+    });
+
+    it("should return 404 when consent is not found", async () => {
+      const request = {
+        url: "http://localhost/api/consent/not-found",
+        params: { id: "not-found" },
+      };
+      const context = { log: vi.fn(), error: vi.fn() };
+
+      const result = await registeredHandlers.getConsentById(request, context);
+
+      expect(result.status).toBe(404);
+      expect(result.jsonBody).toEqual({ error: "Consent record not found" });
+    });
+
+    it("should handle error when retrieving consent", async () => {
+      const request = {
+        url: "http://localhost/api/consent/error-id",
+        params: { id: "error-id" },
+      };
+      const context = { log: vi.fn(), error: vi.fn() };
+
+      const result = await registeredHandlers.getConsentById(request, context);
+
+      expect(result.status).toBe(500);
+      expect(result.jsonBody).toEqual({ error: "Failed to retrieve consent" });
+      expect(context.error).toHaveBeenCalled();
+    });
+
+    it("should handle non-Error object in error", async () => {
+      // Reset the mock only for this test
+      const coreMock = await import("@open-source-consent/core");
+      (coreMock.ConsentService as any).mockImplementationOnce(() => ({
+        getConsentDetails: vi.fn().mockRejectedValue("String error"),
+      }));
+
+      const request = {
+        url: "http://localhost/api/consent/test-consent-id",
+        params: { id: "test-consent-id" },
+      };
+      const context = { log: vi.fn(), error: vi.fn() };
+
+      const result = await registeredHandlers.getConsentById(request, context);
+
+      expect(result.status).toBe(500);
       expect(result.jsonBody).toEqual({ error: "Unknown error occurred" });
       expect(context.error).toHaveBeenCalled();
     });
