@@ -1,5 +1,6 @@
 // @ts-nocheck
-import type { ChangeEvent, useState } from "react";
+import { useState } from "react";
+import type { ChangeEvent } from "react";
 import {
   Container,
   Paper,
