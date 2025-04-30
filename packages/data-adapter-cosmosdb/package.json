@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "jest",
+    "test": "vitest run",
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {
@@ -26,10 +26,8 @@
     "@open-source-consent/data-adapter-interface": "workspace:*"
   },
   "devDependencies": {
-    "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",
-    "jest": "^29.0.0",
-    "ts-jest": "^29.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^1.6.1"
   }
 }

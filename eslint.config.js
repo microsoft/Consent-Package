@@ -3,7 +3,7 @@ import tseslint from "@typescript-eslint/eslint-plugin";
 import tsparser from "@typescript-eslint/parser";
 import prettier from "eslint-config-prettier";
 import globals from "globals";
-import jest from "eslint-plugin-jest";
+import vitest from "eslint-plugin-vitest";
 
 export default [
   {
@@ -26,17 +26,17 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
-        ...globals.jest,
+        ...globals.vitest,
         React: "readonly",
         JSX: "readonly",
       },
     },
     plugins: {
       "@typescript-eslint": tseslint,
-      jest,
+      vitest,
     },
     rules: {
-      ...jest.configs.recommended.rules,
+      ...vitest.configs.recommended.rules,
       "@typescript-eslint/explicit-function-return-type": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": [

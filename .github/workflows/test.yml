@@ -1,4 +1,4 @@
-name: Test
+name: Build and Test
 
 on:
   push:
@@ -9,5 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+      - name: Clean
+        run: pnpm clean
+      - name: Build
+        run: pnpm build
       - name: Run tests
         run: pnpm test
