@@ -10,7 +10,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "clean": "pnpm -r exec -- rm -rf dist",
-    "test": "pnpm -r --filter './packages/api' --filter './packages/core' test",
+    "test": "pnpm -r --filter './packages/api' --filter './packages/core' --filter './packages/data-adapter-cosmosdb' test:coverage",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "dev": "pnpm --parallel -r dev",
     "prepare": "husky"

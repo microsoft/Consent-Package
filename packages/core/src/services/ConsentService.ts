@@ -1,42 +1,9 @@
-import type { ConsentRecord } from "../types/ConsentRecord.js";
-
-export interface IConsentDataAdapter {
-  createConsent(
-    data: Omit<ConsentRecord, "id" | "createdAt" | "updatedAt" | "version">
-  ): Promise<ConsentRecord>;
-  updateConsent(
-    id: string,
-    updates: Partial<Omit<ConsentRecord, "id" | "createdAt">>,
-    currentVersion: number
-  ): Promise<ConsentRecord>;
-  findConsentById(id: string): Promise<ConsentRecord | null>;
-  findActiveConsentsBySubject(subjectId: string): Promise<ConsentRecord[]>;
-}
-
-export interface GrantConsentInput {
-  subjectId: string;
-  policyId: string;
-  consenter: {
-    type: "self" | "proxy";
-    userId: string;
-    proxyDetails?: {
-      relationship: string;
-      subjectAgeGroup: "under13" | "13-17" | "18+";
-    };
-  };
-  grantedScopes: string[];
-  metadata: {
-    consentMethod: "digital_form" | "paper_scan" | "api_call";
-    ipAddress?: string;
-    userAgent?: string;
-  };
-}
-
-export interface RevokeConsentInput {
-  consentId: string;
-  scopesToRevoke?: string[];
-  currentVersion: number;
-}
+import type {
+  ConsentRecord,
+  GrantConsentInput,
+  RevokeConsentInput,
+  IConsentDataAdapter,
+} from "@open-source-consent/types";
 
 export class ConsentService {
   constructor(private dataAdapter: IConsentDataAdapter) {}

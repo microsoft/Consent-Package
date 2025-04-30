@@ -1,7 +1,7 @@
-export type ConsentStatus = 'granted' | 'revoked' | 'superseded';
-export type ConsentMethod = 'digital_form' | 'paper_scan' | 'api_call';
-export type AgeGroup = 'under13' | '13-17' | '18+';
-export type ConsenterType = 'self' | 'proxy';
+export type ConsentStatus = "granted" | "revoked" | "superseded";
+export type ConsentMethod = "digital_form" | "paper_scan" | "api_call";
+export type AgeGroup = "under13" | "13-17" | "18+";
+export type ConsenterType = "self" | "proxy";
 
 export interface ConsentRecord {
   readonly id: string;
@@ -28,4 +28,4 @@ export interface ConsentRecord {
   };
   readonly createdAt: Date;
   readonly updatedAt: Date;
-} 
+}

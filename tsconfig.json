@@ -5,7 +5,7 @@
     { "path": "./packages/api" },
     { "path": "./packages/core" },
     { "path": "./packages/data-adapter-cosmosdb" },
-    { "path": "./packages/data-adapter-interface" },
+    { "path": "./packages/types" },
     { "path": "./packages/ui" }
   ]
 } 

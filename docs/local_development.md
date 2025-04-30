@@ -110,7 +110,7 @@
 ```markdown
 packages/
   ├── core/              # Core business logic and types
-  ├── data-adapter-interface/    # Data adapter interface
+  ├── types/    # Relevant types and interfaces
   ├── data-adapter-cosmosdb/     # Cosmos DB implementation
   ├── api/               # Azure Functions API
   └── ui/               # Currently just a Debug UI

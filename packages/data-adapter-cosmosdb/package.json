@@ -18,15 +18,18 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {
     "@azure/cosmos": "^4.0.0",
     "@open-source-consent/core": "workspace:*",
-    "@open-source-consent/data-adapter-interface": "workspace:*"
+    "@open-source-consent/types": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.6.1",
     "typescript": "^5.0.0",
     "vitest": "^1.6.1"
   }

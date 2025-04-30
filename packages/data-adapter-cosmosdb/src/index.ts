@@ -1,9 +1,9 @@
 import type { Container, Database } from "@azure/cosmos";
 import { CosmosClient, PartitionKeyKind } from "@azure/cosmos";
 import type {
-  ConsentRecord,
   IConsentDataAdapter,
-} from "@open-source-consent/data-adapter-interface";
+  ConsentRecord,
+} from "@open-source-consent/types";
 
 interface CosmosDBConfig {
   endpoint: string;

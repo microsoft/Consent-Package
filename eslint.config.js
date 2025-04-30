@@ -15,7 +15,11 @@ export default [
     languageOptions: {
       parser: tsparser,
       parserOptions: {
-        project: ["./tsconfig.json", "./packages/*/tsconfig.json"],
+        project: [
+          "./tsconfig.json",
+          "./packages/*/tsconfig.json",
+          "./tsconfig.eslint.json",
+        ],
         tsconfigRootDir: ".",
         ecmaVersion: "latest",
         sourceType: "module",
@@ -74,6 +78,20 @@ export default [
       semi: ["error", "always"],
       quotes: ["error", "single", { avoidEscape: true }],
       "no-empty": ["error", { allowEmptyCatch: true }],
+    },
+  },
+  // Test files specific configuration
+  {
+    files: ["**/__tests__/**/*.ts", "**/*.test.ts", "**/vitest.config.ts"],
+    languageOptions: {
+      parser: tsparser,
+      parserOptions: {
+        project: ["./tsconfig.eslint.json"],
+        tsconfigRootDir: ".",
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
   prettier,

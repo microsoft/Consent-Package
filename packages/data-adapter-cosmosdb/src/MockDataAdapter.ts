@@ -1,7 +1,7 @@
 import type {
   ConsentRecord,
   IConsentDataAdapter,
-} from "@open-source-consent/data-adapter-interface";
+} from "@open-source-consent/types";
 
 export class MockDataAdapter implements IConsentDataAdapter {
   private consents: Map<string, ConsentRecord> = new Map();

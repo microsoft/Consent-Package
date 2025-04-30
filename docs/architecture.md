@@ -49,7 +49,7 @@ A monorepo structure (`pnpm workspaces`).
 │   │   │   └── app/            # Example app
 │   │   └── package.json
 │   │
-│   ├── data-adapter-interface/ # Data storage adapter interface
+│   ├── types / # Relevant types and interfaces
 │   │   ├── src/
 │   │   │   └── index.ts        # Defines IConsentDataAdapter
 │   │   └── package.json

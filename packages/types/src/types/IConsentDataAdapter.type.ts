@@ -1,6 +1,4 @@
-import type { ConsentRecord } from "@open-source-consent/core";
-
-export type { ConsentRecord };
+import type { ConsentRecord } from "./ConsentRecord.type.js";
 
 export interface IConsentDataAdapter {
   createConsent(

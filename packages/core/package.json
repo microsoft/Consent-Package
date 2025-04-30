@@ -17,10 +17,17 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "vitest run --coverage",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "lint": "eslint src --ext .ts,.tsx"
   },
+  "dependencies": {
+    "@open-source-consent/types": "workspace:*"
+  },
   "devDependencies": {
+    "@vitest/coverage-v8": "^1.6.1",
+    "typescript": "^5.0.0",
+    "vitest": "^1.6.1",
     "@vitest/coverage-v8": "^1.6.1",
     "typescript": "^5.0.0",
     "vitest": "^1.6.1"
