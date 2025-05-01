@@ -21,8 +21,8 @@ describe("ConsentService", () => {
       createConsent: vi.fn() as IConsentDataAdapter["createConsent"],
       updateConsent: vi.fn() as IConsentDataAdapter["updateConsent"],
       findConsentById: vi.fn() as IConsentDataAdapter["findConsentById"],
-      findActiveConsentsBySubject:
-        vi.fn() as IConsentDataAdapter["findActiveConsentsBySubject"],
+      findConsentsBySubject:
+        vi.fn() as IConsentDataAdapter["findConsentsBySubject"],
     };
 
     consentService = new ConsentService(mockDataAdapter);
@@ -388,7 +388,7 @@ describe("ConsentService", () => {
         },
       ];
 
-      (mockDataAdapter.findActiveConsentsBySubject as any).mockResolvedValue(
+      (mockDataAdapter.findConsentsBySubject as any).mockResolvedValue(
         mockConsents
       );
 
@@ -401,7 +401,7 @@ describe("ConsentService", () => {
       ]);
 
       // Assert
-      expect(mockDataAdapter.findActiveConsentsBySubject).toHaveBeenCalledWith(
+      expect(mockDataAdapter.findConsentsBySubject).toHaveBeenCalledWith(
         "user123"
       );
       expect(result).toEqual({
@@ -414,9 +414,7 @@ describe("ConsentService", () => {
 
     it("should return all false when subject has no consents", async () => {
       // Arrange
-      (mockDataAdapter.findActiveConsentsBySubject as any).mockResolvedValue(
-        []
-      );
+      (mockDataAdapter.findConsentsBySubject as any).mockResolvedValue([]);
 
       // Act
       const result = await consentService.getSubjectConsentStatus("user456", [
@@ -425,7 +423,7 @@ describe("ConsentService", () => {
       ]);
 
       // Assert
-      expect(mockDataAdapter.findActiveConsentsBySubject).toHaveBeenCalledWith(
+      expect(mockDataAdapter.findConsentsBySubject).toHaveBeenCalledWith(
         "user456"
       );
       expect(result).toEqual({

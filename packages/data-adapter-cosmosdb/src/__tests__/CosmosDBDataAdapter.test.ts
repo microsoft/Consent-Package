@@ -425,8 +425,8 @@ describe("CosmosDBDataAdapter", () => {
     });
   });
 
-  describe("findActiveConsentsBySubject", () => {
-    it("should return active consents for a subject", async () => {
+  describe("findConsentsBySubject", () => {
+    it("should return consents for a subject", async () => {
       // Arrange
       await dataAdapter.initialize();
 
@@ -482,12 +482,11 @@ describe("CosmosDBDataAdapter", () => {
       });
 
       // Act
-      const result = await dataAdapter.findActiveConsentsBySubject(subjectId);
+      const result = await dataAdapter.findConsentsBySubject(subjectId);
 
       // Assert
       expect(container.items.query).toHaveBeenCalledWith({
-        query:
-          "SELECT * FROM c WHERE c.subjectId = @subjectId AND c.status = 'granted'",
+        query: "SELECT * FROM c WHERE c.subjectId = @subjectId",
         parameters: [
           {
             name: "@subjectId",

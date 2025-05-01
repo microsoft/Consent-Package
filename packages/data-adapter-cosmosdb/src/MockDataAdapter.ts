@@ -52,12 +52,9 @@ export class MockDataAdapter implements IConsentDataAdapter {
     return this.consents.get(id) || null;
   }
 
-  async findActiveConsentsBySubject(
-    subjectId: string
-  ): Promise<ConsentRecord[]> {
+  async findConsentsBySubject(subjectId: string): Promise<ConsentRecord[]> {
     return Array.from(this.consents.values()).filter(
-      (consent) =>
-        consent.subjectId === subjectId && consent.status === "granted"
+      (consent) => consent.subjectId === subjectId
     );
   }
 }

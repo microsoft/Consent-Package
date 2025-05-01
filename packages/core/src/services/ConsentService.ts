@@ -57,12 +57,22 @@ export class ConsentService {
     return this.dataAdapter.findConsentById(consentId);
   }
 
+  async findActiveConsentsBySubject(
+    subjectId: string
+  ): Promise<ConsentRecord[]> {
+    const allConsents = await this.dataAdapter.findConsentsBySubject(subjectId);
+    return allConsents.filter(
+      (consent: ConsentRecord) =>
+        consent.status === "granted" &&
+        (!consent.revokedAt || consent.revokedAt > new Date())
+    );
+  }
+
   async getSubjectConsentStatus(
     subjectId: string,
     scopes: readonly string[]
   ): Promise<Record<string, boolean>> {
-    const activeConsents =
-      await this.dataAdapter.findActiveConsentsBySubject(subjectId);
+    const activeConsents = await this.findActiveConsentsBySubject(subjectId);
     return scopes.reduce(
       (acc, scope) => {
         const isGranted = activeConsents.some(

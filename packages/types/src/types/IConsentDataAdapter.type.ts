@@ -10,5 +10,5 @@ export interface IConsentDataAdapter {
     currentVersion: number
   ): Promise<ConsentRecord>;
   findConsentById(id: string): Promise<ConsentRecord | null>;
-  findActiveConsentsBySubject(subjectId: string): Promise<ConsentRecord[]>;
+  findConsentsBySubject(subjectId: string): Promise<ConsentRecord[]>;
 }

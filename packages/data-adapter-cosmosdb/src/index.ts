@@ -120,13 +120,10 @@ export class CosmosDBDataAdapter implements IConsentDataAdapter {
     }
   }
 
-  async findActiveConsentsBySubject(
-    subjectId: string
-  ): Promise<ConsentRecord[]> {
+  async findConsentsBySubject(subjectId: string): Promise<ConsentRecord[]> {
     const container = this.getInitializedContainer();
     const querySpec = {
-      query:
-        "SELECT * FROM c WHERE c.subjectId = @subjectId AND c.status = 'granted'",
+      query: "SELECT * FROM c WHERE c.subjectId = @subjectId",
       parameters: [
         {
           name: "@subjectId",
@@ -138,6 +135,7 @@ export class CosmosDBDataAdapter implements IConsentDataAdapter {
     const { resources } = await container.items.query(querySpec).fetchAll();
     return resources;
   }
+
   // TODO: Remove this, useful for testing but not for production
   async getAllConsents(): Promise<ConsentRecord[]> {
     const container = this.getInitializedContainer();
