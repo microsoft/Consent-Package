@@ -1,0 +1,39 @@
+:root {
+  /* TODO: Eval these */
+  /* style guide colors */
+
+  /* backgrounds */
+  --bg-primary: #f9f1e4;
+  --bg-secondary: #fff;
+
+  /* texts */
+  --text-primary: #1e232c;
+  --text-secondary: #a19983;
+  --text-tertiary: #fff;
+  --text-additional: #de9319;
+
+  /* borders */
+  --border-1: #fcdaa4;
+  --border-2: #f8b5ab;
+  --border-3: #f3cbb7;
+  --border-4: #a0cbc6;
+
+  /* general web colors */
+  --primary-color: #0078d4;
+  --primary-disabled-color: #106ebe;
+
+  --secondary-color: #f3f2f1;
+  --secondary-foreground-color: #323130;
+  --secondary-disabled-color: #e1dfdd;
+
+  --disabled-color: #a19f9d;
+  --outline-disabled-color: rgba(0, 120, 212, 0.1);
+
+  --danger-color: #d13438;
+  --danger-disabled-color: #c50f1f;
+}
+
+.submit-button {
+  width: 100%;
+  height: 44px;
+}

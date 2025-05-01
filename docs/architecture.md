@@ -49,6 +49,17 @@ A monorepo structure (`pnpm workspaces`).
 │   │   │   └── app/            # Example app
 │   │   └── package.json
 │   │
+│   ├── components/             # Frontend: Component Library of general expected interactions
+│   │   ├── src/
+│   │   │   ├── index.ts
+│   │   │   └── components/
+│   │   │       ├── AgeSelect/
+│   │   │       ├── Details/    # TODO?
+│   │   │       ├── Profile/    # Display Personal Information, Managed Subjects and status of Consents
+│   │   │       ├── RoleSelect/
+│   │   │       └── Signature/
+│   │   └── package.json
+│   │
 │   ├── types / # Relevant types and interfaces
 │   │   ├── src/
 │   │   │   └── index.ts        # Defines IConsentDataAdapter

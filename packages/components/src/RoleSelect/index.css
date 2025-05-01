@@ -1,0 +1,35 @@
+.role-select-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  width: 100%;
+}
+
+.role-button {
+  width: 100%;
+  height: auto;
+  padding: 24px !important;
+  border-width: 2px !important;
+}
+
+.role-button:hover {
+  background-color: var(--border-1);
+}
+
+.role-button.selected {
+  border-color: var(--border-3);
+  background-color: var(--bg-primary);
+}
+
+.role-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.role-description {
+  color: var(--text-primary);
+  font-style: italic;
+}
