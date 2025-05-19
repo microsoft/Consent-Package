@@ -22,10 +22,12 @@
 
 .profile-card .fui-CardPreview {
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .profile-card .fui-CardFooter {
-  padding: 16px;
   border-top: 2px solid var(--border-3);
   background-color: var(--bg-secondary);
 }
@@ -51,15 +53,37 @@
   background-color: var(--bg-primary);
 }
 
+.profile-consent-badge {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.profile-consent-scopes-list {
+  margin-left: 16px;
+}
+
 .profile-form-group {
   display: flex !important;
   flex-direction: column;
   gap: 4px;
   margin-bottom: 8px;
+  max-width: 100%;
+}
+
+.profile-form-group .fui-Input {
+  max-width: 100%;
 }
 
 .profile-button-group {
   display: flex;
   gap: 8px;
   margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.profile-card .fui-Text {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 }

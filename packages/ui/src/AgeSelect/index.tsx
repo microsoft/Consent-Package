@@ -1,26 +1,8 @@
 import React, { useState } from 'react';
-import {
-  Button,
-  Text,
-} from '@fluentui/react-components';
+import { Button, Text } from '@fluentui/react-components';
 import { DatePicker } from '@fluentui/react-datepicker-compat';
+import type { AgeRange, AgeSelectProps } from './AgeSelect.type.js';
 import './index.css';
-
-export interface AgeRange {
-  id: string;
-  label: string;
-  description?: string;
-  minAge?: number;
-  maxAge?: number;
-}
-
-export interface AgeSelectProps {
-  onSubmit(ageId: string): void;
-  ageRanges?: AgeRange[];
-  selectedAgeRange?: string;
-  submitLabel?: string;
-  useDatePicker?: boolean;
-}
 
 const defaultAgeRanges: AgeRange[] = [
   {
@@ -48,16 +30,22 @@ const defaultAgeRanges: AgeRange[] = [
 
 // DatePicker or DateSelect applicable
 const AgeSelect: React.FC<AgeSelectProps> = ({
+  initialDateValue,
+  initialAgeRangeIdValue,
   ageRanges = defaultAgeRanges,
   onSubmit,
-  selectedAgeRange,
+  onChange,
   submitLabel = 'Continue',
   useDatePicker = false,
+  showTitle = false,
 }) => {
-  const [selected, setSelected] = useState<string | undefined>(selectedAgeRange);
+  const [selectedAgeRangeId, setSelectedAgeRangeId] = useState<string | undefined>(initialAgeRangeIdValue ?? ageRanges[0]?.id);
+  const [dob, setDob] = useState<Date | undefined>(undefined);
+  const [age, setAge] = useState<number | undefined>(undefined);
 
   const handleAgeRangeSelect = (ageRangeId: string): void => {
-    setSelected(ageRangeId);
+    setSelectedAgeRangeId(ageRangeId);
+    onChange?.(ageRangeId, dob, age);
   };
 
   const calculateAge = (birthDate: Date): number => {
@@ -74,7 +62,7 @@ const AgeSelect: React.FC<AgeSelectProps> = ({
   };
 
   const findAgeRange = (age: number): string | undefined => {
-    return ageRanges.find(range => {
+    return ageRanges.find((range: AgeRange) => {
       const meetsMinAge = range.minAge === undefined || age >= range.minAge;
       const meetsMaxAge = range.maxAge === undefined || age <= range.maxAge;
       return meetsMinAge && meetsMaxAge;
@@ -89,33 +77,38 @@ const AgeSelect: React.FC<AgeSelectProps> = ({
     const ageRangeId = findAgeRange(age);
     
     if (ageRangeId) {
-      setSelected(ageRangeId);
+      setSelectedAgeRangeId(ageRangeId);
+      setDob(birthDate);
+      setAge(age);
+      onChange?.(ageRangeId, birthDate, age);
     }
   };
 
   const handleSubmit = (): void => {
-    if (selected) onSubmit(selected);
+    if (selectedAgeRangeId) onSubmit?.(selectedAgeRangeId, dob, age);
   };
 
   return (
     <div className="age-select-container">
-      <Text size={500} weight="semibold">
+      {showTitle && <Text size={500} weight="semibold">
         Select Age Range
-      </Text>
+      </Text>}
       {
         useDatePicker ? <DatePicker
             placeholder="Select date of birth..."
+            value={initialDateValue === undefined ? null : initialDateValue}
             onSelectDate={handleDateSelect}
             showGoToToday={false}
             maxDate={new Date()}
+            allowTextInput
           /> :
           <div className="age-select-container">
-            {ageRanges.map((ageRange) => (
+            {ageRanges.map((ageRange: AgeRange) => (
               <Button
                 key={ageRange.id}
                 appearance="secondary"
                 onClick={() => handleAgeRangeSelect(ageRange.id)}
-                className={`age-range-button ${selected === ageRange.id ? 'selected' : ''}`}
+                className={`age-range-button ${selectedAgeRangeId === ageRange.id ? 'selected' : ''}`}
               >
                 <div className="age-range-content">
                   <Text size={400} weight="semibold">
@@ -131,14 +124,14 @@ const AgeSelect: React.FC<AgeSelectProps> = ({
             ))}
           </div>
       }
-      <Button
+      {onSubmit && <Button
         appearance="primary"
         onClick={handleSubmit}
-        disabled={!selected}
+        disabled={!selectedAgeRangeId}
         className="submit-button"
       >
         {submitLabel}
-      </Button>
+      </Button>}
     </div>
   );
 };

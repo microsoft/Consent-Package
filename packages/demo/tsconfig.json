@@ -2,17 +2,16 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
     "jsx": "react-jsx",
-    "declaration": true,
-    "module": "NodeNext",
-    "declarationMap": true
+    "types": ["vite/client"],
+    "module": "NodeNext"
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "vite.config.ts"
   ],
   "exclude": [
-    "dist",
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 } 

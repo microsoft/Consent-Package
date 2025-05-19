@@ -12,7 +12,7 @@ import {
   Label,
 } from '@fluentui/react-components';
 import { EditRegular, EditOffRegular } from '@fluentui/react-icons';
-import type { ProfileData } from './index.js';
+import type { ProfileData } from './Profile.type.js';
 
 interface PersonalProfileTabProps {
   profileData: ProfileData;
@@ -53,7 +53,7 @@ const PersonalProfileTab: React.FC<PersonalProfileTabProps> = ({
         header={
           <Body1>
             <Avatar name={profileData.name} />&nbsp;
-            <b>Personal Information</b>
+            <b>{profileData.name}</b>
           </Body1>
         }
         description={<Caption1>{profileData.role?.label}</Caption1>}

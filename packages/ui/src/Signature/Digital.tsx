@@ -42,6 +42,7 @@ const Digital: React.FC<DigitalProps> = ({ onSignatureSubmit }) => {
         checked={isChecked}
         onChange={(_: ChangeEvent<HTMLInputElement>, data: CheckboxOnChangeData) => setIsChecked(data.checked)}
         label="I have read and agree to the terms and conditions"
+        disabled={!digitalSignature}
       />
       {digitalSignature && signatureDate ? <div className="signature-capture-container">
         <span>Signed by: {digitalSignature}</span>

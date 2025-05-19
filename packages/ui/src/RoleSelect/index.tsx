@@ -1,22 +1,7 @@
 import React, { useState } from 'react';
-import {
-  Button,
-  Text,
-} from '@fluentui/react-components';
+import { Button, Text } from '@fluentui/react-components';
+import type { RoleSelectProps, Role } from './RoleSelect.type.js';
 import './index.css';
-
-export interface Role {
-  id: string;
-  label: string;
-  description?: string;
-}
-
-export interface RoleSelectProps {
-  roles: Role[];
-  onSubmit(roleId: string): void;
-  selectedRole?: string;
-  submitLabel?: string;
-}
 
 const defaultRoles: Role[] = [
   {
@@ -32,26 +17,29 @@ const defaultRoles: Role[] = [
 ];
 
 const RoleSelect: React.FC<RoleSelectProps> = ({
+  initialRoleIdValue,
   roles = defaultRoles,
   onSubmit,
-  selectedRole,
+  onChange,
   submitLabel = 'Continue',
+  showTitle = false,
 }) => {
-  const [selected, setSelected] = useState<string | undefined>(selectedRole);
+  const [selected, setSelected] = useState<string | undefined>(initialRoleIdValue ?? roles[0]?.id);
 
   const handleRoleSelect = (roleId: string): void => {
     setSelected(roleId);
+    onChange?.(roleId);
   };
 
   const handleSubmit = (): void => {
-    if (selected) onSubmit(selected);
+    if (selected) onSubmit?.(selected);
   };
 
   return (
     <div className="role-select-container">
-      <Text size={500} weight="semibold">
+      {showTitle && <Text size={500} weight="semibold">
         Select Role
-      </Text>
+      </Text>}
       <div className="role-select-container">
         {roles.map((role) => (
           <Button
@@ -73,14 +61,14 @@ const RoleSelect: React.FC<RoleSelectProps> = ({
           </Button>
         ))}
       </div>
-      <Button
+      {onSubmit && <Button
         appearance="primary"
         onClick={handleSubmit}
         disabled={!selected}
         className="submit-button"
       >
         {submitLabel}
-      </Button>
+      </Button>}
     </div>
   );
 };

@@ -3,7 +3,7 @@ import {
   Text,
   Badge,
 } from '@fluentui/react-components';
-import type { ProfileData } from './index.js';
+import type { ProfileData } from './Profile.type.js';
 
 interface ConsentsTabProps {
   consents: ProfileData['consents'];
@@ -25,13 +25,15 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({ consents }) => {
           <Text size={400} weight="semibold">
             Policy: {consent.policy?.label}
           </Text>
-          <Badge color={consent.status.id === 'granted' ? 'success' : 'danger'}>
+          <Badge
+            className="profile-consent-badge"
+            color={consent.status.id === 'granted' ? 'success' : 'danger'}>
             {consent.status?.label}
           </Badge>
-          <ul>
+          <ul className="profile-consent-scopes-list">
             {consent.scopes.map(scope => (
               <li key={scope.id}>
-                <Text>{scope.label}</Text>
+                {scope.label}
               </li>
             ))}
           </ul>
