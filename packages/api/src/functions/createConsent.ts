@@ -1,44 +1,51 @@
 import { app } from "@azure/functions";
-import type { GrantConsentInput } from "@open-source-consent/types";
-import { ConsentService } from "@open-source-consent/core";
-import { getInitializedDataAdapter } from "../shared/dataAdapter.js";
+import type {
+  HttpRequest,
+  HttpResponseInit,
+  InvocationContext,
+} from "@azure/functions";
+import type { ConsentService } from "@open-source-consent/core";
+import type { CreateConsentInput } from "@open-source-consent/types";
+import { createHttpHandler } from "../shared/httpHandler.js";
+import {
+  handleError,
+  type ErrorHandlingOptions,
+} from "../shared/errorHandler.js";
+import { createConsentService } from "../shared/factories.js";
+
+async function executeCreateConsentLogic(
+  request: HttpRequest,
+  context: InvocationContext,
+  consentService: ConsentService,
+  endpointDefaultMessage?: string
+): Promise<HttpResponseInit> {
+  try {
+    const body = (await request.json()) as CreateConsentInput;
+
+    const result = await consentService.grantConsent(body);
+    return { status: 201, jsonBody: result };
+  } catch (error) {
+    const errorOptions: ErrorHandlingOptions = {
+      defaultStatus: 400,
+      defaultMessage: endpointDefaultMessage,
+      customErrorMap: [
+        {
+          check: (err) => err.message.includes("modified"),
+          status: 409,
+          message: "",
+          useActualErrorMessage: true,
+        },
+      ],
+    };
+    return handleError(context, error, "Error creating consent:", errorOptions);
+  }
+}
 
 app.http("createConsent", {
   methods: ["POST"],
   authLevel: "anonymous",
   route: "consent",
-  handler: async (request, context) => {
-    let dataAdapter;
-    let consentService;
-    try {
-      dataAdapter = await getInitializedDataAdapter();
-      consentService = new ConsentService(dataAdapter);
-    } catch (initError) {
-      context.error("Failed to get initialized CosmosDB adapter:", initError);
-      return {
-        status: 500,
-        jsonBody: { error: "Database connection failed." },
-      };
-    }
-
-    context.log(`Http function processed request for url "${request.url}"`);
-
-    try {
-      const body = (await request.json()) as GrantConsentInput;
-      const result = await consentService.grantConsent(body);
-      return { jsonBody: result };
-    } catch (error) {
-      context.error("Error creating consent:", error);
-      return {
-        status:
-          error instanceof Error && error.message.includes("modified")
-            ? 409
-            : 400,
-        jsonBody: {
-          error:
-            error instanceof Error ? error.message : "Unknown error occurred",
-        },
-      };
-    }
-  },
+  handler: createHttpHandler(createConsentService, executeCreateConsentLogic, {
+    defaultMessage: "An error occurred while creating the consent.",
+  }),
 });

@@ -62,7 +62,8 @@ A monorepo structure (`pnpm workspaces`).
 │   │
 │   ├── types / # Relevant types and interfaces
 │   │   ├── src/
-│   │   │   └── index.ts        # Defines IConsentDataAdapter
+│   │   │   ├── types/          # Defines various type interfaces and records
+│   │   │   └── index.ts        # Exports types from the types/ directory
 │   │   └── package.json
 │   │
 │   └── data-adapter-cosmosdb/  # Cosmos DB adapter implementation

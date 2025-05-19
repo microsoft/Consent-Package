@@ -1,4 +1,4 @@
-export interface GrantConsentInput {
+export interface CreateConsentInput {
   subjectId: string;
   policyId: string;
   consenter: {
@@ -11,14 +11,8 @@ export interface GrantConsentInput {
   };
   grantedScopes: string[];
   metadata: {
-    consentMethod: "digital_form" | "paper_scan" | "api_call";
+    consentMethod: "digital_form";
     ipAddress?: string;
     userAgent?: string;
   };
-}
-
-export interface RevokeConsentInput {
-  consentId: string;
-  scopesToRevoke?: string[];
-  currentVersion: number;
 }

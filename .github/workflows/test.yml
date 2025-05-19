@@ -6,6 +6,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      cosmosdb:
+        image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
+        ports:
+          - 8081:8081
+          - 10250-10255:10250-10255
+        env:
+          AZURE_COSMOS_EMULATOR_PARTITION_COUNT: 10
+          AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "false"
+        options: >-
+          --health-cmd "curl -k https://localhost:8081/_explorer/emulator.pem > /dev/null"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -14,4 +28,8 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Run tests
+        env:
+          COSMOSDB_ENDPOINT: "https://localhost:8081/"
+          COSMOSDB_KEY: "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
+          NODE_TLS_REJECT_UNAUTHORIZED: 0 # Required for the emulator's self-signed certificate
         run: pnpm test

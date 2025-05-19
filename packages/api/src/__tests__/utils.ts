@@ -51,37 +51,120 @@ export const setupMockConsentService = (mockImplementation?: any) => {
       }
       return Promise.resolve({ id, status: "granted" });
     }),
-    findActiveConsentsBySubject: vi.fn().mockImplementation((subjectId) => {
-      if (subjectId === "test-subject-id") {
-        return Promise.resolve([
-          {
-            id: "active-consent-1",
-            status: "granted",
-            subjectId: "test-subject-id",
-          },
-          {
-            id: "active-consent-2",
-            status: "granted",
-            subjectId: "test-subject-id",
-          },
-        ]);
-      }
-      if (subjectId === "empty-subject") {
+    getLatestConsentVersionsForSubject: vi
+      .fn()
+      .mockImplementation((subjectId) => {
+        if (subjectId === "test-subject-id") {
+          return Promise.resolve([
+            {
+              id: "active-consent-1",
+              status: "granted",
+              subjectId: "test-subject-id",
+            },
+            {
+              id: "active-consent-2",
+              status: "granted",
+              subjectId: "test-subject-id",
+            },
+          ]);
+        }
+        if (subjectId === "empty-subject") {
+          return Promise.resolve([]);
+        }
+        if (subjectId === "error-subject") {
+          return Promise.reject(
+            new Error("Failed to retrieve active consents")
+          );
+        }
         return Promise.resolve([]);
-      }
-      if (subjectId === "error-subject") {
-        return Promise.reject(new Error("Failed to retrieve active consents"));
-      }
-      return Promise.resolve([]);
-    }),
+      }),
     ...mockImplementation,
   };
 
-  const ConsentService = vi
-    .fn()
-    .mockImplementation(() => defaultImplementation);
+  const getInstance = vi.fn().mockReturnValue(defaultImplementation);
 
-  return { ConsentService, defaultImplementation };
+  const MockConsentService = {
+    getInstance,
+  };
+
+  return { ConsentService: MockConsentService, defaultImplementation };
+};
+
+export const setupMockPolicyService = (mockImplementation?: any) => {
+  const defaultImplementation = {
+    createPolicy: vi.fn().mockResolvedValue({
+      id: "mock-policy-id",
+      status: "draft",
+      version: 1,
+      policyGroupId: "mock-group",
+    }),
+    getPolicyById: vi.fn().mockImplementation((id: string) => {
+      if (id === "found-policy-id") {
+        return Promise.resolve({
+          id,
+          status: "active",
+          version: 1,
+          policyGroupId: "mock-group",
+        });
+      }
+      if (id === "not-found-policy-id") {
+        return Promise.resolve(null);
+      }
+      if (id === "error-policy-id") {
+        return Promise.reject(new Error("Failed to retrieve policy"));
+      }
+      return Promise.resolve({
+        id,
+        status: "draft",
+        version: 1,
+        policyGroupId: "mock-group",
+      });
+    }),
+    getAllPolicyVersionsByGroupId: vi
+      .fn()
+      .mockImplementation((policyGroupId: string) => {
+        if (policyGroupId === "error-group-id") {
+          return Promise.reject(new Error("Failed to retrieve versions"));
+        }
+        return Promise.resolve([
+          { id: "version-1", policyGroupId, version: 1, status: "archived" },
+          { id: "version-2", policyGroupId, version: 2, status: "active" },
+        ]);
+      }),
+    getLatestActivePolicyByGroupId: vi
+      .fn()
+      .mockImplementation((policyGroupId: string) => {
+        if (policyGroupId === "no-active-policy-group") {
+          return Promise.resolve(null);
+        }
+        if (policyGroupId === "error-finding-latest-group") {
+          return Promise.reject(
+            new Error("Failed to find latest active policy")
+          );
+        }
+        return Promise.resolve({
+          id: "latest-active-id",
+          policyGroupId,
+          status: "active",
+          version: 2,
+        });
+      }),
+    listPolicies: vi.fn().mockResolvedValue([
+      {
+        id: "policy-A",
+        status: "active",
+        version: 1,
+        policyGroupId: "group-A",
+      },
+      { id: "policy-B", status: "draft", version: 2, policyGroupId: "group-B" },
+    ]),
+    ...mockImplementation,
+  };
+
+  const getInstance = vi.fn().mockReturnValue(defaultImplementation);
+  const MockPolicyService = { getInstance };
+
+  return { PolicyService: MockPolicyService, defaultImplementation };
 };
 
 const registeredHandlers: Record<string, Function> = {};
@@ -103,30 +186,42 @@ export const setupMockAzureFunctions = () => {
 
 export const initializeTestEnvironment = async (
   functionModulePaths: string[]
-) => {
-  // 1. Setup individual mocks
+): Promise<{
+  registeredHandlers: Record<string, Function>;
+  dataAdapter: any;
+  consentServiceMocks: any;
+  policyServiceMocks: any;
+}> => {
   const { registeredHandlers, httpMock } = setupMockAzureFunctions();
   const { getInitializedDataAdapter, dataAdapter } = setupMockDataAdapter();
-  const { ConsentService, defaultImplementation } = setupMockConsentService();
+  const {
+    ConsentService: MockConsentService,
+    defaultImplementation: consentServiceMocks,
+  } = setupMockConsentService();
+  const {
+    PolicyService: MockPolicyService,
+    defaultImplementation: policyServiceMocks,
+  } = setupMockPolicyService();
 
-  // 2. Apply mocks to modules
   vi.mocked(await import("@azure/functions")).app.http = httpMock;
   vi.mocked(
     await import("../shared/dataAdapter.js")
   ).getInitializedDataAdapter = getInitializedDataAdapter;
-  vi.mocked(await import("@open-source-consent/core")).ConsentService =
-    ConsentService;
 
-  // 3. Import function modules to register handlers
+  vi.doMock("@open-source-consent/core", () => ({
+    ConsentService: MockConsentService,
+    PolicyService: MockPolicyService,
+  }));
+
   for (const path of functionModulePaths) {
     await import(path);
   }
 
-  // 4. Return registered handlers and underlying mocks for potential test overrides
   return {
     registeredHandlers,
     dataAdapter,
-    consentServiceMocks: defaultImplementation,
+    consentServiceMocks: consentServiceMocks,
+    policyServiceMocks: policyServiceMocks,
   };
 };
 

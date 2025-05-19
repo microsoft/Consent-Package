@@ -5,17 +5,22 @@ import type {
 
 export class MockDataAdapter implements IConsentDataAdapter {
   private consents: Map<string, ConsentRecord> = new Map();
-  private currentId = 0;
+  private currentIdCounter = 0;
+
+  private generateId(): string {
+    this.currentIdCounter++;
+    return `mock-consent-${this.currentIdCounter}`;
+  }
 
   async createConsent(
-    data: Omit<ConsentRecord, "id" | "createdAt" | "updatedAt" | "version">
+    data: Omit<ConsentRecord, "id" | "createdAt" | "updatedAt">
   ): Promise<ConsentRecord> {
     const now = new Date();
-    const id = (++this.currentId).toString();
+    const id = this.generateId();
+
     const consent: ConsentRecord = {
       ...data,
       id,
-      version: 1,
       createdAt: now,
       updatedAt: now,
     };
@@ -28,24 +33,47 @@ export class MockDataAdapter implements IConsentDataAdapter {
     updates: Partial<Omit<ConsentRecord, "id" | "createdAt">>,
     currentVersion: number
   ): Promise<ConsentRecord> {
-    const existing = this.consents.get(id);
-    if (!existing) {
-      throw new Error(`Consent with id ${id} not found`);
+    const existingConsent = this.consents.get(id);
+    if (!existingConsent) {
+      throw new Error(`Consent record with id ${id} not found`);
     }
-    if (existing.version !== currentVersion) {
+    if (existingConsent.version !== currentVersion) {
       throw new Error(
-        `Version mismatch. Expected ${currentVersion}, got ${existing.version}`
+        `Optimistic concurrency check failed for consent record ${id}. Expected version ${currentVersion}, found ${existingConsent.version}.`
       );
     }
-
-    const updated: ConsentRecord = {
-      ...existing,
+    const updatedConsent = {
+      ...existingConsent,
       ...updates,
       version: currentVersion + 1,
       updatedAt: new Date(),
     };
-    this.consents.set(id, updated);
-    return updated;
+    this.consents.set(id, updatedConsent);
+    return updatedConsent;
+  }
+
+  async updateConsentStatus(
+    id: string,
+    status: ConsentRecord["status"],
+    expectedVersion: number
+  ): Promise<ConsentRecord> {
+    const existingConsent = this.consents.get(id);
+    if (!existingConsent) {
+      throw new Error(`Consent record with id ${id} not found`);
+    }
+    if (existingConsent.version !== expectedVersion) {
+      throw new Error(
+        `Optimistic concurrency check failed for consent record ${id}. Expected version ${expectedVersion}, found ${existingConsent.version}.`
+      );
+    }
+    const updatedConsent: ConsentRecord = {
+      ...existingConsent,
+      status: status,
+      updatedAt: new Date(),
+      // Version remains the same for a status update on the same record
+    };
+    this.consents.set(id, updatedConsent);
+    return updatedConsent;
   }
 
   async findConsentById(id: string): Promise<ConsentRecord | null> {
@@ -56,5 +84,33 @@ export class MockDataAdapter implements IConsentDataAdapter {
     return Array.from(this.consents.values()).filter(
       (consent) => consent.subjectId === subjectId
     );
+  }
+
+  async findLatestConsentBySubjectAndPolicy(
+    subjectId: string,
+    policyId: string
+  ): Promise<ConsentRecord | null> {
+    const relevantConsents = Array.from(this.consents.values()).filter(
+      (c) => c.subjectId === subjectId && c.policyId === policyId
+    );
+    if (relevantConsents.length === 0) return null;
+    relevantConsents.sort((a, b) => b.version - a.version); // Sort descending by version
+    return relevantConsents[0];
+  }
+
+  async findAllConsentVersionsBySubjectAndPolicy(
+    subjectId: string,
+    policyId: string
+  ): Promise<ConsentRecord[]> {
+    const relevantConsents = Array.from(this.consents.values()).filter(
+      (c) => c.subjectId === subjectId && c.policyId === policyId
+    );
+    relevantConsents.sort((a, b) => a.version - b.version); // Sort ascending by version
+    return relevantConsents;
+  }
+
+  async getAllConsents(): Promise<ConsentRecord[]> {
+    // Returns all consents, similar to a simple table scan for mocks
+    return Array.from(this.consents.values());
   }
 }

@@ -1,34 +1,57 @@
 import { CosmosDBDataAdapter } from "@open-source-consent/data-adapter-cosmosdb";
+import type { IDataAdapter } from "@open-source-consent/types";
 
-const dataAdapter = new CosmosDBDataAdapter({
-  endpoint: process.env.CosmosDB_Endpoint!,
-  key: process.env.CosmosDB_Key!,
-  databaseName: process.env.CosmosDB_DatabaseName!,
-  containerName: "consents",
-});
-
+let dataAdapter: IDataAdapter | null = null;
 let initializePromise: Promise<void> | null = null;
 
+export function configureDataAdapter(adapter: IDataAdapter): void {
+  if (dataAdapter) {
+    throw new Error("Data adapter already configured");
+  }
+  dataAdapter = adapter;
+}
+
+// Default configuration using CosmosDB if no custom adapter is provided
+export function configureDefaultDataAdapter(): void {
+  if (dataAdapter) {
+    return;
+  }
+
+  const cosmosAdapter = new CosmosDBDataAdapter({
+    endpoint: process.env.CosmosDB_Endpoint!,
+    key: process.env.CosmosDB_Key!,
+    databaseName: process.env.CosmosDB_DatabaseName!,
+    containerName: "consents",
+  });
+
+  configureDataAdapter(cosmosAdapter);
+}
+
 /**
- * Gets the initialized CosmosDBDataAdapter instance.
+ * Gets the initialized data adapter instance.
  * Ensures that initialization is only attempted once.
  */
-export async function getInitializedDataAdapter(): Promise<CosmosDBDataAdapter> {
-  if (!initializePromise) {
-    // eslint-disable-next-line no-console
-    console.log("Initializing shared CosmosDB adapter...");
+export async function getInitializedDataAdapter(): Promise<IDataAdapter> {
+  if (!dataAdapter) {
+    configureDefaultDataAdapter();
+  }
+
+  if (!initializePromise && typeof dataAdapter?.initialize === "function") {
+    // Only initialize if the adapter has an initialize method,
+    // Custom adapters may handle initialization in their constructor
     initializePromise = dataAdapter
       .initialize()
-      .then(() => {
-        // eslint-disable-next-line no-console
-        console.log("Shared CosmosDB adapter initialized successfully.");
-      })
+      .then(() => {})
       .catch((err: Error) => {
-        console.error("Failed to initialize shared CosmosDB adapter:", err);
+        console.error("Failed to initialize data adapter:", err);
         initializePromise = null;
         throw err;
       });
   }
-  await initializePromise;
-  return dataAdapter;
+
+  if (initializePromise) {
+    await initializePromise;
+  }
+
+  return dataAdapter!;
 }

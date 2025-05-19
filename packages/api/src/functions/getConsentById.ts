@@ -1,54 +1,47 @@
 import { app } from "@azure/functions";
-import { ConsentService } from "@open-source-consent/core";
-import { getInitializedDataAdapter } from "../shared/dataAdapter.js";
+import type {
+  HttpRequest,
+  HttpResponseInit,
+  InvocationContext,
+} from "@azure/functions";
+import type { ConsentService } from "@open-source-consent/core";
+import { createHttpHandler } from "../shared/httpHandler.js";
+import { handleError } from "../shared/errorHandler.js";
+import { createConsentService } from "../shared/factories.js";
+
+async function executeGetConsentByIdLogic(
+  request: HttpRequest,
+  context: InvocationContext,
+  consentService: ConsentService,
+  endpointDefaultMessage?: string
+): Promise<HttpResponseInit> {
+  const id = request.params.id;
+  if (!id) {
+    return handleError(context, new Error("Consent ID is required"), "", {
+      defaultStatus: 400,
+    });
+  }
+  try {
+    const result = await consentService.getConsentDetails(id);
+    if (!result) {
+      return handleError(context, new Error("Consent record not found"), "", {
+        defaultStatus: 404,
+      });
+    }
+    return { status: 200, jsonBody: result };
+  } catch (error) {
+    return handleError(context, error, "Error retrieving consent:", {
+      defaultStatus: 500,
+      defaultMessage: endpointDefaultMessage,
+    });
+  }
+}
 
 app.http("getConsentById", {
   methods: ["GET"],
   authLevel: "anonymous",
   route: "consent/{id}",
-  handler: async (request, context) => {
-    let dataAdapter;
-    let consentService;
-    try {
-      dataAdapter = await getInitializedDataAdapter();
-      consentService = new ConsentService(dataAdapter);
-    } catch (initError) {
-      context.error("Failed to get initialized CosmosDB adapter:", initError);
-      return {
-        status: 500,
-        jsonBody: { error: "Database connection failed." },
-      };
-    }
-
-    context.log(`Http function processed request for url "${request.url}"`);
-
-    try {
-      const id = request.params.id;
-      if (!id) {
-        return {
-          status: 400,
-          jsonBody: { error: "Consent ID is required" },
-        };
-      }
-
-      const result = await consentService.getConsentDetails(id);
-      if (!result) {
-        return {
-          status: 404,
-          jsonBody: { error: "Consent record not found" },
-        };
-      }
-
-      return { jsonBody: result };
-    } catch (error) {
-      context.error("Error retrieving consent:", error);
-      return {
-        status: 500,
-        jsonBody: {
-          error:
-            error instanceof Error ? error.message : "Unknown error occurred",
-        },
-      };
-    }
-  },
+  handler: createHttpHandler(createConsentService, executeGetConsentByIdLogic, {
+    defaultMessage: "An error occurred while retrieving the consent record.",
+  }),
 });

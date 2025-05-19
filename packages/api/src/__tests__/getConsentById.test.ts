@@ -11,6 +11,7 @@ vi.mock("@open-source-consent/core");
 
 describe("getConsentById function", () => {
   let registeredHandlers: Record<string, Function>;
+  let consentServiceMocks: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -20,6 +21,7 @@ describe("getConsentById function", () => {
       "../functions/getConsentById.js",
     ]);
     registeredHandlers = env.registeredHandlers;
+    consentServiceMocks = env.consentServiceMocks;
   });
 
   it("should return consent when valid ID is provided", async () => {
@@ -40,7 +42,7 @@ describe("getConsentById function", () => {
   it("should handle database initialization failure", async () => {
     const dataAdapterMock = await import("../shared/dataAdapter.js");
     (dataAdapterMock.getInitializedDataAdapter as any).mockRejectedValueOnce(
-      new Error("DB connection failed")
+      new Error("Database connection failed.")
     );
 
     const request: MockRequest = {
@@ -97,10 +99,13 @@ describe("getConsentById function", () => {
   });
 
   it("should handle non-Error object in error", async () => {
-    const consentServiceMock = await import("@open-source-consent/core");
-    (consentServiceMock.ConsentService as any).mockImplementationOnce(() => ({
+    const consentServiceMockModule = await import("@open-source-consent/core");
+    (
+      consentServiceMockModule.ConsentService.getInstance as vi.Mock
+    ).mockReturnValueOnce({
+      ...consentServiceMocks,
       getConsentDetails: vi.fn().mockRejectedValue("String error"),
-    }));
+    });
 
     const request: MockRequest = {
       url: "http://localhost/api/consent/test-consent-id",
@@ -111,7 +116,9 @@ describe("getConsentById function", () => {
     const result = await registeredHandlers.getConsentById(request, context);
 
     expect(result.status).toBe(500);
-    expect(result.jsonBody).toEqual({ error: "Unknown error occurred" });
+    expect(result.jsonBody).toEqual({
+      error: "An error occurred while retrieving the consent record.",
+    });
     expect(context.error).toHaveBeenCalled();
   });
 });

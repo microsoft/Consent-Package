@@ -44,7 +44,7 @@ describe("createConsent function", () => {
   it("should handle database initialization failure", async () => {
     const dataAdapterModule = await import("../shared/dataAdapter.js");
     (dataAdapterModule.getInitializedDataAdapter as any).mockRejectedValueOnce(
-      new Error("DB connection failed")
+      new Error("Database connection failed.")
     );
 
     const request: MockRequest = {
@@ -96,10 +96,13 @@ describe("createConsent function", () => {
   });
 
   it("should handle non-Error object in error", async () => {
-    const consentServiceMock = await import("@open-source-consent/core");
-    (consentServiceMock.ConsentService as any).mockImplementationOnce(() => ({
+    const consentServiceMockModule = await import("@open-source-consent/core");
+    (
+      consentServiceMockModule.ConsentService.getInstance as any
+    ).mockReturnValueOnce({
+      ...consentServiceMocks,
       grantConsent: vi.fn().mockRejectedValue("String error"),
-    }));
+    });
 
     const request: MockRequest = {
       json: vi.fn().mockResolvedValue({
@@ -112,7 +115,9 @@ describe("createConsent function", () => {
     const result = await registeredHandlers.createConsent(request, context);
 
     expect(result.status).toBe(400);
-    expect(result.jsonBody).toEqual({ error: "Unknown error occurred" });
+    expect(result.jsonBody).toEqual({
+      error: "An error occurred while creating the consent.",
+    });
     expect(context.error).toHaveBeenCalled();
   });
 });

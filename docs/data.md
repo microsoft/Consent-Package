@@ -29,7 +29,7 @@ interface ConsentRecord {
   readonly revokedScopes?: Readonly<Record<string, { revokedAt: Date }>>; // e.g., { "activity_data": { revokedAt: ... } }
   // Metadata is useful for non-repudiation, can be optional
   readonly metadata: {
-    readonly consentMethod: 'digital_form' | 'paper_form' | '???';
+    readonly consentMethod: 'digital_form' | undefined;
     readonly ipAddress?: string; // IP address associated with digital consent capture
     readonly userAgent?: string; // User agent string associated with digital consent capture
   };
@@ -52,8 +52,7 @@ interface Policy {
   readonly contentSections: ReadonlyArray<{ // Collection of distinct content sections
     readonly title: string; // Section title
     readonly description: string; // Section description
-    readonly contentUrl?: string; // Link to the full content for this section
-    readonly contentText?: string; // Inline content text for this section
+    readonly content: string; // Rich text or HTML content for this section. Sanitized by the API.
   }>;
   // Defines the data scopes/categories covered by this policy
   readonly availableScopes: Readonly<Array<{
@@ -85,67 +84,51 @@ Defines the contract (interface) for how consent data is persisted and retrieved
 
 interface IConsentDataAdapter {
   // Creates a new consent record
-  createConsent(data: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt' | 'version'>): Promise<ConsentRecord>;
+  createConsent(data: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt'>): Promise<ConsentRecord>;
 
-  // Updates an existing consent record, using version for optimistic concurrency
-  updateConsent(id: string, updates: Partial<Omit<ConsentRecord, 'id' | 'createdAt'>>, currentVersion: number): Promise<ConsentRecord>;
+  // Updates the status of an existing consent record, using version for optimistic concurrency
+  updateConsentStatus(id: string, status: ConsentRecord['status'], expectedVersion: number): Promise<ConsentRecord>;
 
   // Retrieves a specific consent record by its unique ID
   findConsentById(id: string): Promise<ConsentRecord | null>;
 
-  // Finds all currently active consent records for a given subject ID
-  findActiveConsentsBySubject(subjectId: string): Promise<ConsentRecord[]>;
+  // Finds all consent records for a given subject ID
+  findConsentsBySubject(subjectId: string): Promise<ConsentRecord[]>;
 
-  // Potentially add methods for more specific queries, e.g.:
-  // findConsentByPolicyAndSubject(policyId: string, subjectId: string): Promise<ConsentRecord | null>;
-  // findConsentsWithScope(scopeKey: string, subjectId?: string): Promise<ConsentRecord[]>;
-  // etc.
+  // Finds the latest consent record for a given subject ID and policy ID
+  findLatestConsentBySubjectAndPolicy(subjectId: string, policyId: string): Promise<ConsentRecord | null>;
+
+  // Finds all versions of consent records for a given subject ID and policy ID
+  findAllConsentVersionsBySubjectAndPolicy(subjectId: string, policyId: string): Promise<ConsentRecord[]>;
+
+  // Retrieves all consent records
+  getAllConsents(): Promise<ConsentRecord[]>;
 }
 ```
 
-## `GrantConsentInput`
+## `CreateConsentInput`
 
 Represents the necessary information required by the `ConsentService` to grant consent.
 
 ```typescript
 
-interface GrantConsentInput {
-  readonly subjectId: string;
-  readonly policyId: string; // The specific policy version being consented to
-  readonly consenter: {
-    readonly type: 'self' | 'proxy';
-    readonly userId: string;
-    readonly proxyDetails?: {
-      readonly relationship: string;
-      readonly subjectAgeGroup: 'under13' | '13-17' | '18+';
+interface CreateConsentInput {
+  subjectId: string;
+  policyId: string; // The specific policy version being consented to
+  consenter: {
+    type: 'self' | 'proxy';
+    userId: string;
+    proxyDetails?: {
+      relationship: string;
+      subjectAgeGroup: 'under13' | '13-17' | '18+';
     };
   };
-  readonly grantedScopes: readonly string[]; // Array of scope keys being granted
-  readonly metadata: {
-    readonly consentMethod: 'digital_form' | 'paper_form' | '???';
-    readonly ipAddress?: string;
-    readonly userAgent?: string;
+  grantedScopes: string[]; // Array of scope keys being granted
+  metadata: {
+    consentMethod: 'digital_form'; // Note: 'undefined' is not allowed by current type
+    ipAddress?: string;
+    userAgent?: string;
     // Other relevant metadata for this specific grant action
-  };
-}
-```
-
-## `RevokeConsentInput`
-
-Represents the necessary information required by the `ConsentService` to revoke consent. This could target an entire `ConsentRecord` or specific scopes within it.
-
-```typescript
-
-interface RevokeConsentInput {
-  readonly consentRecordId: string; // The ID of the ConsentRecord to modify
-  readonly reason?: string; // 
-  readonly revokerUserId: string; // ID of the user performing the revocation
-  // Optionally, specify specific scopes to revoke, otherwise the whole record is revoked
-  readonly scopesToRevoke?: readonly string[];
-  readonly metadata: { // Metadata related to the revocation action
-    readonly revocationMethod?: 'digital_form' | 'paper_form' | '???';
-    readonly ipAddress?: string;
-    readonly userAgent?: string;
   };
 }
 ```
@@ -159,5 +142,3 @@ interface RevokeConsentInput {
 - Confidentiality of records
 - Compensation
 - Contact Information
-
-
