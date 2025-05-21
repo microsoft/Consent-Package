@@ -6,6 +6,7 @@
   "scripts": {
     "dev:local": "VITE_USE_MOCK_API=true vite",
     "build:local": "tsc && VITE_USE_MOCK_API=true vite build",
+    "build": "tsc && vite build",
     "preview:local": "VITE_USE_MOCK_API=true vite preview",
     "dev:remote": "VITE_USE_MOCK_API=false vite",
     "build:remote": "tsc && VITE_USE_MOCK_API=false vite build",

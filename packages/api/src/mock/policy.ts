@@ -1,11 +1,24 @@
 import { PolicyService } from "@open-source-consent/core";
-import { IndexedDBDataAdapter } from "@open-source-consent/data-adapter-indexeddb";
-import type { CreatePolicyInput, Policy } from "@open-source-consent/types";
+import { getInitializedDataAdapter } from "../shared/dataAdapter.js";
+import type {
+  CreatePolicyInput,
+  Policy,
+  IPolicyDataAdapter,
+} from "@open-source-consent/types";
 import sanitizeHtml from "sanitize-html";
 import { defaultCorePolicyJson } from "./data/defaultPolicy.js";
 
-const dataAdapter = new IndexedDBDataAdapter();
-const policyService = new PolicyService(dataAdapter);
+let policyServiceInstance: PolicyService | null = null;
+
+async function getPolicyService(): Promise<PolicyService> {
+  if (!policyServiceInstance) {
+    const dataAdapter = await getInitializedDataAdapter();
+    policyServiceInstance = PolicyService.getInstance(
+      dataAdapter as IPolicyDataAdapter
+    );
+  }
+  return policyServiceInstance;
+}
 
 let hasSeedingBeenAttempted = false;
 
@@ -14,6 +27,7 @@ async function ensureDefaultPolicySeeded(): Promise<void> {
   hasSeedingBeenAttempted = true;
 
   try {
+    const policyService = await getPolicyService();
     const existingPolicyForGroup =
       await policyService.getLatestActivePolicyByGroupId(
         defaultCorePolicyJson.policyGroupId
@@ -49,6 +63,7 @@ export async function createPolicy(
   policyData: CreatePolicyInput
 ): Promise<Policy> {
   await ensureDefaultPolicySeeded();
+  const policyService = await getPolicyService();
   if (
     !policyData ||
     !policyData.policyGroupId ||
@@ -73,6 +88,7 @@ export async function createPolicy(
 
 export async function getPolicyById(policyId: string): Promise<Policy | null> {
   await ensureDefaultPolicySeeded();
+  const policyService = await getPolicyService();
   if (!policyId) {
     throw new Error("Policy ID is required.");
   }
@@ -83,6 +99,7 @@ export async function getLatestActivePolicyByGroupId(
   policyGroupId: string
 ): Promise<Policy | null> {
   await ensureDefaultPolicySeeded();
+  const policyService = await getPolicyService();
   if (!policyGroupId) {
     throw new Error("Policy Group ID is required.");
   }
@@ -93,6 +110,7 @@ export async function getAllPolicyVersionsByGroupId(
   policyGroupId: string
 ): Promise<Policy[]> {
   await ensureDefaultPolicySeeded();
+  const policyService = await getPolicyService();
   if (!policyGroupId) {
     throw new Error("Policy Group ID is required.");
   }
@@ -101,5 +119,6 @@ export async function getAllPolicyVersionsByGroupId(
 
 export async function listPolicies(): Promise<Policy[]> {
   await ensureDefaultPolicySeeded();
+  const policyService = await getPolicyService();
   return policyService.listPolicies();
 }
