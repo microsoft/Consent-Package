@@ -20,10 +20,6 @@ async function ensureDefaultPolicySeeded(): Promise<void> {
       );
 
     if (!existingPolicyForGroup) {
-      console.log(
-        `[Mock API] Seeding default policy for group ID: ${defaultCorePolicyJson.policyGroupId} into IndexedDB.`
-      );
-
       const policyToSeed: CreatePolicyInput = {
         title: defaultCorePolicyJson.title,
         policyGroupId: defaultCorePolicyJson.policyGroupId,
@@ -32,7 +28,7 @@ async function ensureDefaultPolicySeeded(): Promise<void> {
         status: defaultCorePolicyJson.status,
         contentSections: defaultCorePolicyJson.contentSections.map((cs) => ({
           title: cs.title,
-          description: cs.description, // This field might not be in CreatePolicyInput, check core types
+          description: cs.description,
           content: cs.content,
         })),
         availableScopes: defaultCorePolicyJson.availableScopes.map((as) => ({

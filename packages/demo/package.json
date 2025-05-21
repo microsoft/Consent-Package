@@ -21,7 +21,6 @@
     "@open-source-consent/ui": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-quill": "^2.0.0",
     "react-router-dom": "^6.30.0"
   },
   "devDependencies": {
