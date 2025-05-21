@@ -39,25 +39,18 @@ A monorepo structure (`pnpm workspaces`).
 │   │   ├── local.settings.json.sample 
 │   │   └── package.json
 │   │
-│   ├── ui/                     # Frontend: React/Tailwind UI library
+│   ├── ui/                     # Frontend: React/Fluent UI library
 │   │   ├── src/
 │   │   │   ├── index.ts
-│   │   │   ├── components/
-│   │   │   ├── hooks/          # e.g., useConsentApi, usePolicy
-│   │   │   ├── contexts/       # Config provider
-│   │   │   ├── styles/         # Base styles
-│   │   │   └── app/            # Example app
-│   │   └── package.json
-│   │
-│   ├── components/             # Frontend: Component Library of general expected interactions
-│   │   ├── src/
-│   │   │   ├── index.ts
-│   │   │   └── components/
-│   │   │       ├── AgeSelect/
-│   │   │       ├── Details/    # TODO?
-│   │   │       ├── Profile/    # Display Personal Information, Managed Subjects and status of Consents
-│   │   │       ├── RoleSelect/
-│   │   │       └── Signature/
+│   │   │   ├── AgeSelect/
+│   │   │   ├── ConsentFlow/    # Supporting steps components for stepping through the consent flow
+│   │   │   ├── hooks/          # e.g., useConsent*, usePolicy*
+│   │   │   ├── Policy/
+│   │   │   ├── Profile/        # Display Personal Information, Managed Subjects and status of Consents
+│   │   │   ├── RoleSelect/     
+│   │   │   ├── Signature/
+│   │   │   ├── index.css       # Base styles
+│   │   │   └── index.ts
 │   │   └── package.json
 │   │
 │   ├── types / # Relevant types and interfaces

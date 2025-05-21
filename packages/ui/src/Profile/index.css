@@ -87,3 +87,15 @@
   word-break: break-word;
   hyphens: auto;
 }
+
+.profile-consent-scope-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.profile-consent-scope-item .fui-Text {
+  flex: 1;
+  margin-right: 8px;
+}

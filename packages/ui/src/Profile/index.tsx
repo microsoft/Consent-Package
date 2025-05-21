@@ -94,7 +94,17 @@ export const Profile: React.FC<ProfileProps> = ({
           }}
           onSave={(updates) => handleSubjectUpdate(selectedSubject.id, updates)}
         />
-        <ConsentsTab consents={selectedSubject.consents} />
+        <ConsentsTab
+          consents={selectedSubject.consents}
+          onGrantScope={(consentId: string, scopeId: string, updatedConsents: ProfileData['consents']) => {
+            console.log('grant scope', consentId, scopeId, updatedConsents);
+            handleSubjectUpdate(selectedSubject.id, { consents: updatedConsents });
+          }}
+          onRevokeScope={(consentId: string, scopeId: string, updatedConsents: ProfileData['consents']) => {
+            console.log('revoke scope', consentId, scopeId, updatedConsents);
+            handleSubjectUpdate(selectedSubject.id, { consents: updatedConsents });
+          }}
+        />
       </div>
     );
   }
@@ -128,7 +138,17 @@ export const Profile: React.FC<ProfileProps> = ({
         )}
 
         {selectedTab === PROFILE_TABS.CONSENTS && !isManagingSubjects && (
-          <ConsentsTab consents={editedProfileData.consents} />
+          <ConsentsTab
+            consents={editedProfileData.consents}
+            onGrantScope={(consentId: string, scopeId: string, updatedConsents: ProfileData['consents']) => {
+              console.log('grant scope', consentId, scopeId, updatedConsents);
+              handleSave({ consents: updatedConsents });
+            }}
+            onRevokeScope={(consentId: string, scopeId: string, updatedConsents: ProfileData['consents']) => {
+              console.log('revoke scope', consentId, scopeId, updatedConsents);
+              handleSave({ consents: updatedConsents });
+            }}
+          />
         )}
       </div>
     </div>

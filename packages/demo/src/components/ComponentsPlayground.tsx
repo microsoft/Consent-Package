@@ -24,10 +24,10 @@ const consents = [
       label: 'Scopes Allowed'
     },
     scopes: [
-      { id: 'basic_info', label: 'Basic Info' },
-      { id: 'medical_history', label: 'Medical History' },
-      { id: 'genetic_data', label: 'Genetic Data' },
-      { id: 'nutrition_data', label: 'Nutrition Data' }
+      { id: 'basic_info', label: 'Basic Info', required: true },
+      { id: 'medical_history', label: 'Medical History', required: false },
+      { id: 'genetic_data', label: 'Genetic Data', required: false },
+      { id: 'nutrition_data', label: 'Nutrition Data', required: false }
     ]
   },
   {
@@ -41,8 +41,8 @@ const consents = [
       label: 'Scopes Revoked'
     },
     scopes: [
-      { id: 'location_data', label: 'Location Data' },
-      { id: 'camera_usage', label: 'Camera Usage' }
+      { id: 'location_data', label: 'Location Data', required: false },
+      { id: 'camera_usage', label: 'Camera Usage', required: false }
     ]
   },
   {
@@ -56,9 +56,9 @@ const consents = [
       label: 'Scopes Allowed'
     },
     scopes: [
-      { id: 'usage_analytics', label: 'Usage Analytics Info' },
-      { id: 'performance_metrics', label: 'Performance Metrics' },
-      { id: 'activity_log', label: 'Activity Log' }
+      { id: 'usage_analytics', label: 'Usage Analytics Info', required: true },
+      { id: 'performance_metrics', label: 'Performance Metrics', required: true },
+      { id: 'activity_log', label: 'Activity Log', required: false }
     ]
   }
 ];
@@ -79,7 +79,8 @@ const proxySampleProfileData: ProfileData = {
       ageGroup: {
         id: 'under13',
         label: 'Child'
-      }
+      },
+      consents
     },
     {
       id: 'child2',

@@ -4,11 +4,15 @@ interface BasicInfo {
   description?: string;
 }
 
+interface Scope extends BasicInfo { 
+  required?: boolean
+}
+
 interface Consent {
   id: string;
   policy: BasicInfo;
   status: BasicInfo;
-  scopes: BasicInfo[];
+  scopes: Scope[];
 }
 
 interface ManagedSubject {

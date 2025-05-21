@@ -49,6 +49,11 @@ const useStyles = makeStyles({
     },
   },
   navLink: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
     color: "var(--color-text)",
     textDecoration: "none",
     fontWeight: 600,

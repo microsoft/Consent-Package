@@ -80,6 +80,7 @@ export function ProfilePage(): JSX.Element {
           return {
             id: scopeId,
             label: scope ? `${scope.name} (${scope.description})` : scopeId,
+            required: scope?.required ?? false,
           };
         }),
       };
@@ -98,6 +99,7 @@ export function ProfilePage(): JSX.Element {
           .map((scope: PolicyScope) => ({
             id: scope.key,
             label: `${scope.name} (${scope.description})`,
+            required: scope?.required ?? false,
           })),
       };
     }

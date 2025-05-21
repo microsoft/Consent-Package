@@ -31,6 +31,7 @@ const useStyles = makeStyles({
     marginBottom: "48px",
     position: "relative",
     padding: "0 16px",
+    paddingTop: "4px",
     overflowX: "auto",
     "&::before": {
       content: '""',
