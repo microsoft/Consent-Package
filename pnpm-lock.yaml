@@ -214,6 +214,9 @@ importers:
         specifier: ^6.30.0
         version: 6.30.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
+      '@sctg/vite-plugin-github-pages-spa':
+        specifier: ^0.1.1
+        version: 0.1.1(vite@5.4.18(@types/node@22.14.1))
       '@types/react':
         specifier: ^18.2.0
         version: 18.3.20
@@ -1332,6 +1335,11 @@ packages:
     resolution: {integrity: sha512-lpPE1cLfP5oPzVjKMx10pgBmKELQnFJXHgvtHCtuJWOv8MxqdEIMNtgHgBFf7Ea2/7EuVwa9fodWUfXAlXZLZQ==}
     cpu: [x64]
     os: [win32]
+
+  '@sctg/vite-plugin-github-pages-spa@0.1.1':
+    resolution: {integrity: sha512-l1jBVbz9otNTKM8QEQLnzMzo70odFeiVcqMMfZP9HFrOFSnPRctiUu2SEhEETRJyrh+ZogK+9Spc5/Y2pRbPrQ==}
+    peerDependencies:
+      vite: '>=6.3.0'
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -4868,6 +4876,10 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.40.0':
     optional: true
+
+  '@sctg/vite-plugin-github-pages-spa@0.1.1(vite@5.4.18(@types/node@22.14.1))':
+    dependencies:
+      vite: 5.4.18(@types/node@22.14.1)
 
   '@sinclair/typebox@0.27.8': {}
 

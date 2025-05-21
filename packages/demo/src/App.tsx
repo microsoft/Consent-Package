@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Home } from "./components/Home.js";
 import { GetStarted } from "./components/GetStarted.js";
@@ -10,8 +9,6 @@ import PolicyViewPage from "./components/PolicyViewPage.js";
 import { Header } from "./components/Header.js";
 import { Footer } from "./components/Footer.js";
 import { makeStyles } from "@fluentui/react-components";
-import { setDataAdapter } from "@open-source-consent/api/shared";
-import { IndexedDBDataAdapter } from "@open-source-consent/data-adapter-indexeddb";
 
 const useStyles = makeStyles({
   root: {
@@ -27,13 +24,8 @@ const useStyles = makeStyles({
 export default function App(): JSX.Element {
   const styles = useStyles();
 
-  useEffect(() => {
-    const dataAdapter = new IndexedDBDataAdapter();
-    setDataAdapter(dataAdapter);
-  }, []);
-
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <div className={styles.root}>
         <Header />
         <main className={styles.main}>

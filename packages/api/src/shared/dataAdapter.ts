@@ -1,78 +1,57 @@
-import { CosmosDBDataAdapter } from "@open-source-consent/data-adapter-cosmosdb";
 import type { IDataAdapter } from "@open-source-consent/types";
 
 let globalDataAdapter: IDataAdapter | null = null;
-let dataAdapter: IDataAdapter | null = null;
 let initializePromise: Promise<void> | null = null;
 
-export function configureDataAdapter(adapter: IDataAdapter): void {
-  if (dataAdapter) {
-    throw new Error("Data adapter already configured");
-  }
-  dataAdapter = adapter;
-}
-
+/**
+ * Sets the global data adapter instance for the application.
+ * This must be called by the consuming application before any API services that require a data adapter are used.
+ * @param adapter - The data adapter instance to use.
+ */
 export function setDataAdapter(adapter: IDataAdapter): void {
-  globalDataAdapter = adapter;
-  dataAdapter = adapter;
-  // Reset initializePromise if the adapter changes
-  initializePromise = null;
-}
-
-// Default configuration using CosmosDB if no custom adapter is provided
-export function configureDefaultDataAdapter(): void {
-  if (dataAdapter) {
-    return;
+  if (globalDataAdapter !== adapter) {
+    globalDataAdapter = adapter;
+    // Reset initialization promise if the adapter instance itself changes, forcing re-initialization.
+    initializePromise = null;
   }
-
-  const cosmosAdapter = new CosmosDBDataAdapter({
-    endpoint: process.env.CosmosDB_Endpoint!,
-    key: process.env.CosmosDB_Key!,
-    databaseName: process.env.CosmosDB_DatabaseName!,
-    containerName: "consents",
-  });
-
-  configureDataAdapter(cosmosAdapter);
 }
 
 /**
  * Gets the initialized data adapter instance.
- * Ensures that initialization is only attempted once.
+ * Ensures that setDataAdapter has been called and the adapter is initialized.
+ * @throws Error if setDataAdapter has not been called prior to this.
+ * @returns The initialized data adapter instance.
  */
 export async function getInitializedDataAdapter(): Promise<IDataAdapter> {
-  if (globalDataAdapter) {
-    dataAdapter = globalDataAdapter;
-    // Reset initializePromise if the adapter changes to global
-    if (!initializePromise && typeof dataAdapter?.initialize === "function") {
-      initializePromise = dataAdapter
-        .initialize()
-        .then(() => {})
-        .catch((err: Error) => {
-          console.error("Failed to initialize global data adapter:", err);
-          initializePromise = null; // Reset on error so it can be retried
-          throw err;
-        });
-    }
-    if (initializePromise) {
-      await initializePromise;
-    }
-    return dataAdapter!;
+  if (!globalDataAdapter) {
+    throw new Error(
+      "Data adapter has not been set. Ensure setDataAdapter() is called by the application before using API services."
+    );
   }
 
-  if (!dataAdapter) {
-    configureDefaultDataAdapter();
-  }
-
-  if (!initializePromise && typeof dataAdapter?.initialize === "function") {
-    // Only initialize if the adapter has an initialize method,
-    // Custom adapters may handle initialization in their constructor
-    initializePromise = dataAdapter
+  // Initialize the globalDataAdapter if it has an initialize method and it hasn't been successfully initialized yet
+  // for the current adapter instance.
+  if (
+    !initializePromise &&
+    typeof globalDataAdapter.initialize === "function"
+  ) {
+    console.info(
+      `Initializing data adapter: ${globalDataAdapter.constructor.name}...`
+    );
+    initializePromise = globalDataAdapter
       .initialize()
-      .then(() => {})
+      .then(() => {
+        console.info(
+          `Data adapter '${globalDataAdapter?.constructor?.name}' initialized successfully.`
+        );
+      })
       .catch((err: Error) => {
-        console.error("Failed to initialize data adapter:", err);
-        initializePromise = null;
-        throw err;
+        console.error(
+          `Failed to initialize data adapter '${globalDataAdapter?.constructor?.name}':`,
+          err
+        );
+        initializePromise = null; // Reset on error to allow potential retry if the issue is fixable and initialize is called again.
+        throw err; // Re-throw the error to the caller
       });
   }
 
@@ -80,5 +59,5 @@ export async function getInitializedDataAdapter(): Promise<IDataAdapter> {
     await initializePromise;
   }
 
-  return dataAdapter!;
+  return globalDataAdapter;
 }

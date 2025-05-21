@@ -6,7 +6,7 @@
   "scripts": {
     "dev:local": "VITE_USE_MOCK_API=true vite",
     "build:local": "tsc && VITE_USE_MOCK_API=true vite build",
-    "build": "tsc && vite build",
+    "build": "tsc && VITE_USE_MOCK_API=true vite build",
     "preview:local": "VITE_USE_MOCK_API=true vite preview",
     "dev:remote": "VITE_USE_MOCK_API=false vite",
     "build:remote": "tsc && VITE_USE_MOCK_API=false vite build",
@@ -25,6 +25,7 @@
     "react-router-dom": "^6.30.0"
   },
   "devDependencies": {
+    "@sctg/vite-plugin-github-pages-spa": "^0.1.1",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@types/sanitize-html": "^2.9.0",
