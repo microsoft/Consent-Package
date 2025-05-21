@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { Text, Card, makeStyles } from "@fluentui/react-components";
 import { Profile, useConsentFlow } from "@open-source-consent/ui";
 import type { ProfileData, ConsentFlowFormData } from "@open-source-consent/ui";

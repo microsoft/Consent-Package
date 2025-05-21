@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import {
   usePolicyEditor,
   PolicyMetadataForm,
@@ -96,7 +96,7 @@ const PolicyEditorPage: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     await savePolicy();
-    navigate(`/policies`);
+    await navigate(`/policies`);
   };
 
   if (isLoading) return <p>Loading policy editor...</p>;

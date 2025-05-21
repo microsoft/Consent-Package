@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import {
   makeStyles,
   Button,
@@ -159,12 +159,12 @@ export function GetStarted(): JSX.Element {
     [dynamicSteps, currentStepId]
   );
 
-  const handleNext = (): void => {
+  const handleNext = async (): Promise<void> => {
     const nextIndex = currentStepIndex + 1;
     if (nextIndex < dynamicSteps.length) {
       setCurrentStepId(dynamicSteps[nextIndex].id);
     } else {
-      navigate("/profile", { state: { formData } });
+      await navigate("/profile", { state: { formData } });
     }
   };
 

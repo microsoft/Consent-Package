@@ -1,4 +1,5 @@
 import { makeStyles, tokens } from "@fluentui/react-components";
+import { Link } from "react-router";
 
 const useStyles = makeStyles({
   footer: {
@@ -52,21 +53,48 @@ export function Footer(): JSX.Element {
       <div className={styles.container}>
         <div className={styles.section}>
           <h3 className={styles.title}>Product</h3>
-          <a href="/get-started" className={styles.link}>Get Started</a>
-          <a href="/playground" className={styles.link}>Playground</a>
-          <a href="/docs" className={styles.link}>Documentation</a>
+          <Link to="/get-started" className={styles.link}>
+            Get Started
+          </Link>
+          <Link to="/playground" className={styles.link}>
+            Playground
+          </Link>
+          <Link
+            to="https://github.com/microsoft/Open-Source-Consent-Package/tree/main/docs"
+            className={styles.link}
+          >
+            Documentation
+          </Link>
         </div>
         <div className={styles.section}>
           <h3 className={styles.title}>Resources</h3>
-          <a href="https://github.com/microsoft/Open-Source-Consent-Package" className={styles.link}>GitHub</a>
-          <a href="/blog" className={styles.link}>Blog</a>
-          <a href="/support" className={styles.link}>Support</a>
+          <Link
+            to="https://github.com/microsoft/Open-Source-Consent-Package"
+            className={styles.link}
+          >
+            GitHub
+          </Link>
+          <Link
+            to="https://github.com/microsoft/Open-Source-Consent-Package/issues"
+            className={styles.link}
+          >
+            Report an issue
+          </Link>
         </div>
         <div className={styles.section}>
           <h3 className={styles.title}>Legal</h3>
-          <a href="/privacy" className={styles.link}>Privacy Policy</a>
-          <a href="/terms" className={styles.link}>Terms of Service</a>
-          <a href="/license" className={styles.link}>License</a>
+          <Link
+            to="https://github.com/microsoft/Open-Source-Consent-Package/blob/main/SECURITY.md"
+            className={styles.link}
+          >
+            Report Security Issue
+          </Link>
+          <Link
+            to="https://github.com/microsoft/Open-Source-Consent-Package/blob/main/LICENSE"
+            className={styles.link}
+          >
+            License
+          </Link>
         </div>
       </div>
       <div className={styles.copyright}>
@@ -74,4 +102,4 @@ export function Footer(): JSX.Element {
       </div>
     </footer>
   );
-} 
+}

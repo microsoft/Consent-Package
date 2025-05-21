@@ -22,7 +22,7 @@
     "@open-source-consent/ui": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.30.0"
+    "react-router": "^7.6.0"
   },
   "devDependencies": {
     "@sctg/vite-plugin-github-pages-spa": "^0.1.1",

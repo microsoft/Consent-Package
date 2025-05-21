@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import {
   Button,
   Card,
@@ -44,12 +44,12 @@ const PolicyListPage: React.FC = () => {
   const navigate = useNavigate();
   const { policies, isLoading, error } = usePolicyList();
 
-  const handleViewPolicy = (policyId: string) => {
-    navigate(`/policy/view/${policyId}`);
+  const handleViewPolicy = async (policyId: string) => {
+    await navigate(`/policy/view/${policyId}`);
   };
 
-  const handleEditPolicy = (policyId: string) => {
-    navigate(`/policy/edit/${policyId}`);
+  const handleEditPolicy = async (policyId: string) => {
+    await navigate(`/policy/edit/${policyId}`);
   };
 
   if (isLoading) {
@@ -86,8 +86,8 @@ const PolicyListPage: React.FC = () => {
 
         <PolicyTable
           policies={policies}
-          onViewPolicy={handleViewPolicy}
-          onEditPolicy={handleEditPolicy}
+          onViewPolicy={(policyId) => void handleViewPolicy(policyId)}
+          onEditPolicy={(policyId) => void handleEditPolicy(policyId)}
         />
       </Card>
     </div>

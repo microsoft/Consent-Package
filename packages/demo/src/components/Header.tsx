@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router";
 import { makeStyles } from "@fluentui/react-components";
 
 const useStyles = makeStyles({
@@ -248,8 +248,10 @@ export function Header(): JSX.Element {
           <button
             className={styles.loginBtn}
             onClick={() => {
-              if (location.pathname === "/profile") navigate("/");
-              else navigate("/profile");
+              void (async () => {
+                if (location.pathname === "/profile") await navigate("/");
+                else await navigate("/profile");
+              })();
             }}
           >
             {location.pathname === "/profile" ? "Log out" : "Log in"}
@@ -289,9 +291,11 @@ export function Header(): JSX.Element {
             <button
               className={`${styles.loginBtn} ${styles.mobileLoginBtn}`}
               onClick={() => {
-                if (location.pathname === "/profile") navigate("/");
-                else navigate("/profile");
-                closeMobileMenu();
+                void (async () => {
+                  if (location.pathname === "/profile") await navigate("/");
+                  else await navigate("/profile");
+                  closeMobileMenu();
+                })();
               }}
             >
               {location.pathname === "/profile" ? "Log out" : "Log in"}

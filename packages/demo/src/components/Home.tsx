@@ -1,6 +1,17 @@
-import { useNavigate } from "react-router-dom";
-import { makeStyles, tokens, Text, Title1, Button, Title2 } from "@fluentui/react-components";
-import { ShieldLockRegular, DataTrendingRegular, CodeRegular } from "@fluentui/react-icons";
+import { useNavigate } from "react-router";
+import {
+  makeStyles,
+  tokens,
+  Text,
+  Title1,
+  Button,
+  Title2,
+} from "@fluentui/react-components";
+import {
+  ShieldLockRegular,
+  DataTrendingRegular,
+  CodeRegular,
+} from "@fluentui/react-icons";
 
 const useStyles = makeStyles({
   root: {
@@ -11,7 +22,8 @@ const useStyles = makeStyles({
   hero: {
     padding: "calc(var(--spacing-unit) * 12) calc(var(--spacing-unit) * 2)",
     textAlign: "center",
-    background: "linear-gradient(180deg, var(--color-background) 0%, var(--color-border) 100%)",
+    background:
+      "linear-gradient(180deg, var(--color-background) 0%, var(--color-border) 100%)",
   },
   heroContent: {
     display: "flex",
@@ -53,7 +65,8 @@ const useStyles = makeStyles({
     borderRadius: "var(--border-radius)",
     border: `var(--border-width) solid var(--color-border)`,
     cursor: "pointer",
-    transition: "transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease",
+    transition:
+      "transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease",
     "&:hover": {
       transform: "translateY(-4px)",
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
@@ -100,12 +113,14 @@ export function Home(): JSX.Element {
             Share Consent with Confidence
           </Title1>
           <Text className={styles.description}>
-            The Open Source Consent Package provides a secure, privacy-focused solution for managing and sharing consent data. 
-            Built with transparency and user control at its core, it helps organizations maintain compliance while respecting user privacy.
+            The Open Source Consent Package provides a secure, privacy-focused
+            solution for managing and sharing consent data. Built with
+            transparency and user control at its core, it helps organizations
+            maintain compliance while respecting user privacy.
           </Text>
-          <Button 
-            appearance="primary" 
-            size="large" 
+          <Button
+            appearance="primary"
+            size="large"
             onClick={() => navigate("/get-started")}
             className={styles.ctaButton}
           >
@@ -117,24 +132,33 @@ export function Home(): JSX.Element {
       <section className={styles.features}>
         <div className={styles.featuresGrid}>
           <div className={styles.featureCard}>
-            <ShieldLockRegular aria-hidden="true" className={styles.featureIcon} />
+            <ShieldLockRegular
+              aria-hidden="true"
+              className={styles.featureIcon}
+            />
             <Title2 className={styles.featureTitle}>Secure by Design</Title2>
             <Text className={styles.featureDescription}>
-              Built with security as a first principle, ensuring your consent data is always protected and handled with care.
+              Built with security as a first principle, ensuring your consent
+              data is always protected and handled with care.
             </Text>
           </div>
           <div className={styles.featureCard}>
-            <DataTrendingRegular aria-hidden="true" className={styles.featureIcon} />
+            <DataTrendingRegular
+              aria-hidden="true"
+              className={styles.featureIcon}
+            />
             <Title2 className={styles.featureTitle}>Privacy-Focused</Title2>
             <Text className={styles.featureDescription}>
-              Empowers users with control over their data while helping organizations maintain compliance with privacy regulations.
+              Empowers users with control over their data while helping
+              organizations maintain compliance with privacy regulations.
             </Text>
           </div>
           <div className={styles.featureCard}>
             <CodeRegular aria-hidden="true" className={styles.featureIcon} />
             <Title2 className={styles.featureTitle}>Open Source</Title2>
             <Text className={styles.featureDescription}>
-              Transparent, community-driven development that you can trust and contribute to.
+              Transparent, community-driven development that you can trust and
+              contribute to.
             </Text>
           </div>
         </div>
