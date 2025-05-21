@@ -1,3 +1,6 @@
+// First import the API switcher, mock vs real API
+import "./utils/apiSwitcher.js";
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { FluentProvider, webLightTheme } from "@fluentui/react-components";
@@ -7,7 +10,7 @@ import "./main.css";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <FluentProvider theme={webLightTheme}>
-      <App/>
+      <App />
     </FluentProvider>
   </React.StrictMode>
 );

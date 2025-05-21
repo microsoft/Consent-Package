@@ -301,7 +301,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     const updatedPolicyDocument = {
       id: existingPolicy.id,
       policyGroupId: existingPolicy.policyGroupId,
-      version: existingPolicy.version + 1,
+      version: existingPolicy.version,
       status: status,
       effectiveDate: existingPolicy.effectiveDate,
       contentSections: existingPolicy.contentSections,
@@ -310,6 +310,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
       updatedAt: new Date(),
       docType: existingPolicy.docType,
       subjectId: existingPolicy.subjectId,
+      title: existingPolicy.title,
     };
 
     const { resource: replacedResource } = await container

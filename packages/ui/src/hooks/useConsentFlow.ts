@@ -1,129 +1,33 @@
-import { useState, useEffect } from 'react';
-import type { ConsentFlowPolicy, ConsentFlowFormData } from '../ConsentFlow/ConsentFlow.type.js';
+import { useState, useEffect } from "react";
+import type { Policy } from "@open-source-consent/types";
+import type { ConsentFlowFormData } from "../ConsentFlow/ConsentFlow.type.js";
 
-const samplePolicy: ConsentFlowPolicy = {
-  id: "sample-policy-1",
-  title: "Open Source Consent Policy",
-  description: "This policy outlines how we handle your data and what you can expect from our service.",
-  contentSections: [
-    {
-      title: "Data Collection",
-      content: "We collect only the information necessary to provide our services and ensure compliance with privacy regulations.",
-      risks: [
-        "Your personal information may be temporarily stored in our secure systems",
-        "Data collection may require additional verification steps",
-        "Some data points may be mandatory for service provision"
-      ],
-      dataTypes: [
-        "Personal identification information",
-        "Contact details and communication preferences",
-        "Account credentials and security information"
-      ],
-      compensation: [
-        "Access to personalized service features",
-        "Enhanced account security measures",
-        "Priority customer support access"
-      ]
-    },
-    {
-      title: "Data Usage",
-      content: "Your data is used solely for the purposes you consent to, and we never sell or share your information with third parties without your explicit permission.",
-      risks: [
-        "Data may be used for service improvement and analytics",
-        "Information may be shared with service providers under strict confidentiality",
-        "Data may be retained for legal compliance purposes"
-      ],
-      dataTypes: [
-        "Usage patterns and preferences",
-        "Service interaction logs",
-        "Analytics and performance data"
-      ],
-      compensation: [
-        "Improved service recommendations",
-        "Customized user experience",
-        "Early access to new features"
-      ]
-    },
-    {
-      title: "Your Rights",
-      content: "You have the right to access, modify, or delete your data at any time. You can also withdraw your consent at any point.",
-      risks: [
-        "Withdrawing consent may limit access to certain features",
-        "Data deletion requests may take up to 30 days to process",
-        "Some data may be retained for legal or regulatory requirements"
-      ],
-      dataTypes: [
-        "Consent management records",
-        "Data access and modification history",
-        "Privacy preference settings"
-      ],
-      compensation: [
-        "Full control over data management",
-        "Transparent data usage reporting",
-        "Flexible consent options"
-      ]
-    }
-  ],
-  scopes: [
-    {
-      key: "basic_profile",
-      name: "Basic Profile",
-      description: "Access to your basic profile information including name and contact details",
-      required: true
-    },
-    {
-      key: "health_records",
-      name: "Health Records",
-      description: "Access to your medical history, conditions, and treatment records",
-      required: false
-    },
-    {
-      key: "medication_history",
-      name: "Medication History",
-      description: "Access to your current and past medications, dosages, and schedules",
-      required: false
-    },
-    {
-      key: "appointment_data",
-      name: "Appointment Data",
-      description: "Access to your upcoming and past medical appointments",
-      required: false
-    },
-    {
-      key: "insurance_info",
-      name: "Insurance Information",
-      description: "Access to your health insurance details and coverage information",
-      required: false
-    },
-    {
-      key: "payment_history",
-      name: "Payment History",
-      description: "Access to your medical payment and billing history",
-      required: false
-    }
-  ]
-};
+// Define a more specific type for the scope object if not exported directly from @open-source-consent/types
+// This is effectively Policy['availableScopes'][number]
+type PolicyScope = Policy["availableScopes"][number];
 
-const policies = [samplePolicy];
+// Removed defaultSamplePolicyData from here, it will be handled by mock API layer if needed.
 
 interface UseConsentFlowResult {
-  policy: ConsentFlowPolicy | null;
+  policy: Policy | null;
   formData: ConsentFlowFormData;
   isFormValid: boolean;
   isLoading: boolean;
+  error: string | null;
   setFormData(data: ConsentFlowFormData): void;
   updateScopes(scopeId: string, isChecked: boolean, subjectId?: string): void;
 }
 
-const useConsentFlow = (policyId: string): UseConsentFlowResult => {
-  const [policy, setPolicy] = useState<ConsentFlowPolicy | null>(null);
+const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
+  const [policy, setPolicy] = useState<Policy | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ConsentFlowFormData>({
-    name: '',
-    ageRangeId: '',
+    name: "",
+    ageRangeId: "",
     dob: undefined,
     age: undefined,
-    roleId: '',
+    roleId: "",
     isProxy: false,
     managedSubjects: [],
     grantedScopes: [],
@@ -132,71 +36,145 @@ const useConsentFlow = (policyId: string): UseConsentFlowResult => {
 
   useEffect(() => {
     setIsLoading(true);
-    
-    // TODO: Fetch policy from API
-    setTimeout(() => {
-      setPolicy(policies.find((p: ConsentFlowPolicy) => p.id === policyId) ?? null);
-      setIsLoading(false);
-    }, 500);
-  }, [policyId]);
+    setError(null);
+
+    fetch(`/api/policyGroups/${policyGroupId}/latest`)
+      .then((response) => {
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error(
+              `Latest active policy for group ID "${policyGroupId}" not found.`
+            );
+          }
+          throw new Error(
+            `Failed to fetch policy: ${response.status} ${response.statusText}`
+          );
+        }
+        return response.json();
+      })
+      .then((data: Policy) => {
+        setPolicy(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching policy:", err);
+        setError(err.message || "An unknown error occurred");
+        setPolicy(null); // Set policy to null on error
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [policyGroupId]);
 
   useEffect(() => {
     validateForm();
-  }, [formData]);
+  }, [formData, policy]); // Add policy to dependencies for validateForm if it uses policy scopes for validation
 
   const validateForm = (): void => {
     const hasName = formData.name.trim().length > 0;
     const hasAgeRange = !!formData.ageRangeId;
+    // Example: Adult check, adjust as needed
     const hasValidAge = formData.age !== undefined && formData.age >= 18;
     const hasRole = !!formData.roleId;
-    
-    // If user is a proxy, they must have at least one managed subject
-    const hasManagedSubjects = !formData.isProxy || formData.managedSubjects.length > 0;
-    const hasValidManagedSubjects = formData.managedSubjects.every(subject => 
-      subject.name?.trim().length > 0 && subject.age !== undefined && subject.age >= 0
+
+    const hasManagedSubjects =
+      !formData.isProxy || formData.managedSubjects.length > 0;
+    const hasValidManagedSubjects = formData.managedSubjects.every(
+      (subject) =>
+        subject.name?.trim().length > 0 &&
+        subject.age !== undefined &&
+        subject.age >= 0
     );
-    
-    setIsFormValid(hasName && hasAgeRange && hasValidAge && hasRole && hasManagedSubjects && hasValidManagedSubjects);
+
+    // Check if all required scopes are granted (if policy is loaded)
+    let hasRequiredScopes = true;
+    if (policy && !formData.isProxy) {
+      // Only for self-consenter for now
+      const requiredScopeKeys = policy.availableScopes
+        .filter((s: PolicyScope) => s.required)
+        .map((s: PolicyScope) => s.key);
+      if (requiredScopeKeys.length > 0) {
+        hasRequiredScopes = requiredScopeKeys.every((key: string) =>
+          formData.grantedScopes?.includes(key)
+        );
+      }
+    }
+    // If proxy, check required scopes for each subject
+    if (policy && formData.isProxy) {
+      const requiredScopeKeys = policy.availableScopes
+        .filter((s: PolicyScope) => s.required)
+        .map((s: PolicyScope) => s.key);
+      if (requiredScopeKeys.length > 0) {
+        hasRequiredScopes = formData.managedSubjects.every((subject) =>
+          requiredScopeKeys.every((key: string) =>
+            subject.grantedScopes?.includes(key)
+          )
+        );
+      }
+    }
+
+    setIsFormValid(
+      hasName &&
+        hasAgeRange &&
+        hasValidAge &&
+        hasRole &&
+        hasManagedSubjects &&
+        hasValidManagedSubjects &&
+        hasRequiredScopes
+    );
   };
 
-  const updateScopes = (scopeId: string, isChecked: boolean, subjectId?: string): void => {
+  const updateScopes = (
+    scopeId: string,
+    isChecked: boolean,
+    subjectId?: string
+  ): void => {
     if (!policy || !formData) return;
 
     const updatedFormData = { ...formData };
 
-    // Get all required scopes
-    const requiredScopes = policy.scopes
-      .filter((scope) => scope.required)
-      .map((scope) => scope.key);
+    const requiredScopeKeys = policy.availableScopes
+      .filter((scope: PolicyScope) => scope.required)
+      .map((scope: PolicyScope) => scope.key);
 
     if (subjectId) {
-      // Update scopes for a managed subject
-      const subjectIndex = updatedFormData.managedSubjects.findIndex((s) => s.id === subjectId);
+      const subjectIndex = updatedFormData.managedSubjects.findIndex(
+        (s) => s.id === subjectId
+      );
       if (subjectIndex !== -1) {
-        const currentScopes = updatedFormData.managedSubjects[subjectIndex].grantedScopes || [];
-        const newScopes = isChecked
-          ? [...currentScopes, scopeId]
+        const currentScopes =
+          updatedFormData.managedSubjects[subjectIndex].grantedScopes || [];
+        let newScopes = isChecked
+          ? [...new Set([...currentScopes, scopeId])] // Ensure uniqueness
           : currentScopes.filter((id) => id !== scopeId);
 
-        // Ensure required scopes are always included
-        const finalScopes = [...new Set([...newScopes, ...requiredScopes])];
+        // If unchecking a required scope, prevent it (or handle as per business logic)
+        // For now, we ensure required scopes are always present if any scope is granted or if it's an initial state
+        if (isChecked) {
+          newScopes = [...new Set([...newScopes, ...requiredScopeKeys])];
+        } else {
+          // Allow unchecking non-required scopes. Required scopes remain unless explicitly handled.
+          // If we want to prevent unchecking required scopes, add logic here.
+          // For simplicity, current logic allows unchecking but they might be re-added if form validation runs.
+        }
+        // A better approach for required scopes: always include them if the checkbox group is active
+        // Or, disable their checkboxes. For this hook, we'll ensure they are part of the set if isChecked is true for any scope.
 
         updatedFormData.managedSubjects[subjectIndex] = {
           ...updatedFormData.managedSubjects[subjectIndex],
-          grantedScopes: finalScopes
+          grantedScopes: newScopes,
         };
       }
     } else {
-      // Update scopes for the consenter
       const currentScopes = updatedFormData.grantedScopes || [];
-      const newScopes = isChecked
-        ? [...currentScopes, scopeId]
+      let newScopes = isChecked
+        ? [...new Set([...currentScopes, scopeId])] // Ensure uniqueness
         : currentScopes.filter((id) => id !== scopeId);
 
-      // Ensure required scopes are always included
-      const finalScopes = [...new Set([...newScopes, ...requiredScopes])];
+      if (isChecked) {
+        newScopes = [...new Set([...newScopes, ...requiredScopeKeys])];
+      }
 
-      updatedFormData.grantedScopes = finalScopes;
+      updatedFormData.grantedScopes = newScopes;
     }
 
     setFormData(updatedFormData);
@@ -207,9 +185,10 @@ const useConsentFlow = (policyId: string): UseConsentFlowResult => {
     formData,
     isFormValid,
     isLoading,
+    error,
     setFormData,
     updateScopes,
   };
-}
+};
 
 export default useConsentFlow;

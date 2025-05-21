@@ -524,6 +524,7 @@ describe("CosmosDBDataAdapter", () => {
     describe("createPolicy", () => {
       it("should create a policy record with auto-generated fields and specified version", async () => {
         const policyInput: CreatePolicyInput = {
+          title: "Policy 1",
           policyGroupId: POLICY_GROUP_ID_1,
           version: 1,
           status: "draft",
@@ -585,6 +586,7 @@ describe("CosmosDBDataAdapter", () => {
 
       it("should create a policy record with default version 1 if adapter sets it (type expects version)", async () => {
         const policyInput: CreatePolicyInput = {
+          title: "Policy 1",
           policyGroupId: POLICY_GROUP_ID_1,
           status: "active",
           version: 1, // CreatePolicyInput expects version
@@ -652,6 +654,7 @@ describe("CosmosDBDataAdapter", () => {
         (uninitializedAdapter as any).dataContainer = undefined;
 
         const policyInput: CreatePolicyInput = {
+          title: "Policy 1",
           policyGroupId: "pGroupUninit",
           status: "draft",
           version: 1,
@@ -670,6 +673,7 @@ describe("CosmosDBDataAdapter", () => {
     describe("updatePolicyStatus", () => {
       let policyToUpdate: Policy;
       const initialPolicyData: CreatePolicyInput = {
+        title: "Policy 1",
         policyGroupId: POLICY_GROUP_ID_1,
         version: 1,
         status: "draft",
@@ -709,11 +713,12 @@ describe("CosmosDBDataAdapter", () => {
 
         expect(updatedPolicy.id).toBe(policyToUpdate.id);
         expect(updatedPolicy.status).toBe(newStatus);
-        expect(updatedPolicy.version).toBe(expectedVersionBeforeUpdate + 1);
+        // A status update should not increment the version
+        expect(updatedPolicy.version).toBe(expectedVersionBeforeUpdate);
         expect(new Date(updatedPolicy.updatedAt).getTime()).toBeGreaterThan(0);
         expect(
           Date.now() - new Date(updatedPolicy.updatedAt).getTime()
-        ).toBeLessThan(5000); // recent
+        ).toBeLessThan(5000);
         expect(updatedPolicy.updatedAt).not.toEqual(policyToUpdate.createdAt); // Should be different
         expect(updatedPolicy.createdAt).toEqual(policyToUpdate.createdAt);
         expect(updatedPolicy.policyGroupId).toBe(policyToUpdate.policyGroupId);
@@ -766,6 +771,7 @@ describe("CosmosDBDataAdapter", () => {
     describe("findPolicyById", () => {
       it("should return a policy record when found", async () => {
         const policyInput: CreatePolicyInput = {
+          title: "Policy 1",
           policyGroupId: POLICY_GROUP_ID_1,
           status: "active",
           version: 1,
@@ -835,24 +841,28 @@ describe("CosmosDBDataAdapter", () => {
       beforeEach(async () => {
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
+          title: "Policy 1",
           policyGroupId: POLICY_GROUP_ID_1,
           version: 1,
           status: "draft",
         });
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
+          title: "Policy 1",
           policyGroupId: POLICY_GROUP_ID_1,
           version: 2,
           status: "active",
         });
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
+          title: "Policy 1",
           policyGroupId: POLICY_GROUP_ID_1,
           version: 3,
           status: "archived",
         });
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
+          title: "Policy 1",
           policyGroupId: POLICY_GROUP_ID_2,
           version: 1,
           status: "active",
@@ -871,12 +881,14 @@ describe("CosmosDBDataAdapter", () => {
       it("should return null if no active policy exists for the group ID", async () => {
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
+          title: "Policy 1",
           policyGroupId: "noActiveGroup",
           version: 1,
           status: "draft",
         });
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
+          title: "Policy 1",
           policyGroupId: "noActiveGroup",
           version: 2,
           status: "archived",
@@ -920,18 +932,21 @@ describe("CosmosDBDataAdapter", () => {
           policyGroupId: "groupForAllVersions",
           version: 1,
           status: "draft",
+          title: "Policy 1",
         });
         p1v2 = await dataAdapter.createPolicy({
           ...commonVersionData,
           policyGroupId: "groupForAllVersions",
           version: 2,
           status: "active",
+          title: "Policy 1",
         });
         await dataAdapter.createPolicy({
           ...commonVersionData,
           policyGroupId: "anotherGroupForVersions",
           version: 1,
           status: "active",
+          title: "Policy 1",
         });
       });
 
@@ -994,24 +1009,28 @@ describe("CosmosDBDataAdapter", () => {
           policyGroupId: P_GROUP_LIST_A,
           version: 2,
           status: "active",
+          title: "Policy A",
         });
         policy_A_v1_listed = await dataAdapter.createPolicy({
           ...commonListData,
           policyGroupId: P_GROUP_LIST_A,
           version: 1,
           status: "draft",
+          title: "Policy A",
         });
         policy_B_v1_listed = await dataAdapter.createPolicy({
           ...commonListData,
           policyGroupId: P_GROUP_LIST_B,
           version: 1,
           status: "active",
+          title: "Policy B",
         });
         policy_C_v1_listed = await dataAdapter.createPolicy({
           ...commonListData,
           policyGroupId: P_GROUP_LIST_C,
           version: 1,
           status: "draft",
+          title: "Policy C",
         });
       });
 

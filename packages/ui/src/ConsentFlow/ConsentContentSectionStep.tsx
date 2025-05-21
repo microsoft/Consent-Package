@@ -1,0 +1,57 @@
+import { makeStyles, Title2, tokens } from "@fluentui/react-components";
+import type { PolicyContentSection } from "@open-source-consent/types";
+
+interface ConsentContentSectionStepProps {
+  section: PolicyContentSection;
+}
+
+const useStyles = makeStyles({
+  root: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "24px",
+    marginBottom: "32px",
+  },
+  sectionHeader: {
+    paddingBottom: "8px",
+    borderBottom: `1px solid ${tokens.colorNeutralStroke1}`,
+  },
+  content: {
+    "& ul, & ol": {
+      paddingLeft: "20px",
+      margin: "8px 0",
+    },
+    "& li": {
+      marginBottom: "4px",
+    },
+    "& h4, & h5, & h6": {
+      marginTop: "12px",
+      marginBottom: "4px",
+      fontWeight: tokens.fontWeightSemibold,
+    },
+  },
+});
+
+const ConsentContentSectionStep = ({
+  section,
+}: ConsentContentSectionStepProps): JSX.Element => {
+  const styles = useStyles();
+
+  return (
+    <div className={styles.root}>
+      <div className={styles.sectionHeader}>
+        <Title2 align="center">{section.title}</Title2>
+      </div>
+      {/* Consider displaying section.description here if appropriate for the UI design */}
+      {section.content && (
+        <div
+          className={styles.content}
+          dangerouslySetInnerHTML={{ __html: section.content }}
+        />
+      )}
+      {/* TODO: Display risks, dataTypes, compensation if needed in separate sections or integrate here */}
+    </div>
+  );
+};
+
+export default ConsentContentSectionStep;

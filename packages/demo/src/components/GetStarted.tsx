@@ -1,8 +1,21 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { makeStyles, Button, tokens, Text, Spinner } from "@fluentui/react-components";
-import { ConsentWelcome, ConsentDetails, ConsentScopes, ConsentReview, useConsentFlow } from "@open-source-consent/ui";
-import type { ConsentFlowFormData, ConsentFlowContentSection } from "@open-source-consent/ui";
+import {
+  makeStyles,
+  Button,
+  tokens,
+  Text,
+  Spinner,
+} from "@fluentui/react-components";
+import {
+  ConsentWelcome,
+  ConsentScopes,
+  ConsentReview,
+  useConsentFlow,
+  ConsentContentSectionStep,
+} from "@open-source-consent/ui";
+import type { ConsentFlowFormData } from "@open-source-consent/ui";
+import type { Policy, PolicyContentSection } from "@open-source-consent/types";
 
 const useStyles = makeStyles({
   root: {
@@ -18,6 +31,7 @@ const useStyles = makeStyles({
     marginBottom: "48px",
     position: "relative",
     padding: "0 16px",
+    overflowX: "auto",
     "&::before": {
       content: '""',
       position: "absolute",
@@ -28,7 +42,7 @@ const useStyles = makeStyles({
       backgroundColor: tokens.colorNeutralStroke1,
       zIndex: 0,
       transition: "background-color 0.3s ease",
-    }
+    },
   },
   step: {
     display: "flex",
@@ -37,9 +51,11 @@ const useStyles = makeStyles({
     position: "relative",
     zIndex: 1,
     transition: "transform 0.2s ease",
+    minWidth: "80px",
+    textAlign: "center",
     "&:hover": {
       transform: "translateY(-2px)",
-    }
+    },
   },
   stepNumber: {
     width: "40px",
@@ -53,6 +69,7 @@ const useStyles = makeStyles({
     marginBottom: "12px",
     transition: "all 0.3s ease",
     boxShadow: tokens.shadow2,
+    cursor: "pointer",
   },
   stepNumberActive: {
     backgroundColor: tokens.colorBrandBackground,
@@ -60,7 +77,7 @@ const useStyles = makeStyles({
     transform: "scale(1.1)",
   },
   stepLabel: {
-    fontSize: "14px",
+    fontSize: "12px",
     color: tokens.colorNeutralForeground1,
     transition: "color 0.3s ease",
   },
@@ -74,147 +91,198 @@ const useStyles = makeStyles({
     display: "flex",
     justifyContent: "flex-end",
     paddingTop: "24px",
-    "& button:first-child": { // Previous button
+    "& button:first-child": {
       marginRight: "8px",
-    }
+    },
   },
   loading: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     height: "400px",
-  }
+  },
 });
 
-const steps = [
-  { id: "welcome", label: "Welcome" },
-  { id: "risks", label: "Risks" },
-  { id: "data-types", label: "Data Types" },
-  { id: "compensation", label: "Compensation" },
-  { id: "scopes", label: "Scopes" },
-  { id: "review", label: "Review" },
+const baseSteps = [
+  { id: "welcome" as const, label: "Welcome" },
+  { id: "scopes" as const, label: "Scopes" },
+  { id: "review" as const, label: "Review & Sign" },
 ] as const;
 
-type Step = typeof steps[number]["id"];
+type StepId = (typeof baseSteps)[number]["id"] | `contentSection_${number}`;
 
-export function GetStarted(/* policyId: string */): JSX.Element {
+interface Step {
+  id: StepId;
+  label: string;
+}
+
+export function GetStarted(): JSX.Element {
   const styles = useStyles();
   const navigate = useNavigate();
-  const { policy, formData, isFormValid, isLoading, setFormData, updateScopes } = useConsentFlow("sample-policy-1" /* policyId */);
-  const [currentStep, setCurrentStep] = useState<Step>("welcome");
+  const {
+    policy,
+    formData,
+    isFormValid,
+    isLoading,
+    setFormData,
+    updateScopes,
+  }: { policy?: Policy | null } & Omit<
+    ReturnType<typeof useConsentFlow>,
+    "policy"
+  > = useConsentFlow("sample-group-1");
 
-  const currentStepIndex = steps.findIndex(step => step.id === currentStep);
+  const dynamicSteps = useMemo<Step[]>(() => {
+    if (!policy) return baseSteps.filter((step) => step.id === "welcome");
+
+    const contentSectionSteps: Step[] = policy.contentSections.map(
+      (section: PolicyContentSection, index) => ({
+        id: `contentSection_${index}` as StepId,
+        label:
+          section.title.length > 15
+            ? `${section.title.substring(0, 12)}...`
+            : section.title,
+      })
+    );
+
+    return [
+      baseSteps.find((s) => s.id === "welcome")!,
+      ...contentSectionSteps,
+      ...baseSteps.filter((s) => s.id !== "welcome"),
+    ];
+  }, [policy]);
+
+  const [currentStepId, setCurrentStepId] = useState<StepId>("welcome");
+
+  const currentStepIndex = useMemo(
+    () => dynamicSteps.findIndex((step) => step.id === currentStepId),
+    [dynamicSteps, currentStepId]
+  );
 
   const handleNext = (): void => {
     const nextIndex = currentStepIndex + 1;
-    if (nextIndex < steps.length) {
-      setCurrentStep(steps[nextIndex].id);
+    if (nextIndex < dynamicSteps.length) {
+      setCurrentStepId(dynamicSteps[nextIndex].id);
     } else {
-      // Finish action -- navigate to profile page with form data
-      navigate('/profile', { state: { formData } });
+      navigate("/profile", { state: { formData } });
     }
   };
 
   const handlePrevious = (): void => {
     const prevIndex = currentStepIndex - 1;
     if (prevIndex >= 0) {
-      setCurrentStep(steps[prevIndex].id);
+      setCurrentStepId(dynamicSteps[prevIndex].id);
+    }
+  };
+
+  const handleStepClick = (stepId: StepId): void => {
+    const targetStepIndex = dynamicSteps.findIndex(
+      (step) => step.id === stepId
+    );
+
+    if (stepId === "welcome") {
+      setCurrentStepId(stepId);
+      return;
+    }
+
+    if (targetStepIndex <= currentStepIndex + 1) {
+      if ((stepId === "scopes" || stepId === "review") && !isFormValid) {
+        console.warn("Cannot proceed, form is not valid.");
+        return;
+      }
+      setCurrentStepId(stepId);
     }
   };
 
   const renderSlide = (): JSX.Element | null => {
-    if (isLoading) {
-      return <div className={styles.loading}>
-        <Spinner label="Loading policy..." />
-      </div>;
+    if (isLoading && !policy) {
+      return (
+        <div className={styles.loading}>
+          <Spinner label="Loading policy..." />
+        </div>
+      );
     }
 
     if (!policy) {
-      return <div className={styles.loading}>
-        <Text size={500} weight="semibold">Policy Not Found</Text>
-      </div>;
+      return (
+        <div className={styles.loading}>
+          <Text size={500} weight="semibold">
+            Policy Not Found
+          </Text>
+        </div>
+      );
     }
 
-    switch (currentStep) {
-      case "welcome":
-        return <ConsentWelcome
+    if (currentStepId === "welcome") {
+      return (
+        <ConsentWelcome
           formData={formData}
           policy={policy}
-          onFormDataChange={(formData: ConsentFlowFormData): void => {
-            console.info('ConsentWelcome onFormDataChange', { formData });
-            setFormData(formData);
+          onFormDataChange={(data: ConsentFlowFormData): void => {
+            setFormData(data);
           }}
-        />;
-      case "risks":
-        return <ConsentDetails
-          title="Understanding the Risks"
-          description="Please review these important considerations before proceeding with your consent."
-          details={policy.contentSections.map((section: ConsentFlowContentSection) => ({
-            title: section.title,
-            items: section.risks
-          }))}
-        />;
-      case "data-types":
-        return <ConsentDetails
-          title="Understanding the Data Types"
-          description="Please review these important considerations before proceeding with your consent."
-          details={policy.contentSections.map((section: ConsentFlowContentSection) => ({
-            title: section.title,
-            items: section.dataTypes
-          }))}
-        />;
-      case "compensation":
-        return <ConsentDetails
-          title="Understanding the Benefits"
-          description="Please review these benefits you'll receive for sharing your data."
-          details={policy.contentSections.map((section: ConsentFlowContentSection) => ({
-            title: section.title,
-            items: section.compensation
-          }))}
-        />;
-      case "scopes":
-        return <ConsentScopes
+        />
+      );
+    } else if (currentStepId.startsWith("contentSection_")) {
+      const sectionIndex = parseInt(currentStepId.split("_")[1], 10);
+      const section = policy.contentSections[sectionIndex];
+      if (section) {
+        return <ConsentContentSectionStep section={section} />;
+      }
+      return <Text>Content section not found.</Text>;
+    } else if (currentStepId === "scopes") {
+      return (
+        <ConsentScopes
           formData={formData}
-          availableScopes={policy.scopes}
-          onChange={(scopeId: string, isChecked: boolean, subjectId?: string) => {
-            console.info('ConsentScopes onChange', { scopeId, isChecked, subjectId });
+          availableScopes={policy.availableScopes}
+          onChange={(
+            scopeId: string,
+            isChecked: boolean,
+            subjectId?: string
+          ) => {
             updateScopes(scopeId, isChecked, subjectId);
           }}
-        />;
-      case "review":
-        return <ConsentReview
+        />
+      );
+    } else if (currentStepId === "review") {
+      return (
+        <ConsentReview
           policy={policy}
           formData={formData}
           onSignatureSubmit={(signature: string, date: Date) => {
-            console.info('ConsentReview onSignatureSubmit', { signature, date });
             setFormData({
               ...formData,
               signature,
-              grantedAt: date
+              grantedAt: date,
             });
           }}
-        />;
-      default:
-        return null;
+        />
+      );
     }
+    return null;
   };
 
   return (
     <div className={styles.root}>
       <div className={styles.stepper}>
-        {steps.map((step, index) => (
-          <div key={step.id} className={styles.step}>
-            <div className={`${styles.stepNumber} ${index <= currentStepIndex ? styles.stepNumberActive : ""}`}>
+        {dynamicSteps.map((step, index) => (
+          <div
+            key={step.id}
+            className={styles.step}
+            onClick={() => handleStepClick(step.id)}
+          >
+            <div
+              className={`${styles.stepNumber} ${
+                currentStepIndex === index ? styles.stepNumberActive : ""
+              }`}
+            >
               {index + 1}
             </div>
-            <Text className={styles.stepLabel} weight={index === currentStepIndex ? "semibold" : "regular"}>{step.label}</Text>
+            <Text className={styles.stepLabel}>{step.label}</Text>
           </div>
         ))}
       </div>
 
-      <div className={styles.slide}>
-        {renderSlide()}
-      </div>
+      <div className={styles.slide}>{renderSlide()}</div>
 
       <div className={styles.navigation}>
         {currentStepIndex > 0 && (
@@ -222,10 +290,19 @@ export function GetStarted(/* policyId: string */): JSX.Element {
             Previous
           </Button>
         )}
-        <Button appearance="primary" onClick={handleNext} disabled={currentStepIndex === steps.length - 1 && !formData.signature || !isFormValid}>
-          {currentStepIndex === steps.length - 1 ? "Finish" : "Next"}
+        <Button
+          appearance="primary"
+          onClick={handleNext}
+          disabled={
+            currentStepId !== "review" &&
+            !isFormValid &&
+            dynamicSteps[currentStepIndex]?.id !== "welcome" &&
+            !dynamicSteps[currentStepIndex]?.id.startsWith("contentSection_")
+          }
+        >
+          {currentStepIndex === dynamicSteps.length - 1 ? "Finish" : "Next"}
         </Button>
       </div>
     </div>
   );
-} 
+}

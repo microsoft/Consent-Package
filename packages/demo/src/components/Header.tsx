@@ -58,24 +58,24 @@ const useStyles = makeStyles({
     background: "none",
     transition: "color 0.15s",
     position: "relative",
-    '&:hover': {
+    "&:hover": {
       color: "var(--color-primary)",
     },
   },
   active: {
     color: "var(--color-primary)",
     fontWeight: 700,
-    '&::after': {
+    "&::after": {
       content: '""',
-      display: 'block',
-      margin: '4px auto 0 auto',
-      '@media (max-width: 768px)': {
-        margin: '16px auto 0 auto',
+      display: "block",
+      margin: "4px auto 0 auto",
+      "@media (max-width: 768px)": {
+        margin: "16px auto 0 auto",
       },
-      width: '24px',
-      height: '4px',
-      borderRadius: '2px',
-      background: 'var(--color-primary)',
+      width: "24px",
+      height: "4px",
+      borderRadius: "2px",
+      background: "var(--color-primary)",
     },
   },
   loginBtn: {
@@ -88,7 +88,7 @@ const useStyles = makeStyles({
     fontSize: "16px",
     cursor: "pointer",
     transition: "background 0.15s, color 0.15s",
-    '&:hover': {
+    "&:hover": {
       background: "var(--color-primary)",
       color: "var(--color-background)",
     },
@@ -198,10 +198,12 @@ export function Header(): JSX.Element {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navigationItems = [
+  const navItems = [
     { path: "/", label: "Home" },
     { path: "/get-started", label: "Get Started" },
     { path: "/playground", label: "Playground" },
+    { path: "/profile", label: "Profile" },
+    { path: "/policies", label: "Manage Policies" },
   ];
 
   const isActive = (path: string): boolean => {
@@ -226,11 +228,12 @@ export function Header(): JSX.Element {
           Consent Package
         </Link>
         <div className={styles.navLinks}>
-          {navigationItems.map((item) => (
+          {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
               className={`${styles.navLink} ${isActive(item.path) ? styles.active : ""}`}
+              onClick={closeMobileMenu}
             >
               {item.label}
             </Link>
@@ -240,10 +243,11 @@ export function Header(): JSX.Element {
           <button
             className={styles.loginBtn}
             onClick={() => {
-              if (location.pathname === '/profile') navigate('/');
-              else navigate('/profile');
-            }}>
-            {location.pathname === '/profile' ? 'Log out' : 'Log in'}
+              if (location.pathname === "/profile") navigate("/");
+              else navigate("/profile");
+            }}
+          >
+            {location.pathname === "/profile" ? "Log out" : "Log in"}
           </button>
         </div>
         <button
@@ -251,7 +255,9 @@ export function Header(): JSX.Element {
           onClick={toggleMobileMenu}
           aria-label="Toggle menu"
         >
-          <span className={`${styles.hamburgerIcon} ${isMobileMenuOpen ? styles.hamburgerIconOpen : ""}`} />
+          <span
+            className={`${styles.hamburgerIcon} ${isMobileMenuOpen ? styles.hamburgerIconOpen : ""}`}
+          />
         </button>
       </nav>
 
@@ -265,7 +271,7 @@ export function Header(): JSX.Element {
             ×
           </button>
           <div className={styles.mobileNavLinks}>
-            {navigationItems.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -278,15 +284,16 @@ export function Header(): JSX.Element {
             <button
               className={`${styles.loginBtn} ${styles.mobileLoginBtn}`}
               onClick={() => {
-                if (location.pathname === '/profile') navigate('/');
-                else navigate('/profile');
+                if (location.pathname === "/profile") navigate("/");
+                else navigate("/profile");
                 closeMobileMenu();
-              }}>
-              {location.pathname === '/profile' ? 'Log out' : 'Log in'}
+              }}
+            >
+              {location.pathname === "/profile" ? "Log out" : "Log in"}
             </button>
           </div>
         </div>
       )}
     </div>
   );
-} 
+}

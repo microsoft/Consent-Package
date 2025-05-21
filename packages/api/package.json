@@ -10,6 +10,10 @@
     ".": {
       "types": "./dist/functions/index.d.ts",
       "import": "./dist/functions/index.js"
+    },
+    "./mock": {
+      "types": "./dist/mock/index.d.ts",
+      "import": "./dist/mock/index.js"
     }
   },
   "files": [
@@ -27,7 +31,9 @@
     "@azure/functions": "^4.0.0",
     "@open-source-consent/core": "workspace:*",
     "@open-source-consent/data-adapter-cosmosdb": "workspace:*",
+    "@open-source-consent/data-adapter-indexeddb": "workspace:*",
     "@open-source-consent/types": "workspace:*",
+    "@open-source-consent/ui": "workspace:*",
     "sanitize-html": "^2.17.0"
   },
   "devDependencies": {

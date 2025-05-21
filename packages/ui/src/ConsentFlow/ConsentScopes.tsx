@@ -1,10 +1,18 @@
 import { useState, type ChangeEvent } from "react";
-import { makeStyles, Text, Title2, Checkbox, tokens, Button } from "@fluentui/react-components";
-import type { ConsentFlowFormData, ConsentFlowScope } from "./ConsentFlow.type.js";
+import {
+  makeStyles,
+  Text,
+  Title2,
+  Checkbox,
+  tokens,
+  Button,
+} from "@fluentui/react-components";
+import type { ConsentFlowFormData } from "./ConsentFlow.type.js";
+import type { PolicyScope } from "@open-source-consent/types";
 
 interface ConsentScopesProps {
   formData: ConsentFlowFormData;
-  availableScopes: ConsentFlowScope[];
+  availableScopes: readonly PolicyScope[];
   onChange(scopeId: string, isChecked: boolean, subjectId?: string): void;
 }
 
@@ -23,7 +31,7 @@ const useStyles = makeStyles({
     cursor: "pointer",
     "&:hover": {
       backgroundColor: tokens.colorNeutralBackground2,
-    }
+    },
   },
   subjectSection: {
     display: "flex",
@@ -64,45 +72,68 @@ const useStyles = makeStyles({
     transition: "all 0.2s ease",
     "&:hover": {
       backgroundColor: tokens.colorNeutralStroke2,
-    }
+    },
   },
   activeSlideDot: {
     backgroundColor: tokens.colorBrandBackground,
     transform: "scale(1.2)",
     boxShadow: `0 0 0 2px ${tokens.colorBrandBackground}`,
-  }
+  },
 });
 
-const ConsentScopes = ({ formData, availableScopes, onChange }: ConsentScopesProps): JSX.Element => {
+const ConsentScopes = ({
+  formData,
+  availableScopes,
+  onChange,
+}: ConsentScopesProps): JSX.Element => {
   const styles = useStyles();
-  const [selectedScopes, setSelectedScopes] = useState<Record<string, boolean>>(availableScopes.reduce((acc, scope) => ({
-    ...acc,
-    [scope.key]: formData.grantedScopes?.includes(scope.key) ?? false
-  }), {}));
-  const [subjectScopes, setSubjectScopes] = useState<Record<string, Record<string, boolean>>>(formData.managedSubjects.reduce((acc, subject) => ({
-    ...acc,
-    [subject.id]: availableScopes.reduce((scopeAcc, scope) => ({
-      ...scopeAcc,
-      [scope.key]: subject.grantedScopes?.includes(scope.key) ?? false
-    }), {})
-  }), {}));
+  const [selectedScopes, setSelectedScopes] = useState<Record<string, boolean>>(
+    availableScopes.reduce(
+      (acc, scope: PolicyScope) => ({
+        ...acc,
+        [scope.key]: formData.grantedScopes?.includes(scope.key) ?? false,
+      }),
+      {}
+    )
+  );
+  const [subjectScopes, setSubjectScopes] = useState<
+    Record<string, Record<string, boolean>>
+  >(
+    formData.managedSubjects.reduce(
+      (acc, subject) => ({
+        ...acc,
+        [subject.id]: availableScopes.reduce(
+          (scopeAcc, scope: PolicyScope) => ({
+            ...scopeAcc,
+            [scope.key]: subject.grantedScopes?.includes(scope.key) ?? false,
+          }),
+          {}
+        ),
+      }),
+      {}
+    )
+  );
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const { isProxy, managedSubjects } = formData;
 
-  const handleScopeChange = (scopeId: string, isChecked: boolean, subjectId?: string): void => {
+  const handleScopeChange = (
+    scopeId: string,
+    isChecked: boolean,
+    subjectId?: string
+  ): void => {
     if (subjectId) {
-      setSubjectScopes(prev => ({
+      setSubjectScopes((prev) => ({
         ...prev,
         [subjectId]: {
           ...prev[subjectId],
-          [scopeId]: isChecked
-        }
+          [scopeId]: isChecked,
+        },
       }));
     } else {
-      setSelectedScopes(prev => ({
+      setSelectedScopes((prev) => ({
         ...prev,
-        [scopeId]: isChecked
+        [scopeId]: isChecked,
       }));
     }
     onChange(scopeId, isChecked, subjectId);
@@ -110,13 +141,13 @@ const ConsentScopes = ({ formData, availableScopes, onChange }: ConsentScopesPro
 
   const handleNextSubject = (): void => {
     if (managedSubjects && currentSlide < managedSubjects.length - 1) {
-      setCurrentSlide(prev => prev + 1);
+      setCurrentSlide((prev) => prev + 1);
     }
   };
 
   const handlePreviousSubject = (): void => {
     if (currentSlide > 0) {
-      setCurrentSlide(prev => prev - 1);
+      setCurrentSlide((prev) => prev - 1);
     }
   };
 
@@ -127,20 +158,24 @@ const ConsentScopes = ({ formData, availableScopes, onChange }: ConsentScopesPro
   return (
     <div className={styles.root}>
       <Title2 align="center">Select Data Access Permissions</Title2>
-      <Text align="center">Choose which data you want to share with the service</Text>
+      <Text align="center">
+        Choose which data you want to share with the service
+      </Text>
 
-      {!isProxy && availableScopes.map(scope => (
-        <div key={scope.key} className={styles.scope}>
-          <Checkbox
-            label={scope.name}
-            checked={scope.required || (selectedScopes[scope.key] ?? false)}
-            disabled={scope.required}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              handleScopeChange(scope.key, e.target.checked)}
-          />
-          <Text size={200}>{scope.description}</Text>
-        </div>
-      ))}
+      {!isProxy &&
+        availableScopes.map((scope: PolicyScope) => (
+          <div key={scope.key} className={styles.scope}>
+            <Checkbox
+              label={scope.name}
+              checked={scope.required || (selectedScopes[scope.key] ?? false)}
+              disabled={scope.required}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                handleScopeChange(scope.key, e.target.checked)
+              }
+            />
+            <Text size={200}>{scope.description}</Text>
+          </div>
+        ))}
 
       {isProxy && managedSubjects && managedSubjects.length > 0 && (
         <div className={styles.subjectSection}>
@@ -149,14 +184,28 @@ const ConsentScopes = ({ formData, availableScopes, onChange }: ConsentScopesPro
             <Text weight="semibold" size={400}>
               {managedSubjects[currentSlide].name}
             </Text>
-            {availableScopes.map(scope => (
-              <div key={`${managedSubjects[currentSlide].id}-${scope.key}`} className={styles.scope}>
+            {availableScopes.map((scope: PolicyScope) => (
+              <div
+                key={`${managedSubjects[currentSlide].id}-${scope.key}`}
+                className={styles.scope}
+              >
                 <Checkbox
                   label={scope.name}
-                  checked={scope.required || (subjectScopes[managedSubjects[currentSlide].id]?.[scope.key] ?? false)}
+                  checked={
+                    scope.required ||
+                    (subjectScopes[managedSubjects[currentSlide].id]?.[
+                      scope.key
+                    ] ??
+                      false)
+                  }
                   disabled={scope.required}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleScopeChange(scope.key, e.target.checked, managedSubjects[currentSlide].id)}
+                    handleScopeChange(
+                      scope.key,
+                      e.target.checked,
+                      managedSubjects[currentSlide].id
+                    )
+                  }
                 />
                 <Text size={200}>{scope.description}</Text>
               </div>
@@ -184,7 +233,7 @@ const ConsentScopes = ({ formData, availableScopes, onChange }: ConsentScopesPro
             {managedSubjects.map((_, index) => (
               <div
                 key={index}
-                className={`${styles.slideDot} ${index === currentSlide ? styles.activeSlideDot : ''}`}
+                className={`${styles.slideDot} ${index === currentSlide ? styles.activeSlideDot : ""}`}
                 onClick={() => handleSlideClick(index)}
               />
             ))}
@@ -193,6 +242,6 @@ const ConsentScopes = ({ formData, availableScopes, onChange }: ConsentScopesPro
       )}
     </div>
   );
-}
+};
 
 export default ConsentScopes;

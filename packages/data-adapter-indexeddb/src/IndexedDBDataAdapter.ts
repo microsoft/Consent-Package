@@ -528,7 +528,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
         const updatedPolicy: Policy = {
           ...existingPolicy,
           status: status,
-          version: existingPolicy.version + 1,
+          version: existingPolicy.version,
           updatedAt: new Date(),
         };
 

@@ -23,9 +23,6 @@ export interface ConsentFlowFormData {
 export interface ConsentFlowContentSection {
   title: string;
   content: string;
-  risks: string[];
-  dataTypes: string[];
-  compensation: string[];
 }
 
 export interface ConsentFlowScope {

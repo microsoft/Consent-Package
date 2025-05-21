@@ -62,9 +62,15 @@ importers:
       '@open-source-consent/data-adapter-cosmosdb':
         specifier: workspace:*
         version: link:../data-adapter-cosmosdb
+      '@open-source-consent/data-adapter-indexeddb':
+        specifier: workspace:*
+        version: link:../data-adapter-indexeddb
       '@open-source-consent/types':
         specifier: workspace:*
         version: link:../types
+      '@open-source-consent/ui':
+        specifier: workspace:*
+        version: link:../ui
       sanitize-html:
         specifier: ^2.17.0
         version: 2.17.0
@@ -241,9 +247,18 @@ importers:
       '@fluentui/react-icons':
         specifier: ^2.0.298
         version: 2.0.298(react@18.3.1)
+      '@open-source-consent/api':
+        specifier: workspace:*
+        version: link:../api
       '@open-source-consent/core':
         specifier: workspace:*
         version: link:../core
+      '@open-source-consent/data-adapter-indexeddb':
+        specifier: workspace:*
+        version: link:../data-adapter-indexeddb
+      '@open-source-consent/types':
+        specifier: workspace:*
+        version: link:../types
       '@open-source-consent/ui':
         specifier: workspace:*
         version: link:../ui
@@ -253,6 +268,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
+      react-quill:
+        specifier: ^2.0.0
+        version: 2.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-router-dom:
         specifier: ^6.30.0
         version: 6.30.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -263,6 +281,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.0
         version: 18.3.6(@types/react@18.3.20)
+      '@types/sanitize-html':
+        specifier: ^2.9.0
+        version: 2.16.0
       '@vitejs/plugin-react':
         specifier: ^4.0.0
         version: 4.4.1(vite@5.4.18(@types/node@22.14.1))
@@ -290,9 +311,15 @@ importers:
       '@fluentui/react-icons':
         specifier: ^2.0.298
         version: 2.0.298(react@18.3.1)
+      '@open-source-consent/types':
+        specifier: workspace:*
+        version: link:../types
       react:
         specifier: ^18.2.0
         version: 18.3.1
+      react-quill:
+        specifier: ^2.0.0
+        version: 2.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@types/react':
         specifier: ^18.2.0

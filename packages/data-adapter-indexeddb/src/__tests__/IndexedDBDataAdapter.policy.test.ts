@@ -107,6 +107,7 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
   describe("createPolicy", () => {
     it("should create a policy record with auto-generated fields", async () => {
       const policyInput: CreatePolicyInput = {
+        title: "Policy A",
         policyGroupId: "group1",
         version: 1,
         status: "draft",
@@ -162,6 +163,7 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
   describe("findPolicyById", () => {
     it("should return a policy record when found", async () => {
       const policyInput: CreatePolicyInput = {
+        title: "Policy A",
         policyGroupId: "groupFind",
         version: 1,
         status: "active",
@@ -188,6 +190,7 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
 
     beforeEach(async () => {
       const initialPolicyData: CreatePolicyInput = {
+        title: "Policy A",
         policyGroupId: "groupUpdate",
         version: 1,
         status: "draft",
@@ -202,7 +205,7 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
       policyToUpdate = await dataAdapter.createPolicy(initialPolicyData);
     });
 
-    it("should update a policy's status, increment version, and update 'updatedAt'", async () => {
+    it("should update a policy's status without incrementing version, and update 'updatedAt'", async () => {
       const newStatus = "active";
       const expectedVersionBeforeUpdate = policyToUpdate.version;
 
@@ -218,7 +221,7 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
 
       expect(updatedPolicy.id).toBe(policyToUpdate.id);
       expect(updatedPolicy.status).toBe(newStatus);
-      expect(updatedPolicy.version).toBe(expectedVersionBeforeUpdate + 1);
+      expect(updatedPolicy.version).toBe(expectedVersionBeforeUpdate);
       expect(updatedPolicy.updatedAt).toBeInstanceOf(Date);
       expect(updatedPolicy.updatedAt.getTime()).toBeGreaterThan(
         policyToUpdate.updatedAt.getTime()
@@ -268,6 +271,7 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
       CreatePolicyInput,
       "policyGroupId" | "version" | "status"
     > = {
+      title: "Policy A",
       effectiveDate: new Date("2025-05-01T00:00:00.000Z"),
       contentSections: [
         { title: "All Versions", content: "Content", description: "Desc" },
@@ -322,6 +326,7 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
       CreatePolicyInput,
       "policyGroupId" | "version" | "status"
     > = {
+      title: "Policy A",
       effectiveDate: new Date("2025-04-01T00:00:00.000Z"),
       contentSections: [
         { title: "Latest Active", content: "Test", description: "Desc" },
@@ -400,6 +405,7 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
       CreatePolicyInput,
       "policyGroupId" | "version" | "status"
     > = {
+      title: "Policy A",
       effectiveDate: new Date("2025-06-01T00:00:00.000Z"),
       contentSections: [
         { title: "List", content: "Content", description: "Desc" },
@@ -417,24 +423,28 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
         policyGroupId: P_GROUP_LIST_B,
         version: 1,
         status: "active",
+        title: "Policy B",
       });
       p_A_v1 = await dataAdapter.createPolicy({
         ...commonListData,
         policyGroupId: P_GROUP_LIST_A,
         version: 1,
         status: "draft",
+        title: "Policy A",
       });
       p_A_v2 = await dataAdapter.createPolicy({
         ...commonListData,
         policyGroupId: P_GROUP_LIST_A,
         version: 2,
         status: "active",
+        title: "Policy A",
       });
       await dataAdapter.createPolicy({
         ...commonListData,
         policyGroupId: "listPGroupC",
         version: 1,
         status: "draft",
+        title: "Policy C",
       });
     });
 

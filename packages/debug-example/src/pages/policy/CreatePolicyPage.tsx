@@ -111,8 +111,8 @@ function CreatePolicyPage(): JSX.Element {
   );
   const [effectiveDate, setEffectiveDate] = useState<string>(
     existingPolicy?.effectiveDate
-      ? new Date(existingPolicy.effectiveDate).toISOString().split("T")[0]
-      : new Date().toISOString().split("T")[0]
+      ? new Date(existingPolicy.effectiveDate).toDateString()
+      : new Date().toDateString()
   );
   const [status, setStatus] = useState<Policy["status"]>(
     existingPolicy ? "draft" : "draft" // Always draft for new or new version
@@ -207,6 +207,7 @@ function CreatePolicyPage(): JSX.Element {
     setError(null);
 
     const policyData: CreatePolicyInput = {
+      title: "Policy A",
       policyGroupId,
       version: version || 1,
       effectiveDate: new Date(effectiveDate),

@@ -8,15 +8,17 @@ import { BaseService } from "./BaseService.js";
 
 export class PolicyService extends BaseService<IPolicyDataAdapter> {
   /**
-   * Creates a new policy (can be the first version for a new policyGroupId or a subsequent version).
-   * If creating a subsequent version, ensure policyGroupId and incremented version are handled correctly.
-   * @param data - Input data for the new policy.
-   * @returns The created policy.
+   * Creates a new policy.
+   * If a policy with the same policyGroupId already exists, this method will instead create a new version
+   * for that existing policy group using the provided data.
+   * If no policy exists for the policyGroupId, a new policy (typically version 1 unless specified) is created.
+   * @param data - Input data for the new policy. If creating the first policy in a group and `version` is not supplied, it defaults to 1.
+   * @returns The created policy (either the first version or a new version).
    */
   async createPolicy(
     data: CreatePolicyInput & { version?: number }
   ): Promise<Policy> {
-    // Validation for CreatePolicyInput (all fields required for a new policy definition)
+    // Validation for CreatePolicyInput
     if (
       !data.policyGroupId ||
       !data.contentSections ||
@@ -28,9 +30,37 @@ export class PolicyService extends BaseService<IPolicyDataAdapter> {
         "Missing required fields for policy creation: policyGroupId, contentSections, availableScopes, effectiveDate, status."
       );
     }
-    // The adapter's createPolicy should handle versioning logic internally based on whether a version is provided
-    // or by looking up the latest version for the policyGroupId if version is not provided.
-    return this.adapter.createPolicy(data);
+
+    const existingPoliciesInGroup = await this.getAllPolicyVersionsByGroupId(
+      data.policyGroupId
+    );
+
+    if (existingPoliciesInGroup?.length > 0) {
+      // Group already exists, create a new version
+      const latestExistingPolicy =
+        existingPoliciesInGroup[existingPoliciesInGroup.length - 1]; // Assumes sorted ascending by version
+
+      const newDataForVersion: NewPolicyVersionDataInput = {
+        title: data.title,
+        contentSections: data.contentSections,
+        availableScopes: data.availableScopes,
+        effectiveDate: data.effectiveDate,
+        status: data.status,
+      };
+
+      return this.createNewPolicyVersion(
+        latestExistingPolicy.id,
+        newDataForVersion
+      );
+    } else {
+      // No existing policies in the group, create a new policy
+      // Default to version 1 if not specified for a new policy group
+      const policyDataToCreate = {
+        ...data,
+        version: data.version === undefined ? 1 : data.version,
+      };
+      return this.adapter.createPolicy(policyDataToCreate);
+    }
   }
 
   /**

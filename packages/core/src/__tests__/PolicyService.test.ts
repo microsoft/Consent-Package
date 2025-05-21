@@ -42,6 +42,7 @@ describe("PolicyService", () => {
     it("should create a new policy with the provided data", async () => {
       // Arrange
       const inputData: CreatePolicyInput = {
+        title: "Policy 1",
         policyGroupId: "group1",
         version: 1,
         contentSections: [
@@ -96,6 +97,7 @@ describe("PolicyService", () => {
     it("should allow creating a policy with a specific version if provided", async () => {
       // Arrange
       const inputData: CreatePolicyInput & { version?: number } = {
+        title: "Policy 1",
         policyGroupId: "group1",
         contentSections: [
           {
@@ -141,6 +143,7 @@ describe("PolicyService", () => {
       const oldPolicyVersion = 2;
       const oldPolicy: Policy = {
         id: policyIdToSupersede,
+        title: "Policy 1",
         policyGroupId: "group1",
         version: oldPolicyVersion,
         contentSections: [
@@ -170,12 +173,14 @@ describe("PolicyService", () => {
         availableScopes: [
           { key: "scope2", name: "Scope 2", description: "New Scope Desc" },
         ],
+        title: "Policy 1",
         effectiveDate: mockEffectiveDate,
         status: "draft", // New version starts as draft
       };
 
       const expectedNewPolicy: Policy = {
         id: "newPolicy456",
+        title: "Policy 1",
         policyGroupId: oldPolicy.policyGroupId,
         version: oldPolicyVersion + 1,
         contentSections: newVersionData.contentSections,
@@ -225,6 +230,7 @@ describe("PolicyService", () => {
       // Arrange
       const policyIdToSupersede = "nonExistentPolicy";
       const newVersionData: NewPolicyVersionDataInput = {
+        title: "Policy 1",
         contentSections: [
           {
             title: "New Section",
@@ -259,6 +265,7 @@ describe("PolicyService", () => {
       const policyIdToSupersede = "archivedPolicy123";
       const oldPolicy: Policy = {
         id: policyIdToSupersede,
+        title: "Policy 1",
         policyGroupId: "group1",
         version: 1,
         contentSections: [],
@@ -269,6 +276,7 @@ describe("PolicyService", () => {
         updatedAt: new Date(),
       };
       const newVersionData: NewPolicyVersionDataInput = {
+        title: "Policy 1",
         contentSections: [],
         availableScopes: [],
         effectiveDate: mockEffectiveDate,
@@ -296,6 +304,7 @@ describe("PolicyService", () => {
       const oldPolicyVersion = 1;
       const oldPolicy: Policy = {
         id: policyIdToSupersede,
+        title: "Policy 1",
         policyGroupId: "group2",
         version: oldPolicyVersion,
         contentSections: [{ title: "Old", description: "Old", content: "Old" }],
@@ -307,6 +316,7 @@ describe("PolicyService", () => {
       };
 
       const newVersionData: NewPolicyVersionDataInput = {
+        title: "Policy 1",
         contentSections: [{ title: "New", description: "New", content: "New" }],
         availableScopes: [{ key: "s2", name: "S2", description: "S2" }],
         effectiveDate: mockEffectiveDate,
@@ -315,6 +325,7 @@ describe("PolicyService", () => {
 
       const expectedNewPolicy: Policy = {
         id: "newPolicy789",
+        title: "Policy 1",
         policyGroupId: oldPolicy.policyGroupId,
         version: oldPolicyVersion + 1,
         contentSections: newVersionData.contentSections,
@@ -365,6 +376,7 @@ describe("PolicyService", () => {
       const expectedVersion = 3;
       const updatedPolicy: Policy = {
         id: policyId,
+        title: "Policy 1",
         policyGroupId: "groupX",
         version: expectedVersion, // Version should remain the same after status update
         contentSections: [],
@@ -449,6 +461,7 @@ describe("PolicyService", () => {
         const expectedVersion = 1;
         const updatedPolicy: Policy = {
           id: policyId,
+          title: "Policy 1",
           policyGroupId: "groupX",
           version: expectedVersion,
           contentSections: [],
@@ -486,6 +499,7 @@ describe("PolicyService", () => {
       const policyId = "existingPolicy123";
       const mockPolicy: Policy = {
         id: policyId,
+        title: "Policy 1",
         policyGroupId: "groupA",
         version: 1,
         contentSections: [{ title: "T", description: "D", content: "C" }],
@@ -525,6 +539,7 @@ describe("PolicyService", () => {
       const policyGroupId = "groupB";
       const mockPolicy: Policy = {
         id: "policy789",
+        title: "Policy 1",
         policyGroupId: policyGroupId,
         version: 3, // Assuming this is the latest active
         contentSections: [],
@@ -575,6 +590,7 @@ describe("PolicyService", () => {
       const mockPolicies: Policy[] = [
         {
           id: "policyV1",
+          title: "Policy 1",
           policyGroupId: policyGroupId,
           version: 1,
           contentSections: [],
@@ -586,6 +602,7 @@ describe("PolicyService", () => {
         },
         {
           id: "policyV2",
+          title: "Policy 1",
           policyGroupId: policyGroupId,
           version: 2,
           contentSections: [],
@@ -636,6 +653,7 @@ describe("PolicyService", () => {
       const mockPoliciesList: Policy[] = [
         {
           id: "policy1",
+          title: "Policy 1",
           policyGroupId: "groupX",
           version: 1,
           contentSections: [],
@@ -647,6 +665,7 @@ describe("PolicyService", () => {
         },
         {
           id: "policy2",
+          title: "Policy 2",
           policyGroupId: "groupY",
           version: 2,
           contentSections: [],
