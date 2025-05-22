@@ -1,21 +1,35 @@
-import React from 'react';
-import {
-  Text,
-  Badge,
-  Button,
-} from '@fluentui/react-components';
-import type { ProfileData } from './Profile.type.js';
+import React from "react";
+import { Text, Badge, Button } from "@fluentui/react-components";
+import type { ConsentRecord } from "@open-source-consent/types";
+
+interface ScopeDisplayInfo {
+  id: string;
+  label: string;
+  className?: string;
+  canBeRevoked?: boolean;
+  canBeGranted?: boolean;
+}
 
 interface ConsentsTabProps {
-  consents: ProfileData['consents'];
-  onRevokeScope(consentId: string, scopeId: string, updatedConsents: ProfileData['consents']): void;
-  onGrantScope(consentId: string, scopeId: string, updatedConsents: ProfileData['consents']): void;
+  consents: ConsentRecord[];
+  onRevokeScope(
+    consentId: string,
+    policyId: string,
+    scopeId: string,
+    currentGrantedScopes: string[]
+  ): void;
+  onGrantScope(
+    consentId: string,
+    policyId: string,
+    scopeId: string,
+    currentGrantedScopes: string[]
+  ): void;
 }
 
 const ConsentsTab: React.FC<ConsentsTabProps> = ({
   consents,
   onRevokeScope,
-  onGrantScope
+  onGrantScope,
 }) => {
   if (!consents?.length) {
     return (
@@ -25,126 +39,172 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
     );
   }
 
-  const handleGrantScope = (consentId: string, scopeId: string): void => {
-    let updatedConsents: ProfileData['consents'] = [...consents]
-
-    // Find the revoked consent object
-    const revokedConsent = updatedConsents.find(c => c.id === consentId && c.status.id === 'revoked');
-    if (!revokedConsent) return;
-
-    // Find the scope to grant
-    const scopeToGrant = revokedConsent.scopes.find(s => s.id === scopeId);
-    if (!scopeToGrant) return;
-
-    // Find or create the granted consent object for the same policy
-    let grantedConsent = updatedConsents.find(c =>
-      c.status.id === 'granted' &&
-      c.policy.id === revokedConsent.policy.id
+  const getGrantedScopesForPolicy = (policyId: string): string[] => {
+    const activeConsentForPolicy = consents.find(
+      (c) => c.policyId === policyId && c.status === "granted"
     );
-
-    // Remove the scope from the revoked consent
-    revokedConsent.scopes = revokedConsent.scopes.filter(s => s.id !== scopeId);
-
-    if (!grantedConsent) {
-      // Create a new granted consent object if it doesn't exist
-      grantedConsent = {
-        id: consentId,
-        policy: revokedConsent.policy,
-        status: {
-          id: 'granted',
-          label: 'Scopes Allowed'
-        },
-        scopes: [scopeToGrant]
-      };
-
-      updatedConsents = [...updatedConsents, grantedConsent];
-    } else {
-      grantedConsent.scopes.push(scopeToGrant);
-    }
-
-    onGrantScope(consentId, scopeId, updatedConsents);
-  };
-
-  const handleRevokeScope = (consentId: string, scopeId: string): void => {
-    let updatedConsents: ProfileData['consents'] = [...consents]
-
-    // Find the granted consent object
-    const grantedConsent = updatedConsents.find(c => c.id === consentId && c.status.id === 'granted');
-    if (!grantedConsent) return;
-
-    // Find the scope to revoke
-    const scopeToRevoke = grantedConsent.scopes.find(s => s.id === scopeId);
-    if (!scopeToRevoke) return;
-
-    // Find or create the revoked consent object for the same policy
-    let revokedConsent = updatedConsents.find(c =>
-      c.status.id === 'revoked' &&
-      c.policy.id === grantedConsent.policy.id
-    );
-
-    // Remove the scope from the granted consent
-    grantedConsent.scopes = grantedConsent.scopes.filter(s => s.id !== scopeId);
-
-    if (!revokedConsent) {
-      // Create a new revoked consent object if it doesn't exist
-      revokedConsent = {
-        id: consentId,
-        policy: grantedConsent.policy,
-        status: {
-          id: 'revoked',
-          label: 'Scopes Revoked'
-        },
-        scopes: [scopeToRevoke]
-      };
-
-      updatedConsents = [...updatedConsents, revokedConsent];
-    } else {
-      revokedConsent.scopes.push(scopeToRevoke);
-    }
-
-    onRevokeScope(consentId, scopeId, updatedConsents);
+    return activeConsentForPolicy
+      ? Object.keys(activeConsentForPolicy.grantedScopes || {})
+      : [];
   };
 
   return (
     <div className="profile-consent-list-container">
-      {consents.map(consent => (
-        <div key={`${consent.id}-${consent.status.id}`} className="profile-consent-item">
-          <Text size={400} weight="semibold">
-            Policy: {consent.policy?.label}
-          </Text>
-          <Badge
-            className="profile-consent-badge"
-            color={consent.status.id === 'granted' ? 'success' : 'danger'}>
-            {consent.status?.label}
-          </Badge>
-          <ul className="profile-consent-scopes-list">
-            {consent.scopes.map(scope => (
-              <li key={`${scope.id}-${consent.status.id}`} className="profile-consent-scope-item">
-                <Text>{scope.label}</Text>
-                {consent.status.id === 'granted' ? (
-                  <Button
-                    size="small"
-                    appearance="subtle"
-                    disabled={scope.required}
-                    onClick={() => handleRevokeScope(consent.id, scope.id)}>
-                    Revoke
-                  </Button>
-                ) : (
-                  <Button
-                    size="small"
-                    appearance="subtle"
-                    disabled={scope.required}
-                    onClick={() => handleGrantScope(consent.id, scope.id)}>
-                    Grant
-                  </Button>
+      {consents.map((consent) => {
+        const currentGrantedScopesForThisPolicy = getGrantedScopesForPolicy(
+          consent.policyId
+        );
+        const scopesToDisplay: Array<ScopeDisplayInfo> = [];
+
+        if (consent.status === "granted") {
+          Object.entries(consent.grantedScopes || {}).forEach(
+            ([scopeId, scopeGrant]) => {
+              scopesToDisplay.push({
+                id: scopeId,
+                label: scopeId,
+                className: "scope-granted",
+                canBeRevoked: true,
+              });
+            }
+          );
+          Object.entries(consent.revokedScopes || {}).forEach(
+            ([scopeId, scopeRevocation]) => {
+              scopesToDisplay.push({
+                id: scopeId,
+                label: `${scopeId} (not granted for this version - revoked ${scopeRevocation.revokedAt.toLocaleDateString()})`,
+                className: "scope-revoked-on-granted-record",
+                canBeGranted: true,
+              });
+            }
+          );
+        } else if (consent.status === "revoked") {
+          Object.entries(consent.revokedScopes || {}).forEach(
+            ([scopeId, scopeRevocation]) => {
+              scopesToDisplay.push({
+                id: scopeId,
+                label: `${scopeId} (revoked ${scopeRevocation.revokedAt.toLocaleDateString()})`,
+                className: "scope-explicitly-revoked",
+                canBeGranted: true,
+              });
+            }
+          );
+          Object.entries(consent.grantedScopes || {}).forEach(
+            ([scopeId, scopeGrant]) => {
+              if (!consent.revokedScopes?.[scopeId]) {
+                scopesToDisplay.push({
+                  id: scopeId,
+                  label: `${scopeId} (implicitly revoked as record is revoked)`,
+                  className: "scope-implicitly-revoked",
+                  canBeGranted: true,
+                });
+              }
+            }
+          );
+        } else if (consent.status === "superseded") {
+          const allSupersededScopeKeys = new Set([
+            ...Object.keys(consent.grantedScopes || {}),
+            ...Object.keys(consent.revokedScopes || {}),
+          ]);
+
+          allSupersededScopeKeys.forEach((scopeId) => {
+            let label = scopeId;
+            const revokedInfo = consent.revokedScopes?.[scopeId];
+            const grantedInfo = consent.grantedScopes?.[scopeId];
+
+            if (revokedInfo) {
+              label = `${scopeId} (was revoked on ${revokedInfo.revokedAt.toLocaleDateString()}, record superseded)`;
+            } else if (grantedInfo) {
+              label = `${scopeId} (was granted, record superseded)`;
+            }
+
+            scopesToDisplay.push({
+              id: scopeId,
+              label: label,
+              className: "scope-superseded",
+            });
+          });
+        }
+
+        scopesToDisplay.sort((a, b) => a.id.localeCompare(b.id));
+
+        return (
+          <div key={`${consent.id}`} className="profile-consent-item">
+            <Text size={400} weight="semibold">
+              Policy ID: {consent.policyId}
+            </Text>
+            <Badge
+              className="profile-consent-badge"
+              color={
+                consent.status === "granted"
+                  ? "success"
+                  : consent.status === "revoked"
+                    ? "danger"
+                    : "warning"
+              }
+            >
+              {consent.status}
+            </Badge>
+
+            <ul className="profile-consent-scopes-list">
+              {scopesToDisplay.map((scope) => (
+                <li
+                  key={scope.id}
+                  className={`profile-consent-scope-item ${scope.className || ""}`}
+                >
+                  <Text>{scope.label}</Text>
+                  {scope.canBeRevoked && (
+                    <Button
+                      size="small"
+                      appearance="subtle"
+                      onClick={() =>
+                        onRevokeScope(
+                          consent.id,
+                          consent.policyId,
+                          scope.id,
+                          currentGrantedScopesForThisPolicy
+                        )
+                      }
+                    >
+                      Revoke
+                    </Button>
+                  )}
+                  {scope.canBeGranted && (
+                    <Button
+                      size="small"
+                      appearance="subtle"
+                      onClick={() =>
+                        onGrantScope(
+                          consent.id,
+                          consent.policyId,
+                          scope.id,
+                          currentGrantedScopesForThisPolicy
+                        )
+                      }
+                    >
+                      Grant
+                    </Button>
+                  )}
+                </li>
+              ))}
+              {scopesToDisplay.length === 0 &&
+                (consent.status === "granted" ||
+                  consent.status === "revoked") && (
+                  <Text as="li">
+                    No specific scopes detailed for this consent event.
+                  </Text>
                 )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+              {scopesToDisplay.length === 0 &&
+                consent.status === "superseded" && (
+                  <Text as="li">
+                    No specific scopes detailed for this superseded consent.
+                  </Text>
+                )}
+            </ul>
+          </div>
+        );
+      })}
     </div>
   );
 };
 
-export default ConsentsTab; 
+export default ConsentsTab;

@@ -1,31 +1,45 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router";
-import { makeStyles } from "@fluentui/react-components";
+import { Link, useLocation } from "react-router";
+import {
+  makeStyles,
+  shorthands,
+  Drawer,
+  DrawerHeader,
+  DrawerHeaderTitle,
+  DrawerBody,
+  Button as FluentButton,
+} from "@fluentui/react-components";
+import { AuthMenu } from "./AuthMenu.js";
 
 const useStyles = makeStyles({
   headerWrapper: {
     width: "100%",
     display: "flex",
     justifyContent: "center",
-    alignItems: "flex-start",
+    alignItems: "center",
     background: "transparent",
-    padding: "32px 0 24px 0",
+    paddingTop: "16px",
+    paddingBottom: "16px",
+    position: "fixed",
+    top: 0,
+    left: 0,
+    zIndex: 1000,
+    backgroundColor: "var(--colorNeutralBackground1)",
   },
   navBar: {
-    background: "var(--color-background)",
     boxShadow: "0 4px 24px 0 rgba(80, 80, 120, 0.3)",
     borderRadius: "40px",
     display: "flex",
     alignItems: "center",
     width: "100%",
     maxWidth: "1200px",
-    minHeight: "64px",
+    minHeight: "56px",
     margin: "0 24px",
-    padding: "0 calc(var(--spacing-unit) * 4)",
-    gap: "calc(var(--spacing-unit) * 4)",
+    ...shorthands.padding("0px", "24px"),
+    ...shorthands.gap("16px"),
     position: "relative",
     "@media (max-width: 768px)": {
-      padding: "0 calc(var(--spacing-unit) * 2)",
+      ...shorthands.padding("0px", "16px"),
     },
   },
   logo: {
@@ -34,16 +48,16 @@ const useStyles = makeStyles({
     fontWeight: 700,
     fontSize: "20px",
     letterSpacing: "-0.5px",
-    color: "var(--color-text)",
+    color: "var(--colorNeutralForeground1)",
     textDecoration: "none",
-    marginRight: "calc(var(--spacing-unit) * 2)",
-    gap: "calc(var(--spacing-unit) * 1)",
+    marginRight: "16px",
+    ...shorthands.gap("8px"),
   },
   navLinks: {
     display: "flex",
     flex: 1,
     justifyContent: "center",
-    gap: "calc(var(--spacing-unit) * 4)",
+    ...shorthands.gap("32px"),
     "@media (max-width: 768px)": {
       display: "none",
     },
@@ -54,21 +68,21 @@ const useStyles = makeStyles({
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
-    color: "var(--color-text)",
+    color: "var(--colorNeutralForeground1)",
     textDecoration: "none",
     fontWeight: 600,
     fontSize: "16px",
-    padding: "calc(var(--spacing-unit) * 1) 0",
+    ...shorthands.padding("8px", "0px"),
     border: "none",
     background: "none",
     transition: "color 0.15s",
     position: "relative",
     "&:hover": {
-      color: "var(--color-primary)",
+      color: "var(--colorBrandForegroundLink)",
     },
   },
   active: {
-    color: "var(--color-primary)",
+    color: "var(--colorBrandForegroundLink)",
     fontWeight: 700,
     "&::after": {
       content: '""',
@@ -80,25 +94,7 @@ const useStyles = makeStyles({
       width: "24px",
       height: "4px",
       borderRadius: "2px",
-      background: "var(--color-primary)",
-    },
-  },
-  loginBtn: {
-    padding: "calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 3)",
-    border: "2px solid var(--color-primary)",
-    borderRadius: "calc(var(--spacing-unit) * 3)",
-    background: "var(--color-background)",
-    color: "var(--color-primary)",
-    fontWeight: 600,
-    fontSize: "16px",
-    cursor: "pointer",
-    transition: "background 0.15s, color 0.15s",
-    "&:hover": {
-      background: "var(--color-primary)",
-      color: "var(--color-background)",
-    },
-    "@media (max-width: 768px)": {
-      display: "none",
+      background: "var(--colorBrandBackground)",
     },
   },
   hamburgerButton: {
@@ -106,18 +102,19 @@ const useStyles = makeStyles({
     background: "none",
     border: "none",
     cursor: "pointer",
-    padding: "calc(var(--spacing-unit) * 1)",
+    ...shorthands.padding("8px"),
     marginLeft: "auto",
-    marginRight: "24px",
+    marginRight: "0px",
     "@media (max-width: 768px)": {
       display: "block",
+      marginRight: "8px",
     },
   },
   hamburgerIcon: {
     display: "block",
     width: "24px",
     height: "2px",
-    background: "var(--color-text)",
+    background: "var(--colorNeutralForeground1)",
     position: "relative",
     transition: "background 0.3s",
     "&::before, &::after": {
@@ -126,7 +123,7 @@ const useStyles = makeStyles({
       width: "24px",
       height: "2px",
       left: "0",
-      background: "var(--color-text)",
+      background: "var(--colorNeutralForeground1)",
       transition: "transform 0.3s",
     },
     "&::before": {
@@ -147,67 +144,42 @@ const useStyles = makeStyles({
       bottom: "0",
     },
   },
-  mobileMenuOverlay: {
-    display: "none",
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: "var(--color-background)",
-    padding: "calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 4)",
-    zIndex: 1000,
-    "@media (max-width: 768px)": {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "calc(var(--spacing-unit) * 4)",
-    },
-  },
-  closeButton: {
-    position: "absolute",
-    top: "calc(var(--spacing-unit) * 4)",
-    right: "calc(var(--spacing-unit) * 4)",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    padding: "calc(var(--spacing-unit) * 1)",
-    color: "var(--color-text)",
-    fontSize: "24px",
-    fontWeight: "bold",
-    "&:hover": {
-      color: "var(--color-primary)",
-    },
+  drawerHeaderStyle: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   mobileNavLinks: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: "calc(var(--spacing-unit) * 4)",
+    ...shorthands.gap("24px"),
+    paddingTop: "24px",
   },
   mobileNavLink: {
-    fontSize: "24px",
+    fontSize: "20px",
     fontWeight: 600,
   },
-  mobileLoginBtn: {
-    display: "block !important",
-    marginTop: "calc(var(--spacing-unit) * 4)",
-    padding: "calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 6)",
-    fontSize: "20px",
+  mobileAuthContainer: {
+    marginTop: "24px",
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+  },
+  authContainerDesktop: {
+    marginLeft: "auto",
   },
 });
 
 export function Header(): JSX.Element {
   const styles = useStyles();
   const location = useLocation();
-  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
     { path: "/", label: "Home" },
     { path: "/get-started", label: "Get Started" },
     { path: "/playground", label: "Playground" },
-    { path: "/profile", label: "Profile" },
     { path: "/policies", label: "Manage Policies" },
   ];
 
@@ -227,82 +199,84 @@ export function Header(): JSX.Element {
   };
 
   return (
-    <div className={styles.headerWrapper}>
+    <header className={styles.headerWrapper}>
       <nav className={styles.navBar}>
         <Link to="/" className={styles.logo}>
-          Consent Package
+          <span>Consent Package</span>
         </Link>
         <div className={styles.navLinks}>
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`${styles.navLink} ${isActive(item.path) ? styles.active : ""}`}
+              className={`${styles.navLink} ${
+                isActive(item.path) ? styles.active : ""
+              }`}
               onClick={closeMobileMenu}
             >
               {item.label}
             </Link>
           ))}
         </div>
-        <div>
-          <button
-            className={styles.loginBtn}
-            onClick={() => {
-              void (async () => {
-                if (location.pathname === "/profile") await navigate("/");
-                else await navigate("/profile");
-              })();
-            }}
-          >
-            {location.pathname === "/profile" ? "Log out" : "Log in"}
-          </button>
+
+        <div className={styles.authContainerDesktop}>
+          <AuthMenu />
         </div>
-        <button
+
+        <FluentButton
+          appearance="transparent"
           className={styles.hamburgerButton}
           onClick={toggleMobileMenu}
-          aria-label="Toggle menu"
+          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
         >
           <span
-            className={`${styles.hamburgerIcon} ${isMobileMenuOpen ? styles.hamburgerIconOpen : ""}`}
+            className={`${styles.hamburgerIcon} ${
+              isMobileMenuOpen ? styles.hamburgerIconOpen : ""
+            }`}
           />
-        </button>
+        </FluentButton>
       </nav>
 
-      {isMobileMenuOpen && (
-        <div className={styles.mobileMenuOverlay}>
-          <button
-            className={styles.closeButton}
+      <Drawer
+        type="overlay"
+        open={isMobileMenuOpen}
+        onOpenChange={(_e: unknown, data: { open: boolean }) =>
+          setIsMobileMenuOpen(data.open)
+        }
+        position="end"
+      >
+        <DrawerHeader className={styles.drawerHeaderStyle}>
+          <DrawerHeaderTitle>Menu</DrawerHeaderTitle>
+          <FluentButton
+            appearance="subtle"
+            aria-label="Close panel"
             onClick={closeMobileMenu}
-            aria-label="Close menu"
           >
-            ×
-          </button>
+            &times;
+          </FluentButton>
+        </DrawerHeader>
+        <DrawerBody>
           <div className={styles.mobileNavLinks}>
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`${styles.navLink} ${styles.mobileNavLink} ${isActive(item.path) ? styles.active : ""}`}
-                onClick={closeMobileMenu}
+                className={`${styles.navLink} ${styles.mobileNavLink} ${
+                  isActive(item.path) ? styles.active : ""
+                }`}
+                onClick={() => {
+                  closeMobileMenu();
+                }}
               >
                 {item.label}
               </Link>
             ))}
-            <button
-              className={`${styles.loginBtn} ${styles.mobileLoginBtn}`}
-              onClick={() => {
-                void (async () => {
-                  if (location.pathname === "/profile") await navigate("/");
-                  else await navigate("/profile");
-                  closeMobileMenu();
-                })();
-              }}
-            >
-              {location.pathname === "/profile" ? "Log out" : "Log in"}
-            </button>
           </div>
-        </div>
-      )}
-    </div>
+          <div className={styles.mobileAuthContainer}>
+            <AuthMenu />
+          </div>
+        </DrawerBody>
+      </Drawer>
+    </header>
   );
 }

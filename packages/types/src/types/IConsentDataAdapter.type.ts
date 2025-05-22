@@ -39,4 +39,6 @@ export interface IConsentDataAdapter {
   ): Promise<ConsentRecord[]>;
 
   getAllConsents(): Promise<ConsentRecord[]>;
+
+  getConsentsByProxyId(proxyId: string): Promise<ConsentRecord[]>;
 }

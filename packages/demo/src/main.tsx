@@ -31,7 +31,7 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "playground", element: <ComponentsPlayground /> },
       { path: "get-started", element: <GetStarted /> },
-      { path: "profile", element: <ProfilePage /> },
+      { path: "profile/:userId", element: <ProfilePage /> },
       { path: "policy/new", element: <PolicyEditorPage /> },
       {
         path: "policy/edit/:policyId",

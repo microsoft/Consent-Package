@@ -1,12 +1,47 @@
 import type {
   IConsentDataAdapter,
+  IDataAdapter,
   ConsentRecord,
   CreateNextConsentVersionInput,
   CreateConsentInput,
+  PolicyScope,
 } from "@open-source-consent/types";
 import { BaseService } from "./BaseService.js";
 
 export class ConsentService extends BaseService<IConsentDataAdapter> {
+  private async getRevokedScopesMap(
+    grantedScopes: string[],
+    revokedScopesInput: string[] | undefined,
+    policyId: string,
+    timestamp: Date
+  ): Promise<Record<string, { revokedAt: Date }>> {
+    let finalRevokedScopeKeys: string[];
+
+    if (revokedScopesInput) {
+      finalRevokedScopeKeys = revokedScopesInput;
+    } else {
+      const policyAdapter = this.adapter as IDataAdapter;
+      const policy = await policyAdapter.findPolicyById(policyId);
+      if (!policy || !policy.availableScopes) {
+        throw new Error(
+          `Cannot determine revoked scopes: Policy ${policyId} not found or has no available scopes.`
+        );
+      }
+      const policyAvailableScopes = policy.availableScopes.map(
+        (scope: PolicyScope) => scope.key
+      );
+      finalRevokedScopeKeys = policyAvailableScopes.filter(
+        (key: string) => key !== undefined && !grantedScopes.includes(key)
+      );
+    }
+
+    const map: Record<string, { revokedAt: Date }> = {};
+    finalRevokedScopeKeys.forEach((scope) => {
+      map[scope] = { revokedAt: timestamp };
+    });
+    return map;
+  }
+
   /**
    * Grants consent for a subject to a policy.
    * If an active consent already exists for this subject and policy, a new version is created superseding the old one.
@@ -14,6 +49,7 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
    */
   async grantConsent(input: CreateConsentInput): Promise<ConsentRecord> {
     const operationTimestamp = new Date();
+
     const inputGrantedScopesMap: Record<string, { grantedAt: Date }> = {};
     input.grantedScopes.forEach((scope) => {
       inputGrantedScopesMap[scope] = { grantedAt: operationTimestamp };
@@ -38,39 +74,18 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
     }
 
     if (latestConsentRecord) {
-      // Existing consent found, create a new version
-
-      // Determine scopes that are effectively granted in this new operation
-      const currentEffectiveGrantedScopes: Record<string, { grantedAt: Date }> =
-        {};
-      for (const scope of input.grantedScopes) {
-        if (!latestConsentRecord.revokedScopes?.[scope]) {
-          currentEffectiveGrantedScopes[scope] = {
-            grantedAt: operationTimestamp,
-          };
-        }
-      }
-
+      const currentEffectiveGrantedScopes = inputGrantedScopesMap;
       const newStatus =
         Object.keys(currentEffectiveGrantedScopes).length > 0
           ? "granted"
           : "revoked";
 
-      const newVersionRevokedScopes = {
-        ...(latestConsentRecord.revokedScopes || {}),
-      };
-
-      if (newStatus === "revoked") {
-        // If the new overall status is "revoked" (no effectively granted scopes in this input),
-        // then any scopes that were granted in the previous version and not already explicitly revoked
-        // should now be considered revoked as of this operation.
-        Object.keys(latestConsentRecord.grantedScopes).forEach((scope) => {
-          if (!newVersionRevokedScopes[scope]) {
-            // If it was granted and not yet in our newVersionRevokedScopes
-            newVersionRevokedScopes[scope] = { revokedAt: operationTimestamp };
-          }
-        });
-      }
+      const revokedScopesMapForNewVersion = await this.getRevokedScopesMap(
+        input.grantedScopes,
+        input.revokedScopes,
+        input.policyId,
+        operationTimestamp
+      );
 
       const nextVersionData: CreateNextConsentVersionInput = {
         status: newStatus,
@@ -78,7 +93,7 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
         revokedAt: newStatus === "revoked" ? operationTimestamp : undefined,
         consenter: input.consenter,
         grantedScopes: currentEffectiveGrantedScopes,
-        revokedScopes: newVersionRevokedScopes,
+        revokedScopes: revokedScopesMapForNewVersion,
         metadata: {
           ...latestConsentRecord.metadata,
           ...input.metadata,
@@ -90,18 +105,27 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
         latestConsentRecord.version
       );
     } else {
-      // No active consent found, create a new initial one
+      const initialRevokedScopesMap = await this.getRevokedScopesMap(
+        input.grantedScopes,
+        input.revokedScopes,
+        input.policyId,
+        operationTimestamp
+      );
+
+      const isGranted = input.grantedScopes.length > 0;
       const initialConsentData: Omit<
         ConsentRecord,
         "id" | "createdAt" | "updatedAt"
       > = {
         subjectId: input.subjectId,
         policyId: input.policyId,
-        status: "granted",
+        status: isGranted ? "granted" : "revoked",
         version: 1,
         consentedAt: operationTimestamp,
+        revokedAt: isGranted ? undefined : operationTimestamp,
         consenter: input.consenter,
         grantedScopes: inputGrantedScopesMap,
+        revokedScopes: initialRevokedScopesMap,
         metadata: input.metadata,
       };
       return this.adapter.createConsent(initialConsentData);
@@ -119,17 +143,27 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
       grantedScopesMap[scope] = { grantedAt: now };
     });
 
+    const revokedScopesMap = await this.getRevokedScopesMap(
+      input.grantedScopes,
+      input.revokedScopes,
+      input.policyId,
+      now
+    );
+
+    const isGranted = input.grantedScopes.length > 0;
     const initialConsentData: Omit<
       ConsentRecord,
       "id" | "createdAt" | "updatedAt"
     > = {
       subjectId: input.subjectId,
       policyId: input.policyId,
-      status: "granted",
+      status: isGranted ? "granted" : "revoked",
       version: 1,
       consentedAt: now,
+      revokedAt: isGranted ? undefined : now,
       consenter: input.consenter,
       grantedScopes: grantedScopesMap,
+      revokedScopes: revokedScopesMap,
       metadata: input.metadata,
     };
     return this.adapter.createConsent(initialConsentData);
@@ -144,8 +178,9 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
     newConsentVersionInput: CreateNextConsentVersionInput,
     expectedOldVersion: number
   ): Promise<ConsentRecord> {
-    const oldConsentRecord =
-      await this.adapter.findConsentById(oldConsentRecordId);
+    const oldConsentRecord = await (
+      this.adapter as IDataAdapter
+    ).findConsentById(oldConsentRecordId);
 
     if (!oldConsentRecord) {
       throw new Error(
@@ -193,11 +228,12 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
     };
 
     // Create the new consent version using the generic createConsent
-    const newConsentRecord =
-      await this.adapter.createConsent(newConsentRecordData);
+    const newConsentRecord = await (this.adapter as IDataAdapter).createConsent(
+      newConsentRecordData
+    );
 
     // Mark the old consent record as "superseded"
-    await this.adapter.updateConsentStatus(
+    await (this.adapter as IDataAdapter).updateConsentStatus(
       oldConsentRecord.id,
       "superseded",
       oldConsentRecord.version
@@ -302,5 +338,9 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
 
   async getAllConsents(): Promise<ConsentRecord[]> {
     return this.adapter.getAllConsents();
+  }
+
+  async getConsentsByProxyId(proxyId: string): Promise<ConsentRecord[]> {
+    return this.adapter.getConsentsByProxyId(proxyId);
   }
 }

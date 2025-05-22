@@ -1,12 +1,20 @@
 import { useState, useEffect } from "react";
-import type { Policy } from "@open-source-consent/types";
+import type {
+  Policy,
+  PolicyScope,
+  CreateConsentInput,
+  AgeGroup,
+} from "@open-source-consent/types";
 import type { ConsentFlowFormData } from "../ConsentFlow/ConsentFlow.type.js";
 
-// Define a more specific type for the scope object if not exported directly from @open-source-consent/types
-// This is effectively Policy['availableScopes'][number]
-type PolicyScope = Policy["availableScopes"][number];
-
-// Removed defaultSamplePolicyData from here, it will be handled by mock API layer if needed.
+const getAgeGroup = (age: number | undefined): AgeGroup => {
+  if (age === undefined) {
+    return "18+"; // Fallback, but this should ideally not be reached if validation is correct.
+  }
+  if (age < 13) return "under13";
+  if (age >= 13 && age <= 17) return "13-17";
+  return "18+";
+};
 
 interface UseConsentFlowResult {
   policy: Policy | null;
@@ -16,6 +24,7 @@ interface UseConsentFlowResult {
   error: string | null;
   setFormData(data: ConsentFlowFormData): void;
   updateScopes(scopeId: string, isChecked: boolean, subjectId?: string): void;
+  saveConsent(): Promise<void>;
 }
 
 const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
@@ -67,12 +76,11 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
 
   useEffect(() => {
     validateForm();
-  }, [formData, policy]); // Add policy to dependencies for validateForm if it uses policy scopes for validation
+  }, [formData, policy]);
 
   const validateForm = (): void => {
     const hasName = formData.name.trim().length > 0;
     const hasAgeRange = !!formData.ageRangeId;
-    // Example: Adult check, adjust as needed
     const hasValidAge = formData.age !== undefined && formData.age >= 18;
     const hasRole = !!formData.roleId;
 
@@ -85,7 +93,6 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
         subject.age >= 0
     );
 
-    // Check if all required scopes are granted (if policy is loaded)
     let hasRequiredScopes = true;
     if (policy && !formData.isProxy) {
       // Only for self-consenter for now
@@ -132,6 +139,9 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
 
     const updatedFormData = { ...formData };
 
+    const allAvailableScopeKeys = policy.availableScopes.map(
+      (scope: PolicyScope) => scope.key
+    );
     const requiredScopeKeys = policy.availableScopes
       .filter((scope: PolicyScope) => scope.required)
       .map((scope: PolicyScope) => scope.key);
@@ -144,40 +154,117 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
         const currentScopes =
           updatedFormData.managedSubjects[subjectIndex].grantedScopes || [];
         let newScopes = isChecked
-          ? [...new Set([...currentScopes, scopeId])] // Ensure uniqueness
+          ? [...new Set([...currentScopes, scopeId])]
           : currentScopes.filter((id) => id !== scopeId);
 
-        // If unchecking a required scope, prevent it (or handle as per business logic)
-        // For now, we ensure required scopes are always present if any scope is granted or if it's an initial state
-        if (isChecked) {
+        if (newScopes.length > 0) {
           newScopes = [...new Set([...newScopes, ...requiredScopeKeys])];
-        } else {
-          // Allow unchecking non-required scopes. Required scopes remain unless explicitly handled.
-          // If we want to prevent unchecking required scopes, add logic here.
-          // For simplicity, current logic allows unchecking but they might be re-added if form validation runs.
         }
-        // A better approach for required scopes: always include them if the checkbox group is active
-        // Or, disable their checkboxes. For this hook, we'll ensure they are part of the set if isChecked is true for any scope.
+
+        const newRevokedScopes = allAvailableScopeKeys.filter(
+          (key) => !newScopes.includes(key)
+        );
 
         updatedFormData.managedSubjects[subjectIndex] = {
           ...updatedFormData.managedSubjects[subjectIndex],
           grantedScopes: newScopes,
+          revokedScopes: newRevokedScopes,
         };
       }
     } else {
       const currentScopes = updatedFormData.grantedScopes || [];
       let newScopes = isChecked
-        ? [...new Set([...currentScopes, scopeId])] // Ensure uniqueness
+        ? [...new Set([...currentScopes, scopeId])]
         : currentScopes.filter((id) => id !== scopeId);
 
-      if (isChecked) {
+      if (newScopes.length > 0) {
         newScopes = [...new Set([...newScopes, ...requiredScopeKeys])];
       }
 
+      const newRevokedScopes = allAvailableScopeKeys.filter(
+        (key) => !newScopes.includes(key)
+      );
       updatedFormData.grantedScopes = newScopes;
+      updatedFormData.revokedScopes = newRevokedScopes;
     }
 
     setFormData(updatedFormData);
+  };
+
+  const saveConsent = async (): Promise<void> => {
+    if (!policy || !isFormValid) {
+      setError("Policy not loaded or form is invalid. Cannot save consent.");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    let consentsToCreate: CreateConsentInput[] = [];
+
+    if (formData.isProxy) {
+      consentsToCreate = formData.managedSubjects.map((subject) => {
+        const subjectId = subject.id;
+        return {
+          subjectId: subjectId,
+          policyId: policy.id,
+          consenter: {
+            type: "proxy",
+            userId: formData.name,
+            proxyDetails: {
+              relationship: formData.roleId,
+              subjectAgeGroup: getAgeGroup(subject.age),
+            },
+          },
+          grantedScopes: subject.grantedScopes || [],
+          revokedScopes: subject.revokedScopes || [],
+          metadata: {
+            consentMethod: "digital_form",
+          },
+        };
+      });
+    } else {
+      const consentInput: CreateConsentInput = {
+        subjectId: formData.name,
+        policyId: policy.id,
+        consenter: {
+          type: "self",
+          userId: formData.name,
+        },
+        grantedScopes: formData.grantedScopes || [],
+        revokedScopes: formData.revokedScopes || [],
+        metadata: {
+          consentMethod: "digital_form",
+        },
+      };
+      consentsToCreate.push(consentInput);
+    }
+
+    try {
+      for (const consentInput of consentsToCreate) {
+        const response = await fetch("/api/consents", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(consentInput),
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          throw new Error(
+            `Failed to save consent: ${response.status} ${
+              errorBody || response.statusText
+            }`
+          );
+        }
+      }
+    } catch (err: any) {
+      console.error("Error saving consent:", err);
+      setError(err.message || "An unknown error occurred while saving.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return {
@@ -188,6 +275,7 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
     error,
     setFormData,
     updateScopes,
+    saveConsent,
   };
 };
 

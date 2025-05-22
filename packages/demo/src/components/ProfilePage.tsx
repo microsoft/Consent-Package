@@ -1,8 +1,9 @@
-import { useLocation } from "react-router";
-import { Text, Card, makeStyles } from "@fluentui/react-components";
-import { Profile, useConsentFlow } from "@open-source-consent/ui";
-import type { ProfileData, ConsentFlowFormData } from "@open-source-consent/ui";
-import type { PolicyScope } from "@open-source-consent/types";
+import { useEffect, useState } from "react";
+import { useOutletContext, useParams } from "react-router";
+import { Text, Card, makeStyles, Spinner } from "@fluentui/react-components";
+import { Profile } from "@open-source-consent/ui";
+import type { ProfileData } from "@open-source-consent/ui";
+import { fetchUserProfile } from "../utils/userManagement.js"; // Import the fetch function
 
 const useStyles = makeStyles({
   root: {
@@ -12,173 +13,124 @@ const useStyles = makeStyles({
       padding: "24px",
     },
   },
+  centered: {
+    display: "flex",
+    flexDirection: "column", // Align text vertically
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100%", // Or a fixed height like 300px
+    padding: "24px",
+  },
 });
 
-const sampleProfileData: ProfileData = {
-  id: "user123",
-  name: "Billy Bob [Demo]. Create new profile from 'Get Started'",
-  email: "billy@example.com",
-  role: {
-    id: "self",
-    label: "Myself",
-  },
-  consents: [
-    {
-      id: "consent1",
-      policy: {
-        id: "policy1",
-        label: "Data Collection Policy",
-      },
-      status: {
-        id: "granted",
-        label: "Scopes Allowed",
-      },
-      scopes: [
-        { id: "basic_info", label: "Basic Information" },
-        { id: "preferences", label: "User Preferences" },
-      ],
-    },
-  ],
-};
+interface AppOutletContext {
+  user: ProfileData | null; // This is the logged-in user
+}
 
 export function ProfilePage(): JSX.Element {
-  const location = useLocation();
   const styles = useStyles();
-  const { policy } = useConsentFlow("sample-group-1");
+  const { user: loggedInUser } = useOutletContext<AppOutletContext>(); // Renamed for clarity
+  const { userId } = useParams<{ userId: string }>();
 
-  const formData: ConsentFlowFormData = location.state?.formData;
+  const [profileToDisplay, setProfileToDisplay] = useState<ProfileData | null>(
+    null
+  );
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const getConsentScopes = (
-    type: "allowed" | "revoked" /* TODO: Reuse ConsentStatus */,
-    grantedScopes: string[]
-  ): ProfileData["consents"] => {
-    const common = {
-      policy: {
-        id: policy?.id ?? "sample-group-1",
-        label: policy?.title ?? "Open Source Consent Policy",
-      },
-    };
-    let result: ProfileData["consents"][number] = {
-      id: "",
-      policy: common.policy,
-      status: { id: "", label: "" },
-      scopes: [],
-    };
-
-    if (type === "allowed") {
-      result = {
-        id: "consent1",
-        ...common,
-        status: {
-          id: "granted",
-          label: "Scopes Allowed",
-        },
-        scopes: grantedScopes.map((scopeId: string) => {
-          const scope = policy?.availableScopes.find(
-            (s: PolicyScope) => s.key === scopeId
-          );
-          return {
-            id: scopeId,
-            label: scope ? `${scope.name} (${scope.description})` : scopeId,
-            required: scope?.required ?? false,
-          };
-        }),
-      };
+  useEffect(() => {
+    if (!userId) {
+      setError("No user ID provided in the URL.");
+      setIsLoadingProfile(false);
+      return;
     }
 
-    if (type === "revoked") {
-      result = {
-        id: "consent2",
-        ...common,
-        status: {
-          id: "revoked",
-          label: "Scopes Revoked",
-        },
-        scopes: (policy?.availableScopes ?? [])
-          .filter((scope: PolicyScope) => !grantedScopes?.includes(scope.key))
-          .map((scope: PolicyScope) => ({
-            id: scope.key,
-            label: `${scope.name} (${scope.description})`,
-            required: scope?.required ?? false,
-          })),
-      };
-    }
+    const loadProfile = async () => {
+      setIsLoadingProfile(true);
+      setError(null);
+      try {
+        const fetchedProfile = await fetchUserProfile(userId);
+        if (fetchedProfile) {
+          setProfileToDisplay(fetchedProfile);
+        } else {
+          setError("Profile not found.");
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+        setError(
+          err instanceof Error ? err.message : "An unknown error occurred."
+        );
+      }
+      setIsLoadingProfile(false);
+    };
 
-    return [result];
-  };
-
-  // Create profile data from formData
-  const profileData: ProfileData = !formData
-    ? sampleProfileData
-    : {
-        id: "user123", // TODO: Get from API
-        name: formData?.name,
-        email: "email@example.com",
-        role: {
-          id: formData?.roleId,
-          label: formData?.isProxy
-            ? "Parent / Guardian / Representative"
-            : "Myself", // TODO: Get label from API
-        },
-        managedSubjects: formData?.managedSubjects.map((subject) => {
-          let ageGroupLabel =
-            subject.ageRangeId === "under13"
-              ? "Child"
-              : subject.ageRangeId === "13-17"
-                ? "Teen"
-                : "Adult"; // TODO: Get label from API
-
-          if (subject.age === undefined) ageGroupLabel = "N/A";
-          else if (subject.age < 1)
-            ageGroupLabel = `${ageGroupLabel} (less than 1 year old)`;
-          else if (subject.age === 1)
-            ageGroupLabel = `${ageGroupLabel} (1 year old)`;
-          else ageGroupLabel = `${ageGroupLabel} (${subject.age} years old)`;
-
-          return {
-            id: subject.id,
-            name: subject.name,
-            relationship: "Unknown",
-            ageGroup: {
-              id: subject.ageRangeId,
-              label: ageGroupLabel,
-            },
-            consents: [
-              ...getConsentScopes("allowed", subject?.grantedScopes ?? []),
-              ...getConsentScopes("revoked", subject?.grantedScopes ?? []),
-            ],
-          };
-        }),
-        consents: formData
-          ? [
-              ...getConsentScopes("allowed", formData?.grantedScopes ?? []),
-              ...getConsentScopes("revoked", formData?.grantedScopes ?? []),
-            ]
-          : [],
-      };
+    void loadProfile();
+  }, [userId]);
 
   const handleProfileUpdate = (
     profileId: string,
     updates: Partial<ProfileData>
   ): void => {
-    console.info("handleProfileUpdate", { profileId, updates });
+    console.info("Profile updated (mock):", { profileId, updates });
+    // Potentially re-fetch or update local state if editable
   };
 
-  const handleManagedSubjectSelect = (profileId: string): void => {
-    console.info("handleManagedSubjectSelect", profileId);
+  const handleManagedSubjectSelect = (subjectId: string): void => {
+    console.info("Managed subject selected:", subjectId);
+    // Navigate or perform action for managed subject
   };
+
+  if (isLoadingProfile) {
+    return (
+      <Card className={`${styles.root} ${styles.centered}`}>
+        <Spinner label={`Loading profile for ${userId || "user"}...`} />
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className={`${styles.root} ${styles.centered}`}>
+        <Text as="h2">Error</Text>
+        <Text>{error}</Text>
+      </Card>
+    );
+  }
+
+  if (!profileToDisplay) {
+    // This case should ideally be covered by the error state if fetch fails
+    // or if fetchUserProfile returns null explicitly for a not-found user.
+    return (
+      <Card className={`${styles.root} ${styles.centered}`}>
+        <Text as="h2">Profile not available.</Text>
+        <Text>The profile for the specified user ID could not be loaded.</Text>
+      </Card>
+    );
+  }
+
+  // The check `currentUser.id !== userId` has been removed.
+  // Now we display the profile fetched based on `userId` from the URL.
+  // `loggedInUser` (the old `currentUser`) can be used for permission checks, e.g., edit button.
 
   return (
     <Card className={styles.root}>
       <Text as="h1" size={600} weight="semibold" underline>
-        Profile
+        Profile ({profileToDisplay.name})
       </Text>
 
       <Profile
-        profileData={profileData}
-        isManagingSubjects={profileData.role.id === "proxy"}
+        profileData={profileToDisplay}
+        isManagingSubjects={
+          // Logic for isManagingSubjects might need to consider `loggedInUser` vs `profileToDisplay`
+          // For now, let's assume it's based on the displayed profile's data AND if loggedInUser is the same.
+          loggedInUser?.id === profileToDisplay.id &&
+          profileToDisplay.role?.id !== "self" &&
+          profileToDisplay.managedSubjects &&
+          profileToDisplay.managedSubjects.length > 0
+        }
         onProfileUpdate={handleProfileUpdate}
         onManagedSubjectSelect={handleManagedSubjectSelect}
+        // Consider adding an isEditable prop based on `loggedInUser?.id === profileToDisplay.id`
       />
     </Card>
   );

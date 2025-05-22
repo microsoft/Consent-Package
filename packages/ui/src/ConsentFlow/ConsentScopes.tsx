@@ -87,55 +87,19 @@ const ConsentScopes = ({
   onChange,
 }: ConsentScopesProps): JSX.Element => {
   const styles = useStyles();
-  const [selectedScopes, setSelectedScopes] = useState<Record<string, boolean>>(
-    availableScopes.reduce(
-      (acc, scope: PolicyScope) => ({
-        ...acc,
-        [scope.key]: formData.grantedScopes?.includes(scope.key) ?? false,
-      }),
-      {}
-    )
-  );
-  const [subjectScopes, setSubjectScopes] = useState<
-    Record<string, Record<string, boolean>>
-  >(
-    formData.managedSubjects.reduce(
-      (acc, subject) => ({
-        ...acc,
-        [subject.id]: availableScopes.reduce(
-          (scopeAcc, scope: PolicyScope) => ({
-            ...scopeAcc,
-            [scope.key]: subject.grantedScopes?.includes(scope.key) ?? false,
-          }),
-          {}
-        ),
-      }),
-      {}
-    )
-  );
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const { isProxy, managedSubjects } = formData;
+  const {
+    isProxy,
+    managedSubjects,
+    grantedScopes: selfGrantedScopes,
+  } = formData;
 
   const handleScopeChange = (
     scopeId: string,
     isChecked: boolean,
     subjectId?: string
   ): void => {
-    if (subjectId) {
-      setSubjectScopes((prev) => ({
-        ...prev,
-        [subjectId]: {
-          ...prev[subjectId],
-          [scopeId]: isChecked,
-        },
-      }));
-    } else {
-      setSelectedScopes((prev) => ({
-        ...prev,
-        [scopeId]: isChecked,
-      }));
-    }
     onChange(scopeId, isChecked, subjectId);
   };
 
@@ -167,7 +131,10 @@ const ConsentScopes = ({
           <div key={scope.key} className={styles.scope}>
             <Checkbox
               label={scope.name}
-              checked={scope.required || (selectedScopes[scope.key] ?? false)}
+              checked={
+                scope.required ||
+                (selfGrantedScopes?.includes(scope.key) ?? false)
+              }
               disabled={scope.required}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 handleScopeChange(scope.key, e.target.checked)
@@ -184,32 +151,34 @@ const ConsentScopes = ({
             <Text weight="semibold" size={400}>
               {managedSubjects[currentSlide].name}
             </Text>
-            {availableScopes.map((scope: PolicyScope) => (
-              <div
-                key={`${managedSubjects[currentSlide].id}-${scope.key}`}
-                className={styles.scope}
-              >
-                <Checkbox
-                  label={scope.name}
-                  checked={
-                    scope.required ||
-                    (subjectScopes[managedSubjects[currentSlide].id]?.[
-                      scope.key
-                    ] ??
-                      false)
-                  }
-                  disabled={scope.required}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleScopeChange(
-                      scope.key,
-                      e.target.checked,
-                      managedSubjects[currentSlide].id
-                    )
-                  }
-                />
-                <Text size={200}>{scope.description}</Text>
-              </div>
-            ))}
+            {availableScopes.map((scope: PolicyScope) => {
+              const currentSubjectGrantedScopes =
+                managedSubjects[currentSlide].grantedScopes;
+              return (
+                <div
+                  key={`${managedSubjects[currentSlide].id}-${scope.key}`}
+                  className={styles.scope}
+                >
+                  <Checkbox
+                    label={scope.name}
+                    checked={
+                      scope.required ||
+                      (currentSubjectGrantedScopes?.includes(scope.key) ??
+                        false)
+                    }
+                    disabled={scope.required}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      handleScopeChange(
+                        scope.key,
+                        e.target.checked,
+                        managedSubjects[currentSlide].id
+                      )
+                    }
+                  />
+                  <Text size={200}>{scope.description}</Text>
+                </div>
+              );
+            })}
           </div>
 
           <div className={styles.navigationButtons}>

@@ -56,6 +56,12 @@ export class IndexedDBDataAdapter implements IDataAdapter {
           );
         }
 
+        if (!consentStore.indexNames.contains("consenterUserId_idx")) {
+          consentStore.createIndex("consenterUserId_idx", "consenter.userId", {
+            unique: false,
+          });
+        }
+
         let policyStore: IDBObjectStore;
         if (!db.objectStoreNames.contains(POLICY_STORE_NAME)) {
           policyStore = db.createObjectStore(POLICY_STORE_NAME, {
@@ -424,7 +430,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
       const request = store.getAll();
 
       request.onsuccess = () => {
-        resolve((request.result as ConsentRecord[]) || []);
+        resolve(request.result as ConsentRecord[]);
       };
 
       request.onerror = (event) => {
@@ -434,9 +440,53 @@ export class IndexedDBDataAdapter implements IDataAdapter {
         );
         reject((event.target as IDBRequest).error);
       };
+
       transaction.onabort = (event) => {
         console.error(
           "Get all consents transaction aborted:",
+          (event.target as IDBTransaction).error
+        );
+        reject((event.target as IDBTransaction).error);
+      };
+    });
+  }
+
+  async getConsentsByProxyId(proxyId: string): Promise<ConsentRecord[]> {
+    await this.initialize();
+    if (!this.db) {
+      throw new Error("Database not initialized.");
+    }
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(CONSENT_STORE_NAME, "readonly");
+      const store = transaction.objectStore(CONSENT_STORE_NAME);
+      const index = store.index("consenterUserId_idx");
+      const request = index.getAll(proxyId);
+
+      request.onsuccess = (event) => {
+        const allRecordsForUser = (event.target as IDBRequest<ConsentRecord[]>)
+          .result;
+        if (allRecordsForUser) {
+          const proxyRecords = allRecordsForUser.filter(
+            (record) => record.consenter && record.consenter.type === "proxy"
+          );
+          resolve(proxyRecords);
+        } else {
+          resolve([]);
+        }
+      };
+
+      request.onerror = (event) => {
+        console.error(
+          `Error fetching consents by proxyId ${proxyId} using index:`,
+          (event.target as IDBRequest).error
+        );
+        reject((event.target as IDBRequest).error);
+      };
+
+      transaction.onabort = (event) => {
+        console.error(
+          `Transaction aborted while fetching consents for proxyId ${proxyId}:`,
           (event.target as IDBTransaction).error
         );
         reject((event.target as IDBTransaction).error);

@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ConsentService } from "../services/ConsentService.js";
 import type {
   IConsentDataAdapter,
+  IDataAdapter,
+  Policy,
   ConsentRecord,
   CreateConsentInput,
 } from "@open-source-consent/types";
@@ -18,19 +20,24 @@ describe("ConsentService", () => {
     vi.useFakeTimers();
     vi.setSystemTime(mockDate);
 
-    mockDataAdapter = {
-      createConsent: vi.fn() as IConsentDataAdapter["createConsent"],
-      updateConsentStatus:
-        vi.fn() as IConsentDataAdapter["updateConsentStatus"],
-      findConsentById: vi.fn() as IConsentDataAdapter["findConsentById"],
-      findConsentsBySubject:
-        vi.fn() as IConsentDataAdapter["findConsentsBySubject"],
-      findLatestConsentBySubjectAndPolicy:
-        vi.fn() as IConsentDataAdapter["findLatestConsentBySubjectAndPolicy"],
-      findAllConsentVersionsBySubjectAndPolicy:
-        vi.fn() as IConsentDataAdapter["findAllConsentVersionsBySubjectAndPolicy"],
-      getAllConsents: vi.fn() as IConsentDataAdapter["getAllConsents"],
+    const fullMockAdapter = {
+      createConsent: vi.fn(),
+      updateConsentStatus: vi.fn(),
+      findConsentById: vi.fn(),
+      findConsentsBySubject: vi.fn(),
+      findLatestConsentBySubjectAndPolicy: vi.fn(),
+      findAllConsentVersionsBySubjectAndPolicy: vi.fn(),
+      getAllConsents: vi.fn(),
+      createPolicy: vi.fn(),
+      updatePolicyStatus: vi.fn(),
+      findPolicyById: vi.fn(),
+      findLatestActivePolicyByGroupId: vi.fn(),
+      findAllPolicyVersionsByGroupId: vi.fn(),
+      listPolicies: vi.fn(),
+      getConsentsByProxyId: vi.fn(),
     };
+
+    mockDataAdapter = fullMockAdapter as IConsentDataAdapter;
 
     consentService = ConsentService.getInstance(mockDataAdapter);
   });
@@ -55,6 +62,33 @@ describe("ConsentService", () => {
           ipAddress: "127.0.0.1",
           userAgent: "Mozilla/5.0",
         },
+      };
+
+      const mockPolicy: Policy = {
+        id: "policy456",
+        policyGroupId: "group1",
+        version: 1,
+        status: "active",
+        effectiveDate: new Date("2025-01-01"),
+        title: "Test Policy",
+        contentSections: [
+          {
+            title: "section1",
+            content: "content1",
+            description: "Section 1 Description",
+          },
+        ],
+        availableScopes: [
+          { key: "email", name: "Email", description: "Access to email" },
+          { key: "profile", name: "Profile", description: "Access to profile" },
+          {
+            key: "notifications",
+            name: "Notifications",
+            description: "Access to notifications",
+          }, // Another scope not granted
+        ],
+        createdAt: mockDate,
+        updatedAt: mockDate,
       };
 
       const mockCreatedConsent: ConsentRecord = {
@@ -87,6 +121,9 @@ describe("ConsentService", () => {
       (
         mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
       ).mockResolvedValue(null); // No existing consent
+      (
+        (mockDataAdapter as unknown as IDataAdapter).findPolicyById as any
+      ).mockResolvedValue(mockPolicy);
 
       // Act
       const result = await consentService.grantConsent(mockConsentInput);
@@ -106,6 +143,10 @@ describe("ConsentService", () => {
           email: { grantedAt: mockDate },
           profile: { grantedAt: mockDate },
         },
+        revokedScopes: {
+          notifications: { revokedAt: mockDate },
+        },
+        revokedAt: undefined,
         metadata: {
           consentMethod: "digital_form",
           ipAddress: "127.0.0.1",
@@ -121,6 +162,27 @@ describe("ConsentService", () => {
       const subjectId = "user-supersede";
       const policyId = "policy-supersede";
       const oldConsentVersion = 1;
+
+      const mockPolicySupersede: Policy = {
+        id: policyId,
+        policyGroupId: "groupSupersede",
+        version: 1,
+        status: "active",
+        effectiveDate: new Date("2024-12-01"),
+        title: "Supersede Policy",
+        contentSections: [{ title: "s1", content: "c1", description: "d1" }],
+        availableScopes: [
+          { key: "email", name: "Email", description: "Access to email" },
+          { key: "profile", name: "Profile", description: "Access to profile" },
+          {
+            key: "offline_access",
+            name: "Offline",
+            description: "Offline access",
+          },
+        ],
+        createdAt: new Date("2024-12-01"),
+        updatedAt: new Date("2024-12-01"),
+      };
 
       const existingConsent: ConsentRecord = {
         id: "oldConsent123",
@@ -161,7 +223,10 @@ describe("ConsentService", () => {
           email: { grantedAt: mockDate },
           profile: { grantedAt: mockDate },
         },
-        revokedScopes: {},
+        revokedScopes: {
+          offline_access: { revokedAt: mockDate },
+        },
+        revokedAt: undefined,
         metadata: {
           consentMethod: "digital_form",
           ipAddress: "192.168.1.1",
@@ -183,6 +248,9 @@ describe("ConsentService", () => {
         ...existingConsent,
         status: "superseded",
       });
+      (
+        (mockDataAdapter as unknown as IDataAdapter).findPolicyById as any
+      ).mockResolvedValue(mockPolicySupersede);
 
       // Act
       const result = await consentService.grantConsent(grantInput);
@@ -205,7 +273,10 @@ describe("ConsentService", () => {
           email: { grantedAt: mockDate },
           profile: { grantedAt: mockDate },
         },
-        revokedScopes: {},
+        revokedScopes: {
+          offline_access: { revokedAt: mockDate },
+        },
+        revokedAt: undefined,
         metadata: {
           consentMethod: "digital_form",
           ipAddress: "192.168.1.1",
@@ -323,6 +394,32 @@ describe("ConsentService", () => {
         },
       };
 
+      const mockPolicyForProxy: Policy = {
+        id: "policy456",
+        policyGroupId: "groupProxy",
+        version: 1,
+        status: "active",
+        effectiveDate: new Date("2025-01-01"),
+        title: "Proxy Test Policy",
+        contentSections: [
+          { title: "s_proxy", content: "c_proxy", description: "d_proxy" },
+        ],
+        availableScopes: [
+          {
+            key: "app_usage",
+            name: "App Usage",
+            description: "Tracks app usage",
+          },
+          {
+            key: "location",
+            name: "Location",
+            description: "Access to location",
+          },
+        ],
+        createdAt: mockDate,
+        updatedAt: mockDate,
+      };
+
       const mockCreatedConsent: ConsentRecord = {
         id: "consent789",
         version: 1,
@@ -354,6 +451,9 @@ describe("ConsentService", () => {
       (
         mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
       ).mockResolvedValue(null); // No existing consent
+      (
+        (mockDataAdapter as unknown as IDataAdapter).findPolicyById as any
+      ).mockResolvedValue(mockPolicyForProxy);
 
       // Act
       const result = await consentService.grantConsent(mockProxyConsentInput);
@@ -376,6 +476,10 @@ describe("ConsentService", () => {
         grantedScopes: {
           app_usage: { grantedAt: mockDate },
         },
+        revokedScopes: {
+          location: { revokedAt: mockDate },
+        },
+        revokedAt: undefined,
         metadata: {
           consentMethod: "digital_form",
         },
@@ -390,6 +494,24 @@ describe("ConsentService", () => {
       const policyId = "policy-optimistic-lock";
       const oldConsentVersion = 1;
       const actualDbVersion = 2; // Simulate version changed in DB
+
+      const mockOptimisticPolicy: Policy = {
+        id: policyId,
+        policyGroupId: "groupOptLock",
+        version: 1,
+        status: "active",
+        effectiveDate: new Date("2024-12-01"),
+        title: "Optimistic Lock Policy",
+        contentSections: [
+          { title: "s_opt", content: "c_opt", description: "d_opt" },
+        ],
+        availableScopes: [
+          { key: "email", name: "Email", description: "Access to email" },
+          { key: "profile", name: "Profile", description: "Access to profile" },
+        ],
+        createdAt: new Date("2024-12-01"),
+        updatedAt: new Date("2024-12-01"),
+      };
 
       const existingConsent: ConsentRecord = {
         id: "oldConsentOptimistic123",
@@ -430,6 +552,9 @@ describe("ConsentService", () => {
       (mockDataAdapter.findConsentById as any).mockResolvedValue(
         consentInDbActuallyHasVersion2
       );
+      (
+        (mockDataAdapter as unknown as IDataAdapter).findPolicyById as any
+      ).mockResolvedValue(mockOptimisticPolicy);
 
       // Act & Assert
       // The supersedeConsent method is called with expectedOldVersion = existingConsent.version (which is 1)
@@ -735,6 +860,25 @@ describe("ConsentService", () => {
         },
       };
 
+      const mockInitialPolicy: Policy = {
+        id: "policy-initial",
+        policyGroupId: "groupInitial",
+        version: 1,
+        status: "active",
+        effectiveDate: mockDate,
+        title: "Initial Grant Policy",
+        contentSections: [
+          { title: "s_init", content: "c_init", description: "d_init" },
+        ],
+        availableScopes: [
+          { key: "read", name: "Read", description: "Read access" },
+          { key: "write", name: "Write", description: "Write access" },
+          { key: "delete", name: "Delete", description: "Delete access" },
+        ],
+        createdAt: mockDate,
+        updatedAt: mockDate,
+      };
+
       const mockCreatedConsent: ConsentRecord = {
         id: "initialConsent789",
         version: 1,
@@ -757,6 +901,9 @@ describe("ConsentService", () => {
       );
       // Ensure findLatestConsentBySubjectAndPolicy is NOT called by createInitialGrant
       (mockDataAdapter.findLatestConsentBySubjectAndPolicy as any).mockClear();
+      (
+        (mockDataAdapter as unknown as IDataAdapter).findPolicyById as any
+      ).mockResolvedValue(mockInitialPolicy);
 
       // Act
       const result = await consentService.createInitialGrant(mockConsentInput);
@@ -776,6 +923,10 @@ describe("ConsentService", () => {
           read: { grantedAt: mockDate },
           write: { grantedAt: mockDate },
         },
+        revokedScopes: {
+          delete: { revokedAt: mockDate },
+        },
+        revokedAt: undefined,
         metadata: mockConsentInput.metadata,
       });
       expect(result).toEqual(mockCreatedConsent);

@@ -15,7 +15,7 @@ import {
   ConsentContentSectionStep,
 } from "@open-source-consent/ui";
 import type { ConsentFlowFormData } from "@open-source-consent/ui";
-import type { Policy, PolicyContentSection } from "@open-source-consent/types";
+import type { PolicyContentSection } from "@open-source-consent/types";
 
 const useStyles = makeStyles({
   root: {
@@ -125,12 +125,11 @@ export function GetStarted(): JSX.Element {
     formData,
     isFormValid,
     isLoading,
+    error,
     setFormData,
     updateScopes,
-  }: { policy?: Policy | null } & Omit<
-    ReturnType<typeof useConsentFlow>,
-    "policy"
-  > = useConsentFlow("sample-group-1");
+    saveConsent,
+  } = useConsentFlow("sample-group-1");
 
   const dynamicSteps = useMemo<Step[]>(() => {
     if (!policy) return baseSteps.filter((step) => step.id === "welcome");
@@ -164,7 +163,15 @@ export function GetStarted(): JSX.Element {
     if (nextIndex < dynamicSteps.length) {
       setCurrentStepId(dynamicSteps[nextIndex].id);
     } else {
-      await navigate("/profile", { state: { formData } });
+      if (saveConsent) {
+        await saveConsent();
+        if (!error) {
+          void navigate("/profile", { state: { formData } });
+        }
+      } else {
+        console.error("saveConsent function is not available.");
+        void navigate("/profile", { state: { formData } });
+      }
     }
   };
 
@@ -295,13 +302,20 @@ export function GetStarted(): JSX.Element {
           appearance="primary"
           onClick={handleNext}
           disabled={
-            currentStepId !== "review" &&
-            !isFormValid &&
-            dynamicSteps[currentStepIndex]?.id !== "welcome" &&
-            !dynamicSteps[currentStepIndex]?.id.startsWith("contentSection_")
+            isLoading ||
+            (currentStepId !== "review" &&
+              !isFormValid &&
+              dynamicSteps[currentStepIndex]?.id !== "welcome" &&
+              !dynamicSteps[currentStepIndex]?.id.startsWith("contentSection_"))
           }
         >
-          {currentStepIndex === dynamicSteps.length - 1 ? "Finish" : "Next"}
+          {isLoading && currentStepIndex === dynamicSteps.length - 1 ? (
+            <Spinner size="tiny" />
+          ) : currentStepIndex === dynamicSteps.length - 1 ? (
+            "Finish"
+          ) : (
+            "Next"
+          )}
         </Button>
       </div>
     </div>

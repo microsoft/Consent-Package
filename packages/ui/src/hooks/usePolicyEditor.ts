@@ -186,8 +186,8 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
     const policyDataToSave: CreatePolicyInput | NewPolicyVersionDataInput = {
       ...formData,
       effectiveDate: new Date(formData.effectiveDate),
-      contentSections: formData.contentSections, // Already in correct shape
-      availableScopes: formData.availableScopes, // Already in correct shape
+      contentSections: formData.contentSections,
+      availableScopes: formData.availableScopes,
     };
 
     const endpoint = "/api/policies";

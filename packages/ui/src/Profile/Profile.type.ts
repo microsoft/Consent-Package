@@ -1,18 +1,16 @@
+import type { ConsentRecord } from "@open-source-consent/types";
+
 interface BasicInfo {
   id: string;
   label: string;
   description?: string;
 }
 
-interface Scope extends BasicInfo { 
-  required?: boolean
-}
-
-interface Consent {
+export interface Consent {
   id: string;
   policy: BasicInfo;
   status: BasicInfo;
-  scopes: Scope[];
+  scopes: BasicInfo[];
 }
 
 interface ManagedSubject {
@@ -20,7 +18,7 @@ interface ManagedSubject {
   name: string;
   relationship: string;
   ageGroup: BasicInfo;
-  consents: Consent[];
+  consents: ConsentRecord[];
 }
 
 export interface ProfileData {
@@ -29,7 +27,7 @@ export interface ProfileData {
   email: string;
   role: BasicInfo;
   managedSubjects?: ManagedSubject[];
-  consents: Consent[];
+  consents: ConsentRecord[];
 }
 
 export interface ProfileProps {

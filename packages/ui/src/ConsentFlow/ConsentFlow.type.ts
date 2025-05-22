@@ -5,6 +5,7 @@ export interface ConsentFlowManagedSubject {
   dob?: Date;
   age?: number;
   grantedScopes?: string[];
+  revokedScopes?: string[];
 }
 
 export interface ConsentFlowFormData {
@@ -16,6 +17,7 @@ export interface ConsentFlowFormData {
   isProxy: boolean;
   managedSubjects: ConsentFlowManagedSubject[];
   grantedScopes?: string[];
+  revokedScopes?: string[];
   signature?: string;
   grantedAt?: Date;
 }

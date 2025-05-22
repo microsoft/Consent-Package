@@ -7,3 +7,4 @@ export * from "./getPolicyById.js";
 export * from "./listPolicies.js";
 export * from "./getAllPolicyVersionsByGroupId.js";
 export * from "./getLatestActivePolicyByGroupId.js";
+export * from "./getConsentsByProxy.js";

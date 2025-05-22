@@ -113,4 +113,13 @@ export class MockDataAdapter implements IConsentDataAdapter {
     // Returns all consents, similar to a simple table scan for mocks
     return Array.from(this.consents.values());
   }
+
+  async getConsentsByProxyId(proxyId: string): Promise<ConsentRecord[]> {
+    return Array.from(this.consents.values()).filter(
+      (consent) =>
+        consent.consenter &&
+        consent.consenter.type === "proxy" &&
+        consent.consenter.userId === proxyId
+    );
+  }
 }

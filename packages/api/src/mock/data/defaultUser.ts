@@ -1,8 +1,8 @@
-import type { ProfileData } from "@open-source-consent/ui"; // Assuming ProfileData is the shape we want
+import type { ProfileData } from "@open-source-consent/ui";
 
 export const defaultMockUser: ProfileData = {
   id: "mock-user-123",
-  name: "Mock User [Client-Side]",
+  name: "Mock User",
   email: "mock.user@example.com",
   role: {
     id: "self",
@@ -10,16 +10,26 @@ export const defaultMockUser: ProfileData = {
   },
   consents: [
     {
+      version: 1,
+      subjectId: "mock-user-123",
+      consentedAt: new Date("2025-05-20T00:00:00Z"),
+      consenter: {
+        type: "self",
+        userId: "mock-user-123",
+      },
+      metadata: {
+        consentMethod: "digital_form",
+      },
+      createdAt: new Date("2025-05-20T00:00:00Z"),
+      updatedAt: new Date("2025-05-20T00:00:00Z"),
       id: "mock-consent-1",
-      policy: {
-        id: "sample-policy-1", // Matches the default policy ID
-        label: "Open Source Consent Policy (Mocked Consent)",
+      policyId: "sample-group-1",
+      status: "granted",
+      grantedScopes: {
+        basic_profile: {
+          grantedAt: new Date("2025-05-20T00:00:00Z"),
+        },
       },
-      status: {
-        id: "granted",
-        label: "Scopes Allowed",
-      },
-      scopes: [{ id: "basic_profile", label: "Basic Information" }],
     },
   ],
   managedSubjects: [],

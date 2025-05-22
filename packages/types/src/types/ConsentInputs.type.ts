@@ -10,6 +10,7 @@ export interface CreateConsentInput {
     };
   };
   grantedScopes: string[];
+  revokedScopes?: string[];
   metadata: {
     consentMethod: "digital_form";
     ipAddress?: string;

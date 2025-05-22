@@ -7,6 +7,7 @@ import {
   createConsent,
   getConsentById,
   findActiveConsentsBySubject,
+  getConsentsByProxyId,
 } from "./index.js";
 
 export async function getRequestBody(init?: RequestInit): Promise<any> {
@@ -149,6 +150,21 @@ export const routes = [
         return createJsonResponse(data, 200);
       }
       return createErrorResponse("Invalid subject ID", 400);
+    },
+  },
+  {
+    method: "GET",
+    pathRegex: /\/api\/proxies\/([^/]+)\/consents$/,
+    handler: async (
+      _init?: RequestInit,
+      matches?: RegExpMatchArray
+    ): Promise<Response> => {
+      if (matches && matches[1]) {
+        const proxyId = matches[1];
+        const data = await getConsentsByProxyId(proxyId);
+        return createJsonResponse(data, 200);
+      }
+      return createErrorResponse("Invalid proxy ID", 400);
     },
   },
 ];

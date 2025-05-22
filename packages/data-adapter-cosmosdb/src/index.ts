@@ -1,5 +1,9 @@
 import type { Container, Database } from "@azure/cosmos";
-import { CosmosClient, PartitionKeyKind } from "@azure/cosmos";
+import {
+  CosmosClient,
+  PartitionKeyKind,
+  type SqlQuerySpec,
+} from "@azure/cosmos";
 import type {
   ConsentRecord,
   Policy,
@@ -483,6 +487,23 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     };
     const { resources } = await container.items
       .query<ConsentRecord>(querySpec, { partitionKey: subjectId })
+      .fetchAll();
+    return resources;
+  }
+
+  async getConsentsByProxyId(proxyId: string): Promise<ConsentRecord[]> {
+    const container = this.getInitializedContainer();
+    const querySpec: SqlQuerySpec = {
+      query:
+        "SELECT * FROM c " +
+        "WHERE c.docType = 'consent' " +
+        "AND c.consenter.userId = @proxyId " +
+        "AND c.consenter.type = 'proxy'",
+      parameters: [{ name: "@proxyId", value: proxyId }],
+    };
+
+    const { resources } = await container.items
+      .query<ConsentRecord>(querySpec)
       .fetchAll();
     return resources;
   }
