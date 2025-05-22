@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from "react";
+import { useState, useEffect, type ChangeEvent } from "react";
 import {
   makeStyles,
   Text,
@@ -89,11 +89,27 @@ const ConsentScopes = ({
   const styles = useStyles();
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const requiredScopes = availableScopes.filter((scope) => scope.required).map((scope) => scope.key)
+
   const {
     isProxy,
     managedSubjects,
     grantedScopes: selfGrantedScopes,
   } = formData;
+
+  useEffect(() => {
+    if (!isProxy) {
+      for (const requiredScope of requiredScopes) {
+        onChange(requiredScope, true)
+      }
+    } else {
+      for (const requiredScope of requiredScopes) {
+        for (const subject of managedSubjects) {
+          onChange(requiredScope, true, subject.id)
+        }
+      }
+    }
+  }, []);
 
   const handleScopeChange = (
     scopeId: string,
@@ -119,28 +135,38 @@ const ConsentScopes = ({
     setCurrentSlide(index);
   };
 
+  const scopeCheckbox = (scope: PolicyScope, subjectScopes?: string[], subjectId?: string): JSX.Element => {
+    return <>
+      <Checkbox
+        label={`${scope.name}${scope.required ? " (Mandatory)" : ""}`}
+        checked={
+          scope.required ||
+          (subjectScopes?.includes(scope.key) ?? false)
+        }
+        disabled={scope.required}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          handleScopeChange(scope.key, e.target.checked, subjectId)
+        }
+      />
+      <Text size={200}>{scope.description}</Text>
+    </>
+  }
+
   return (
     <div className={styles.root}>
       <Title2 align="center">Select Data Access Permissions</Title2>
       <Text align="center">
-        Choose which data you want to share with the service
+        {
+          requiredScopes.length > 0 ?
+            'Select additional data you wish to authorize for use with this service. Mandatory permissions cannot be modified.' :
+            'Select the data you wish to authorize for use with this service. At least one permission must be enabled to proceed.'
+        }
       </Text>
 
       {!isProxy &&
         availableScopes.map((scope: PolicyScope) => (
           <div key={scope.key} className={styles.scope}>
-            <Checkbox
-              label={scope.name}
-              checked={
-                scope.required ||
-                (selfGrantedScopes?.includes(scope.key) ?? false)
-              }
-              disabled={scope.required}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                handleScopeChange(scope.key, e.target.checked)
-              }
-            />
-            <Text size={200}>{scope.description}</Text>
+            {scopeCheckbox(scope, selfGrantedScopes)}
           </div>
         ))}
 
@@ -159,23 +185,7 @@ const ConsentScopes = ({
                   key={`${managedSubjects[currentSlide].id}-${scope.key}`}
                   className={styles.scope}
                 >
-                  <Checkbox
-                    label={scope.name}
-                    checked={
-                      scope.required ||
-                      (currentSubjectGrantedScopes?.includes(scope.key) ??
-                        false)
-                    }
-                    disabled={scope.required}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                      handleScopeChange(
-                        scope.key,
-                        e.target.checked,
-                        managedSubjects[currentSlide].id
-                      )
-                    }
-                  />
-                  <Text size={200}>{scope.description}</Text>
+                  {scopeCheckbox(scope, currentSubjectGrantedScopes, managedSubjects[currentSlide].id)}
                 </div>
               );
             })}

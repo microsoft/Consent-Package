@@ -15,7 +15,7 @@ import {
 } from "@open-source-consent/ui";
 import type { ConsentFlowFormData } from "@open-source-consent/ui";
 import type { PolicyContentSection } from "@open-source-consent/types";
-import {useAuth} from "../utils/useAuth.js";
+import { useAuth } from "../utils/useAuth.js";
 
 const useStyles = makeStyles({
   root: {
@@ -160,6 +160,47 @@ export function GetStarted(): JSX.Element {
     [dynamicSteps, currentStepId]
   );
 
+  const isStepValid = useMemo(() => {
+    const isReviewStep = currentStepId === "review";
+    const isContentSectionStep = currentStepId.startsWith("contentSection_");
+    const isScopesStep = currentStepId === "scopes";
+
+    if (isContentSectionStep) {
+      return true;
+    } else if (isReviewStep) {
+      return !!formData.signature && formData.signature.length > 0;
+    } else if (isScopesStep) {
+      // For scopes, we always need to check that required scopes exist
+      let hasRequiredScopes = true;
+      if (policy && !formData.isProxy) {
+        // Only for self-consenter for now
+        const requiredScopeKeys = policy.availableScopes
+          .filter((s) => s.required)
+          .map((s) => s.key);
+        if (requiredScopeKeys.length > 0) {
+          hasRequiredScopes = requiredScopeKeys.every((key) =>
+            formData.grantedScopes?.includes(key)
+          );
+        }
+      } else if (policy && formData.isProxy) {
+        // If proxy, check required scopes for each subject
+        const requiredScopeKeys = policy.availableScopes
+          .filter((s) => s.required)
+          .map((s) => s.key);
+        if (requiredScopeKeys.length > 0) {
+          hasRequiredScopes = formData.managedSubjects.every((subject) =>
+            requiredScopeKeys.every((key) =>
+              subject.grantedScopes?.includes(key)
+            )
+          );
+        }
+      }
+      return isFormValid && hasRequiredScopes;
+    } else {
+      return isFormValid;
+    }
+  }, [currentStepId, isFormValid, formData, policy]);
+
   const handleNext = async (): Promise<void> => {
     const nextIndex = currentStepIndex + 1;
     if (nextIndex < dynamicSteps.length) {
@@ -196,13 +237,15 @@ export function GetStarted(): JSX.Element {
       (step) => step.id === stepId
     );
 
+    if (!isStepValid) return;
+
     if (stepId === "welcome") {
       setCurrentStepId(stepId);
       return;
     }
 
     if (targetStepIndex <= currentStepIndex + 1) {
-      if ((stepId === "scopes" || stepId === "review") && !isFormValid) {
+      if ((stepId === "scopes" || stepId === "review") && !isStepValid) {
         console.warn("Cannot proceed, form is not valid.");
         return;
       }
@@ -312,10 +355,10 @@ export function GetStarted(): JSX.Element {
           onClick={handleNext}
           disabled={
             isPageLoading ||
-            (currentStepId !== "review" &&
-              !isFormValid &&
-              dynamicSteps[currentStepIndex]?.id !== "welcome" &&
-              !dynamicSteps[currentStepIndex]?.id.startsWith("contentSection_"))
+            (
+              (currentStepId === "welcome" || currentStepId === "review") && !isStepValid) ||
+              (!currentStepId.startsWith("contentSection_") && !isStepValid
+            )
           }
         >
           {isPageLoading && currentStepIndex === dynamicSteps.length - 1 ? (

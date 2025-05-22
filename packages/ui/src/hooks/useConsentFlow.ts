@@ -71,12 +71,11 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
 
   const validateForm = (): void => {
     const hasName = formData.name.trim().length > 0;
-    const hasAgeRange = !!formData.ageRangeId;
-    const hasValidAge = formData.age !== undefined && formData.age >= 18;
+    const hasDob = formData.dob !== undefined;
     const hasRole = !!formData.roleId;
 
-    const hasManagedSubjects =
-      !formData.isProxy || formData.managedSubjects.length > 0;
+    // For proxy role, validate managed subjects
+    const hasManagedSubjects = !formData.isProxy || formData.managedSubjects.length > 0;
     const hasValidManagedSubjects = formData.managedSubjects.every(
       (subject) =>
         subject.name?.trim().length > 0 &&
@@ -84,41 +83,9 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
         subject.age >= 0
     );
 
-    let hasRequiredScopes = true;
-    if (policy && !formData.isProxy) {
-      // Only for self-consenter for now
-      const requiredScopeKeys = policy.availableScopes
-        .filter((s: PolicyScope) => s.required)
-        .map((s: PolicyScope) => s.key);
-      if (requiredScopeKeys.length > 0) {
-        hasRequiredScopes = requiredScopeKeys.every((key: string) =>
-          formData.grantedScopes?.includes(key)
-        );
-      }
-    }
-    // If proxy, check required scopes for each subject
-    if (policy && formData.isProxy) {
-      const requiredScopeKeys = policy.availableScopes
-        .filter((s: PolicyScope) => s.required)
-        .map((s: PolicyScope) => s.key);
-      if (requiredScopeKeys.length > 0) {
-        hasRequiredScopes = formData.managedSubjects.every((subject) =>
-          requiredScopeKeys.every((key: string) =>
-            subject.grantedScopes?.includes(key)
-          )
-        );
-      }
-    }
-
-    setIsFormValid(
-      hasName &&
-        hasAgeRange &&
-        hasValidAge &&
-        hasRole &&
-        hasManagedSubjects &&
-        hasValidManagedSubjects &&
-        hasRequiredScopes
-    );
+    const baseValidation = hasName && hasDob && hasRole;
+    const proxyValidation = formData.isProxy ? hasManagedSubjects && hasValidManagedSubjects : true;
+    setIsFormValid(baseValidation && proxyValidation);
   };
 
   const updateScopes = (
