@@ -25,33 +25,38 @@ import { IndexedDBDataAdapter } from "@open-source-consent/data-adapter-indexedd
 const dataAdapter = new IndexedDBDataAdapter();
 setDataAdapter(dataAdapter);
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <App />,
+      children: [
+        { index: true, element: <Home /> },
+        { path: "playground", element: <ComponentsPlayground /> },
+        {
+          path: "get-started",
+          element: (
+            <ProtectedRoute requireNoUser>
+              <GetStarted />
+            </ProtectedRoute>
+          ),
+        },
+        { path: "profile/:userId", element: <ProfilePage /> },
+        { path: "policy/new", element: <PolicyEditorPage /> },
+        {
+          path: "policy/edit/:policyId",
+          element: <PolicyEditorPage />,
+        },
+        { path: "policy/view/:policyId", element: <PolicyViewPage /> },
+        { path: "policies", element: <PolicyListPage /> },
+        { path: "*", element: <Navigate to="/" replace={true} /> },
+      ],
+    },
+  ],
   {
-    path: "/",
-    element: <App />,
-    children: [
-      { index: true, element: <Home /> },
-      { path: "playground", element: <ComponentsPlayground /> },
-      { 
-        path: "get-started", 
-        element: (
-          <ProtectedRoute requireNoUser>
-            <GetStarted />
-          </ProtectedRoute>
-        ) 
-      },
-      { path: "profile/:userId", element: <ProfilePage /> },
-      { path: "policy/new", element: <PolicyEditorPage /> },
-      {
-        path: "policy/edit/:policyId",
-        element: <PolicyEditorPage />,
-      },
-      { path: "policy/view/:policyId", element: <PolicyViewPage /> },
-      { path: "policies", element: <PolicyListPage /> },
-      { path: "*", element: <Navigate to="/" replace={true} /> }, // Corrected catch-all route
-    ],
-  },
-]);
+    basename: import.meta.env.BASE_URL,
+  }
+);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
