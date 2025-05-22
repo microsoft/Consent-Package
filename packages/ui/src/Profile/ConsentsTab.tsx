@@ -72,7 +72,7 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
             ([scopeId, scopeRevocation]) => {
               revokedDisplayScopes.push({
                 id: scopeId,
-                label: `${scopeId} (revoked ${scopeRevocation.revokedAt.toLocaleDateString()})`,
+                label: `${scopeId}`,
                 className: "scope-revoked-within-grant",
                 canBeGranted: true,
               });

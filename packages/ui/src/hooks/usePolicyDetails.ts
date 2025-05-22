@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react";
 import type { Policy } from "@open-source-consent/types";
+import useFetchPolicy from "./useFetchPolicy.js";
 
 interface UsePolicyDetailsResult {
   policy: Policy | null;
   isLoading: boolean;
   error: string | null;
-  fetchPolicy(): void; // Changed to method shorthand
+  fetchPolicy(): void;
 }
 
 const usePolicyDetails = (policyId?: string): UsePolicyDetailsResult => {
   const [policy, setPolicy] = useState<Policy | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { fetchPolicy: fetchPolicyAPI } = useFetchPolicy();
 
   const fetchPolicy = () => {
     if (!policyId) {
@@ -23,25 +25,10 @@ const usePolicyDetails = (policyId?: string): UsePolicyDetailsResult => {
 
     setIsLoading(true);
     setError(null);
-    fetch(`/api/policies/${policyId}`)
-      .then((response) => {
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error(`Policy with ID "${policyId}" not found.`);
-          }
-          throw new Error(
-            `Failed to fetch policy: ${response.status} ${response.statusText}`
-          );
-        }
-        return response.json();
-      })
-      .then((data: Policy) => {
-        setPolicy({
-          ...data,
-          effectiveDate: new Date(data.effectiveDate),
-          createdAt: new Date(data.createdAt),
-          updatedAt: new Date(data.updatedAt),
-        });
+
+    fetchPolicyAPI(policyId)
+      .then((data) => {
+        setPolicy(data);
       })
       .catch((err) => {
         console.error(`Error fetching policy ${policyId}:`, err);

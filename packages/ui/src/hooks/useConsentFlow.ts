@@ -3,18 +3,9 @@ import type {
   Policy,
   PolicyScope,
   CreateConsentInput,
-  AgeGroup,
 } from "@open-source-consent/types";
 import type { ConsentFlowFormData } from "../ConsentFlow/ConsentFlow.type.js";
-
-const getAgeGroup = (age: number | undefined): AgeGroup => {
-  if (age === undefined) {
-    return "18+"; // Fallback, but this should ideally not be reached if validation is correct.
-  }
-  if (age < 13) return "under13";
-  if (age >= 13 && age <= 17) return "13-17";
-  return "18+";
-};
+import { getAgeGroup } from "../utils/ageUtils.js";
 
 interface UseConsentFlowResult {
   policy: Policy | null;

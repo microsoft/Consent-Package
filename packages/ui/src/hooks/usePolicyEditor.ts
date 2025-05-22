@@ -6,16 +6,16 @@ import type {
   CreatePolicyInput,
   NewPolicyVersionDataInput,
 } from "@open-source-consent/types";
+import useFetchPolicy from "./useFetchPolicy.js";
+import useSavePolicy from "./useSavePolicy.js";
 
-// Define PolicyEditorFormData based on CreatePolicyInput,
-// ensuring contentSections and availableScopes use the direct types.
 export type PolicyEditorFormData = Omit<
   CreatePolicyInput,
   "effectiveDate" | "contentSections" | "availableScopes"
 > & {
-  effectiveDate: string; // Store date as string for input compatibility
-  contentSections: Array<PolicyContentSection>; // Use direct type
-  availableScopes: Array<PolicyScope>; // Use direct type
+  effectiveDate: string;
+  contentSections: Array<PolicyContentSection>;
+  availableScopes: Array<PolicyScope>;
 };
 
 interface UsePolicyEditorResult {
@@ -23,9 +23,8 @@ interface UsePolicyEditorResult {
   formData: PolicyEditorFormData;
   isLoading: boolean;
   error: string | null;
-  setFormData(data: PolicyEditorFormData): void; // For simple updates from component
+  setFormData(data: PolicyEditorFormData): void;
   savePolicy(): Promise<void>;
-  // Specialized handlers for content sections
   addContentSection(): void;
   updateContentSection(
     index: number,
@@ -33,7 +32,6 @@ interface UsePolicyEditorResult {
     value: string
   ): void;
   removeContentSection(index: number): void;
-  // Specialized handlers for scopes
   addScope(): void;
   updateScope(
     index: number,
@@ -47,7 +45,7 @@ const getDefaultFormData = (): PolicyEditorFormData => ({
   title: "",
   policyGroupId: "",
   version: 1,
-  effectiveDate: "", // Initialize as string
+  effectiveDate: "",
   contentSections: [{ title: "", description: "", content: "" }],
   availableScopes: [{ key: "", name: "", description: "", required: false }],
   jurisdiction: "",
@@ -61,22 +59,18 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
     useState<PolicyEditorFormData>(getDefaultFormData());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { fetchPolicy } = useFetchPolicy();
+  const { savePolicy: savePolicyAPI } = useSavePolicy();
 
   useEffect(() => {
     if (policyIdToEdit) {
       setIsLoading(true);
       setError(null);
-      fetch(`/api/policies/${policyIdToEdit}`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`Failed to fetch policy ${policyIdToEdit}`);
-          }
-          return response.json();
-        })
-        .then((data: Policy) => {
+
+      fetchPolicy(policyIdToEdit)
+        .then((data) => {
           setPolicy(data);
           setFormData({
-            // Omit 'id' for PolicyEditorFormData as it's not part of CreatePolicyInput base
             policyGroupId: data.policyGroupId,
             title: data.title || "",
             version: data.version,
@@ -111,7 +105,7 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
       setFormData(getDefaultFormData());
       setPolicy(null);
     }
-  }, [policyIdToEdit]);
+  }, [policyIdToEdit, fetchPolicy]);
 
   const addContentSection = useCallback(() => {
     setFormData((prev) => ({
@@ -190,54 +184,29 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
       availableScopes: formData.availableScopes,
     };
 
-    const endpoint = "/api/policies";
-    const method = "POST";
-
     try {
-      const response = await fetch(endpoint, {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(policyDataToSave),
-      });
+      const saved = await savePolicyAPI(policyDataToSave);
 
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(
-          `Failed to save policy: ${response.status} ${errorBody || response.statusText}`
-        );
-      }
-
-      const saved = await response.json();
-      // Assuming the saved policy (or new version) is returned
-      // Update local state if necessary, e.g., if a new ID or version is generated
       if (saved && saved.id) {
         setPolicy(saved); // Update the full policy object
         setFormData((prev) => ({
           ...prev,
-          // Update any fields that might change on save, e.g. version, id from 'saved'
-          // For now, assuming the relevant parts of formData are already correct or handled by full policy set
           version: saved.version || prev.version,
-          // policyGroupId may or may not change depending on create vs new version logic
           policyGroupId: saved.policyGroupId || prev.policyGroupId,
           status: saved.status || prev.status,
-          // if we are creating a new policy, the ID is now known
         }));
       } else {
         setPolicy((prevPolicy) =>
           prevPolicy ? { ...prevPolicy, ...saved } : saved
         );
       }
-
-      console.log("Policy saved successfully:", saved);
     } catch (err: any) {
       console.error("Error saving policy:", err);
       setError(err.message || "An unknown error occurred while saving.");
     } finally {
       setIsLoading(false);
     }
-  }, [formData, policy, setFormData]);
+  }, [formData, savePolicyAPI]);
 
   return {
     policy,

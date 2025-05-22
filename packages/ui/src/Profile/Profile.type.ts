@@ -1,4 +1,4 @@
-import type { ConsentRecord } from "@open-source-consent/types";
+import type { AgeGroup, ConsentRecord } from "@open-source-consent/types";
 
 interface BasicInfo {
   id: string;
@@ -13,7 +13,7 @@ export interface Consent {
   scopes: BasicInfo[];
 }
 
-interface ManagedSubject {
+export interface ManagedSubject {
   id: string;
   name: string;
   relationship: string;
@@ -35,4 +35,12 @@ export interface ProfileProps {
   isManagingSubjects?: boolean;
   onProfileUpdate(profileId: string, updates: Partial<ProfileData>): void;
   onManagedSubjectSelect(profileId: string): void;
+}
+
+export interface SubjectForConsentUpdate {
+  id: string;
+  name?: string;
+  ageForGroupDetermination?: number | string;
+  directAgeGroup?: AgeGroup;
+  roleForRelationship?: string;
 }

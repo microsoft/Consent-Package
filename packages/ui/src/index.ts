@@ -4,9 +4,11 @@ import useConsentFlow from "./hooks/useConsentFlow.js";
 import usePolicyEditor from "./hooks/usePolicyEditor.js";
 import usePolicyList from "./hooks/usePolicyList.js";
 import usePolicyDetails from "./hooks/usePolicyDetails.js";
+import useFetchPolicies from "./hooks/useFetchPolicies.js";
+import useFetchPolicy from "./hooks/useFetchPolicy.js";
+import useSavePolicy from "./hooks/useSavePolicy.js";
 import type { PolicyEditorFormData } from "./hooks/usePolicyEditor.js";
 
-// ConsentFlow components
 import ConsentDetails from "./ConsentFlow/ConsentDetails.js";
 import ConsentReview from "./ConsentFlow/ConsentReview.js";
 import ConsentScopes from "./ConsentFlow/ConsentScopes.js";
@@ -20,14 +22,12 @@ import type {
   ConsentFlowScope,
 } from "./ConsentFlow/ConsentFlow.type.js";
 
-// Other UI components that might have their own index.js structure
 import AgeSelect from "./AgeSelect/index.js";
 import Profile from "./Profile/index.js";
 import RoleSelect from "./RoleSelect/index.js";
 import Signature from "./Signature/index.js";
 import type { ProfileData } from "./Profile/Profile.type.js";
 
-// New Policy components (default exports)
 import PolicySectionDisplay from "./Policy/PolicySectionDisplay.js";
 import PolicyMetadataDisplay from "./Policy/PolicyMetadataDisplay.js";
 import PolicyTable from "./Policy/PolicyTable.js";
@@ -36,14 +36,10 @@ import PolicyMetadataForm from "./Policy/PolicyMetadataForm.js";
 import PolicyContentSectionEditor from "./Policy/PolicyContentSectionEditor.js";
 import PolicyScopeEditor from "./Policy/PolicyScopeEditor.js";
 
-// Re-exporting from directories that have an index.js (or index.tsx)
 export * from "./Profile/index.js";
 export * from "./RoleSelect/index.js";
 export * from "./Signature/index.js";
 export * from "./AgeSelect/index.js";
-// Removed: export * from "./ConsentFlow/index.js"; // Does not have an index file
-// Removed: export * from "./Policy/index.js"; // Policy components imported directly
-// Removed: export * from "./hooks/index.js"; // Hooks imported directly
 
 export {
   // Hooks
@@ -51,6 +47,9 @@ export {
   usePolicyEditor,
   usePolicyList,
   usePolicyDetails,
+  useFetchPolicies,
+  useFetchPolicy,
+  useSavePolicy,
   // UI Components
   AgeSelect,
   Profile,
