@@ -19,11 +19,13 @@ import {
 const useStyles = makeStyles({
   root: {
     padding: '24px',
-    maxWidth: '800px',
     margin: '0 auto',
     display: 'flex',
     flexDirection: 'column',
     gap: tokens.spacingVerticalXXL,
+    '@media (max-width: 768px)': {
+      padding: '0px',
+    },
   },
   form: {
     display: 'flex',

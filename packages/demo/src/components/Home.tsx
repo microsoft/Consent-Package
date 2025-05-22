@@ -65,7 +65,6 @@ const useStyles = makeStyles({
     backgroundColor: 'var(--color-background)',
     borderRadius: 'var(--border-radius)',
     border: `var(--border-width) solid var(--color-border)`,
-    cursor: 'pointer',
     transition:
       'transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease',
     '&:hover': {
@@ -115,10 +114,10 @@ export function Home(): JSX.Element {
             Share Consent with Confidence
           </Title1>
           <Text className={styles.description}>
-            The Open Source Consent Package provides a secure, privacy-focused
-            solution for managing and sharing consent data. Built with
-            transparency and user control at its core, it helps organizations
-            maintain compliance while respecting user privacy.
+            The Open Source Consent Package provides an auditable, traceable,
+            privacy-focused solution for managing and sharing consent data.
+            Built with transparency and user control at its core, it helps
+            organizations maintain compliance while respecting user privacy.
           </Text>
           <Button
             appearance="primary"
@@ -144,10 +143,10 @@ export function Home(): JSX.Element {
               aria-hidden="true"
               className={styles.featureIcon}
             />
-            <Title2 className={styles.featureTitle}>Secure by Design</Title2>
+            <Title2 className={styles.featureTitle}>Auditable by Design</Title2>
             <Text className={styles.featureDescription}>
-              Built with security as a first principle, ensuring your consent
-              data is always protected and handled with care.
+              Built with auditability and immutability as first principles,
+              ensuring your consent stores are always auditable and traceable.
             </Text>
           </div>
           <div className={styles.featureCard}>
@@ -157,8 +156,8 @@ export function Home(): JSX.Element {
             />
             <Title2 className={styles.featureTitle}>Privacy-Focused</Title2>
             <Text className={styles.featureDescription}>
-              Empowers users with control over their data while helping
-              organizations maintain compliance with privacy regulations.
+              Empowers users with control over their data by encouraging
+              granular consent systems.
             </Text>
           </div>
           <div className={styles.featureCard}>

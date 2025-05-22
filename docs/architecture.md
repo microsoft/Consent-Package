@@ -1,5 +1,9 @@
 # Architecture (WIP)
 
+## NOTE
+
+As of 2025-05-22, This doc is now stale. Updates coming before 2025-05-28!
+
 ## Background
 
 1.  **Existing Landscape:** Commercial Consent Management Platforms (CMPs) focus heavily on cookie consent (Usercentrics, Osano, Segment Consent Manager, etc.). Open-source options are less common, especially for *medical research* data consent (granularity, proxies, audit) where no mature Open Source Software (OSS) solutions were found. Relevant: `Pryv.io` , `Kairon Consents`. Relevant commercial: `ConsentGrid`, `Osano`.

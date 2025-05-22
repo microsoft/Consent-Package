@@ -1,5 +1,9 @@
 # Data Structures
 
+## NOTE
+
+As of 2025-05-22, This doc is now stale. Updates coming before 2025-05-28! Refer to the types package for the latest definitions.
+
 ## `ConsentRecord`
 
 Represents the state of consent for a specific subject regarding a specific policy version. This is the primary record stored and audited.

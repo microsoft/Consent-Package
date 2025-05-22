@@ -26,6 +26,10 @@ const useStyles = makeStyles({
     left: 0,
     zIndex: 1000,
     backgroundColor: 'var(--colorNeutralBackground1)',
+    '@media (max-width: 768px)': {
+      paddingTop: '8px',
+      paddingBottom: '8px',
+    },
   },
   navBar: {
     boxShadow: '0 4px 24px 0 rgba(80, 80, 120, 0.3)',
@@ -41,6 +45,10 @@ const useStyles = makeStyles({
     position: 'relative',
     '@media (max-width: 768px)': {
       ...shorthands.padding('0px', '16px'),
+      minHeight: '50px',
+      borderRadius: '30px',
+      ...shorthands.gap('0px'),
+      justifyContent: 'space-between',
     },
   },
   logo: {
@@ -53,6 +61,11 @@ const useStyles = makeStyles({
     textDecoration: 'none',
     marginRight: '16px',
     ...shorthands.gap('8px'),
+    '@media (max-width: 768px)': {
+      fontSize: '16px',
+      marginRight: '0',
+      flex: '1',
+    },
   },
   navLinks: {
     display: 'flex',
@@ -107,24 +120,28 @@ const useStyles = makeStyles({
     marginLeft: 'auto',
     marginRight: '0px',
     '@media (max-width: 768px)': {
-      display: 'block',
-      marginRight: '8px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      ...shorthands.padding('8px'),
+      height: '40px',
+      width: '40px',
     },
   },
   hamburgerIcon: {
     display: 'block',
     width: '24px',
     height: '2px',
-    background: 'var(--colorNeutralForeground1)',
+    backgroundColor: 'var(--colorNeutralForeground1)',
     position: 'relative',
-    transition: 'background 0.3s',
+    transition: 'background-color 0.3s',
     '&::before, &::after': {
       content: '""',
       position: 'absolute',
       width: '24px',
       height: '2px',
       left: '0',
-      background: 'var(--colorNeutralForeground1)',
+      backgroundColor: 'var(--colorNeutralForeground1)',
       transition: 'transform 0.3s',
     },
     '&::before': {
@@ -135,7 +152,7 @@ const useStyles = makeStyles({
     },
   },
   hamburgerIconOpen: {
-    background: 'transparent',
+    backgroundColor: 'transparent',
     '&::before': {
       transform: 'rotate(45deg)',
       top: '0',
@@ -169,6 +186,12 @@ const useStyles = makeStyles({
   },
   authContainerDesktop: {
     marginLeft: 'auto',
+    '@media (max-width: 768px)': {
+      transform: 'scale(0.9)',
+      transformOrigin: 'right center',
+      marginLeft: '8px',
+      marginRight: '8px',
+    },
   },
 });
 

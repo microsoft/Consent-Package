@@ -33,6 +33,11 @@ const useStyles = makeStyles({
     padding: '0 16px',
     paddingTop: '4px',
     overflowX: 'auto',
+    '@media (max-width: 768px)': {
+      justifyContent: 'flex-start',
+      gap: '12px',
+      paddingBottom: '8px',
+    },
     '&::before': {
       content: '""',
       position: 'absolute',
@@ -43,6 +48,10 @@ const useStyles = makeStyles({
       backgroundColor: tokens.colorNeutralStroke1,
       zIndex: 0,
       transition: 'background-color 0.3s ease',
+      '@media (max-width: 768px)': {
+        left: '20px',
+        right: '20px',
+      },
     },
   },
   step: {
@@ -56,6 +65,10 @@ const useStyles = makeStyles({
     textAlign: 'center',
     '&:hover': {
       transform: 'translateY(-2px)',
+    },
+    '@media (max-width: 768px)': {
+      minWidth: '60px',
+      flexShrink: 0,
     },
   },
   stepNumber: {
@@ -71,6 +84,12 @@ const useStyles = makeStyles({
     transition: 'all 0.3s ease',
     boxShadow: tokens.shadow2,
     cursor: 'pointer',
+    '@media (max-width: 768px)': {
+      width: '32px',
+      height: '32px',
+      fontSize: '14px',
+      marginBottom: '8px',
+    },
   },
   stepNumberActive: {
     backgroundColor: tokens.colorBrandBackground,
@@ -81,6 +100,13 @@ const useStyles = makeStyles({
     fontSize: '12px',
     color: tokens.colorNeutralForeground1,
     transition: 'color 0.3s ease',
+    '@media (max-width: 768px)': {
+      fontSize: '10px',
+      maxWidth: '60px',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    },
   },
   slide: {
     minHeight: '400px',

@@ -15,9 +15,70 @@ import {
 import type { Policy } from '@open-source-consent/types';
 
 const useStyles = makeStyles({
+  table: {
+    width: '100%',
+    '@media (max-width: 768px)': {
+      display: 'block',
+    },
+  },
+  tableBody: {
+    '@media (max-width: 768px)': {
+      display: 'block',
+      width: '100%',
+    },
+  },
+  tableHeader: {
+    '@media (max-width: 768px)': {
+      position: 'absolute',
+      top: '-9999px',
+      left: '-9999px',
+    },
+  },
+  tableRow: {
+    '@media (max-width: 768px)': {
+      display: 'block',
+      border: `1px solid ${tokens.colorNeutralStroke2}`,
+      borderRadius: tokens.borderRadiusMedium,
+      marginBottom: tokens.spacingVerticalM,
+      padding: tokens.spacingVerticalS,
+    },
+  },
+  tableCell: {
+    '@media (max-width: 768px)': {
+      display: 'block',
+      textAlign: 'right',
+      position: 'relative',
+      paddingLeft: '50%',
+      paddingBottom: tokens.spacingVerticalXS,
+      paddingTop: tokens.spacingVerticalXS,
+      minHeight: '30px',
+
+      '&::before': {
+        content: 'attr(data-label)',
+        position: 'absolute',
+        left: 0,
+        width: '45%',
+        paddingRight: tokens.spacingHorizontalS,
+        textAlign: 'left',
+        fontWeight: 'bold',
+        color: tokens.colorNeutralForeground2,
+      },
+    },
+  },
   actionsCell: {
     display: 'flex',
+    marginTop: tokens.spacingVerticalS,
+    marginBottom: tokens.spacingVerticalS,
     gap: tokens.spacingHorizontalS,
+
+    '@media (max-width: 768px)': {
+      justifyContent: 'flex-end',
+      paddingLeft: '0 !important',
+
+      '&::before': {
+        display: 'none !important',
+      },
+    },
   },
 });
 
@@ -47,7 +108,7 @@ const PolicyTable: React.FC<PolicyTableProps> = ({
 
   return (
     <Table aria-label="Policies Table" className={styles.table}>
-      <TableHeader>
+      <TableHeader className={styles.tableHeader}>
         <TableRow>
           <TableHeaderCell>Title</TableHeaderCell>
           <TableHeaderCell>Version</TableHeaderCell>
@@ -56,21 +117,23 @@ const PolicyTable: React.FC<PolicyTableProps> = ({
           <TableHeaderCell>Actions</TableHeaderCell>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className={styles.tableBody}>
         {policies.map((policy) => (
-          <TableRow key={policy.id}>
-            <TableCell>{policy.title}</TableCell>
-            <TableCell>{policy.version}</TableCell>
-            <TableCell>
-              <Tag
-                appearance="brand"
-                shape="rounded"
-                className={styles.statusTag}
-              >
+          <TableRow key={policy.id} className={styles.tableRow}>
+            <TableCell data-label="Title" className={styles.tableCell}>
+              {policy.title}
+            </TableCell>
+            <TableCell data-label="Version" className={styles.tableCell}>
+              {policy.version}
+            </TableCell>
+            <TableCell data-label="Status" className={styles.tableCell}>
+              <Tag appearance="brand" shape="rounded">
                 {policy.status.toUpperCase()}
               </Tag>
             </TableCell>
-            <TableCell>{formatDate(policy.effectiveDate)}</TableCell>
+            <TableCell data-label="Effective Date" className={styles.tableCell}>
+              {formatDate(policy.effectiveDate)}
+            </TableCell>
             <TableCell className={styles.actionsCell}>
               <Button
                 appearance="outline"

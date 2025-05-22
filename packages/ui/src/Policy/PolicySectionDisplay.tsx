@@ -20,6 +20,7 @@ const useStyles = makeStyles({
     fontWeight: tokens.fontWeightSemibold,
   },
   sectionDescription: {
+    display: 'block',
     marginBottom: tokens.spacingVerticalM,
     color: tokens.colorNeutralForeground2,
     fontStyle: 'italic',

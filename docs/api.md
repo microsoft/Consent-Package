@@ -18,6 +18,7 @@
     *   Query Parameters:
         *   `scope` (string, optional, repeatable): Filter consents by specific granted scopes.
     *   Response Body: `ConsentRecord[]`
+*   **`GET proxies/{proxyId}/consents`**: Retrieve active consents for a specific subject by proxy.
 
 ### Policies
 

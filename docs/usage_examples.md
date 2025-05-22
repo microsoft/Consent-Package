@@ -1,5 +1,9 @@
 # Usage Examples
 
+## NOTE
+
+As of 2025-05-22, This doc is now stale. Updates coming before 2025-05-28!
+
 Subject to change as planning progresses. This example is presented to guide high-level planning.
 
 ```tsx

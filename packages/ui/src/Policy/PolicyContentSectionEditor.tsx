@@ -25,14 +25,19 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     gap: tokens.spacingVerticalM,
+    position: 'relative',
+    paddingBottom: '100px',
   },
   removeButton: {
-    marginTop: tokens.spacingVerticalM,
-    alignSelf: 'flex-end',
+    backgroundColor: tokens.colorNeutralBackground3,
+    width: '180px',
   },
   quillEditor: {
     height: '200px',
-    marginBottom: tokens.spacingVerticalL,
+  },
+  editorWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
   },
   previewContainer: {
     marginTop: tokens.spacingVerticalL,
@@ -47,6 +52,14 @@ const useStyles = makeStyles({
   },
   tabPanel: {
     marginTop: tokens.spacingVerticalM,
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: '20px',
+    left: '0',
+    right: '0',
   },
 });
 
@@ -166,18 +179,20 @@ const PolicyContentSectionEditor: React.FC<PolicyContentSectionEditorProps> = ({
           aria-labelledby={`section-${index}-edit-tab`}
           className={styles.tabPanel}
         >
-          <Label htmlFor={`content-${index}`}>Section Content (HTML)</Label>
-          <ReactQuill
-            id={`content-${index}`}
-            theme="snow"
-            value={section.content}
-            onChange={(contentValue: string) => {
-              onUpdateSection(index, 'content', contentValue);
-            }}
-            modules={quillModules || defaultQuillModules}
-            formats={quillFormats || defaultQuillFormats}
-            className={styles.quillEditor}
-          />
+          <div className={styles.editorWrapper}>
+            <Label htmlFor={`content-${index}`}>Section Content (HTML)</Label>
+            <ReactQuill
+              id={`content-${index}`}
+              theme="snow"
+              value={section.content}
+              onChange={(contentValue: string) => {
+                onUpdateSection(index, 'content', contentValue);
+              }}
+              modules={quillModules || defaultQuillModules}
+              formats={quillFormats || defaultQuillFormats}
+              className={styles.quillEditor}
+            />
+          </div>
         </div>
       )}
 
@@ -195,14 +210,16 @@ const PolicyContentSectionEditor: React.FC<PolicyContentSectionEditorProps> = ({
         </div>
       )}
 
-      <Button
-        type="button"
-        onClick={() => onRemoveSection(index)}
-        appearance="subtle"
-        className={styles.removeButton}
-      >
-        Remove Section
-      </Button>
+      <div className={styles.buttonContainer}>
+        <Button
+          type="button"
+          onClick={() => onRemoveSection(index)}
+          appearance="outline"
+          className={styles.removeButton}
+        >
+          Remove Section
+        </Button>
+      </div>
     </Card>
   );
 };

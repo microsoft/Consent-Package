@@ -25,7 +25,6 @@ const useStyles = makeStyles({
     color: tokens.colorNeutralForeground1,
     ':focus': {
       outline: `2px solid ${tokens.colorCompoundBrandStroke}`,
-      borderColor: tokens.colorCompoundBrandStroke,
     },
   },
 });
