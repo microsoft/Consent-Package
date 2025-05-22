@@ -151,7 +151,7 @@ const DrawingPad: React.FC<DrawingPadProps> = ({
           disabled={!drawnSignature}
           onClick={handleSubmit}
         >
-          Submit
+          Sign
         </Button>
       </div>
     </div>

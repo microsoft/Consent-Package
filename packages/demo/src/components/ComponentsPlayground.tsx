@@ -128,20 +128,51 @@ export function ComponentsPlayground(): JSX.Element {
         Components Playground
       </Text>
 
-      <RoleSelect 
+      <Text size={400}>
+        To help present how the components can be used, we have created a playground to provide examples of how they can be used.
+        New components or current component updates can be viewed here.
+      </Text>
+
+      <br />
+      <Text size={400}>RoleSelect with default roles -- returns the role id</Text>
+      <RoleSelect
         roles={defaultRoles}
         onSubmit={(roleId: string) => console.info(roleId)} 
       />
-      <AgeSelect useDatePicker onSubmit={(ageRangeId: string) => console.info(ageRangeId)} />
+
+      <br />
+      <br />
+      <Text size={400}>AgeSelect (using a date picker) -- returns the age range id, DOB and age</Text>
+      <AgeSelect useDatePicker onSubmit={(ageRangeId: string, dob?: Date, age?: number) => console.info(ageRangeId, dob, age)} />
+
+      <br />
+      <br />
+      <Text size={400}>AgeSelect (of possible ranges) -- returns the age range id</Text>
       <AgeSelect onSubmit={(ageRangeId: string) => console.info(ageRangeId)} />
+
+      <br />
+      <br />
+      <Text size={400}>Signature (digital) -- returns the text and date</Text>
       <Signature onSignatureSubmit={(signature: string, date: Date) => console.info(signature, date)} />
+
+      <br />
+      <br />
+      <Text size={400}>Signature (drawn) -- returns the signature as a base64 string which can be parsed into an image and date</Text>
       <Signature isDrawnSignature onSignatureSubmit={(signature: string, date: Date) => console.info(signature, date)} />
+
+      <br />
+      <br />
+      <Text size={400}>Profile (Proxy)</Text>
       <Profile
         profileData={proxySampleProfileData}
         isManagingSubjects={proxySampleProfileData.role.id === 'proxy'}
         onProfileUpdate={(profileId: string, updates: Partial<ProfileData>) => console.info('profile update', { profileId, updates })}
         onManagedSubjectSelect={(profileId: string) => console.info('selected managed profile', profileId)}
       />
+
+      <br />
+      <br />
+      <Text size={400}>Profile (Self-consenting)</Text>
       <Profile
         profileData={selfSampleProfileData}
         isManagingSubjects={selfSampleProfileData.role.id === 'proxy'}

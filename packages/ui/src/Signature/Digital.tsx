@@ -54,7 +54,7 @@ const Digital: React.FC<DigitalProps> = ({ onSignatureSubmit }) => {
         disabled={!digitalSignature || !isChecked}
         className="submit-button"
       >
-        Submit
+        Sign
       </Button>
     </div>
   );
