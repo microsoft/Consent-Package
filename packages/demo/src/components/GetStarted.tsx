@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router";
 import {
   makeStyles,
   Button,
@@ -16,6 +15,7 @@ import {
 } from "@open-source-consent/ui";
 import type { ConsentFlowFormData } from "@open-source-consent/ui";
 import type { PolicyContentSection } from "@open-source-consent/types";
+import {useAuth} from "../utils/useAuth.js";
 
 const useStyles = makeStyles({
   root: {
@@ -119,7 +119,6 @@ interface Step {
 
 export function GetStarted(): JSX.Element {
   const styles = useStyles();
-  const navigate = useNavigate();
   const {
     policy,
     formData,
@@ -130,6 +129,9 @@ export function GetStarted(): JSX.Element {
     updateScopes,
     saveConsent,
   } = useConsentFlow("sample-group-1");
+  const { isLoading: isAuthLoading, login } = useAuth();
+
+  const isPageLoading = isLoading || isAuthLoading;
 
   const dynamicSteps = useMemo<Step[]>(() => {
     if (!policy) return baseSteps.filter((step) => step.id === "welcome");
@@ -166,11 +168,18 @@ export function GetStarted(): JSX.Element {
       if (saveConsent) {
         await saveConsent();
         if (!error) {
-          void navigate("/profile", { state: { formData } });
+          try {
+            const subjectId = formData.name.trim();
+            // Will push to '/' because of routing rules
+            await login(subjectId);
+          } catch (err) {
+            console.error("Login failed:", err);
+            alert("Unable to login. Please contact support.");
+          }
         }
       } else {
         console.error("saveConsent function is not available.");
-        void navigate("/profile", { state: { formData } });
+        alert("Unable to save consent. Please contact support.");
       }
     }
   };
@@ -202,7 +211,7 @@ export function GetStarted(): JSX.Element {
   };
 
   const renderSlide = (): JSX.Element | null => {
-    if (isLoading && !policy) {
+    if (isPageLoading && !policy) {
       return (
         <div className={styles.loading}>
           <Spinner label="Loading policy..." />
@@ -302,14 +311,14 @@ export function GetStarted(): JSX.Element {
           appearance="primary"
           onClick={handleNext}
           disabled={
-            isLoading ||
+            isPageLoading ||
             (currentStepId !== "review" &&
               !isFormValid &&
               dynamicSteps[currentStepIndex]?.id !== "welcome" &&
               !dynamicSteps[currentStepIndex]?.id.startsWith("contentSection_"))
           }
         >
-          {isLoading && currentStepIndex === dynamicSteps.length - 1 ? (
+          {isPageLoading && currentStepIndex === dynamicSteps.length - 1 ? (
             <Spinner size="tiny" />
           ) : currentStepIndex === dynamicSteps.length - 1 ? (
             "Finish"

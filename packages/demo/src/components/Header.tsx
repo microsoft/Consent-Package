@@ -10,6 +10,7 @@ import {
   Button as FluentButton,
 } from "@fluentui/react-components";
 import { AuthMenu } from "./AuthMenu.js";
+import { useAuth } from "../utils/useAuth.js";
 
 const useStyles = makeStyles({
   headerWrapper: {
@@ -174,11 +175,13 @@ const useStyles = makeStyles({
 export function Header(): JSX.Element {
   const styles = useStyles();
   const location = useLocation();
+  const { currentUser } = useAuth();
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
     { path: "/", label: "Home" },
-    { path: "/get-started", label: "Get Started" },
+    ...(currentUser ? [] : [{ path: "/get-started", label: "Get Started" }]),
     { path: "/playground", label: "Playground" },
     { path: "/policies", label: "Manage Policies" },
   ];

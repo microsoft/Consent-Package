@@ -1,5 +1,6 @@
-import { makeStyles, tokens } from "@fluentui/react-components";
 import { Link } from "react-router";
+import { makeStyles, tokens } from "@fluentui/react-components";
+import { useAuth } from "../utils/useAuth.js";
 
 const useStyles = makeStyles({
   footer: {
@@ -47,15 +48,18 @@ const useStyles = makeStyles({
 
 export function Footer(): JSX.Element {
   const styles = useStyles();
+  const { currentUser } = useAuth();
 
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
         <div className={styles.section}>
           <h3 className={styles.title}>Product</h3>
-          <Link to="/get-started" className={styles.link}>
-            Get Started
-          </Link>
+          {
+            currentUser ?
+            <Link to={`/profile/${currentUser.id}`} className={styles.link}>View Profile</Link> :
+            <Link to="/get-started" className={styles.link}>Get Started</Link>
+          }
           <Link to="/playground" className={styles.link}>
             Playground
           </Link>

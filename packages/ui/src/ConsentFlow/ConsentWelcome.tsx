@@ -141,7 +141,7 @@ const ConsentWelcome = ({
         ) : (
           <>
             <Text weight="semibold">
-              Are you consenting on behalf of someone else?
+              Are you consenting on behalf of yourself or someone else?
             </Text>
             <RoleSelect
               initialRoleIdValue={formData.roleId}

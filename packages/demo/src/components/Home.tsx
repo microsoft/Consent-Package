@@ -12,6 +12,7 @@ import {
   DataTrendingRegular,
   CodeRegular,
 } from "@fluentui/react-icons";
+import { useAuth } from "../utils/useAuth.js";
 
 const useStyles = makeStyles({
   root: {
@@ -104,6 +105,7 @@ const useStyles = makeStyles({
 export function Home(): JSX.Element {
   const styles = useStyles();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   return (
     <div className={styles.root}>
@@ -121,10 +123,16 @@ export function Home(): JSX.Element {
           <Button
             appearance="primary"
             size="large"
-            onClick={() => navigate("/get-started")}
+            onClick={() => {
+              if (currentUser) {
+                void navigate(`/profile/${currentUser.id}`);
+              } else {
+                void navigate("/get-started");
+              }
+            }}
             className={styles.ctaButton}
           >
-            Get Started
+            {currentUser ? "View Profile" : "Get Started"}
           </Button>
         </div>
       </section>
