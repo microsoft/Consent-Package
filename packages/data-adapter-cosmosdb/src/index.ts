@@ -151,6 +151,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
       status: status,
       consentedAt: existingConsent.consentedAt,
       revokedAt: existingConsent.revokedAt,
+      dateOfBirth: existingConsent.dateOfBirth,
       consenter: existingConsent.consenter,
       grantedScopes: existingConsent.grantedScopes,
       revokedScopes: existingConsent.revokedScopes,

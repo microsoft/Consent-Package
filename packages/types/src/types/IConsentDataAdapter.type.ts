@@ -11,7 +11,13 @@ export type CreateInitialConsentInput = Omit<
 // version will be incremented by the adapter.
 export type CreateNextConsentVersionInput = Omit<
   ConsentRecord,
-  "id" | "createdAt" | "updatedAt" | "version" | "subjectId" | "policyId"
+  | "id"
+  | "createdAt"
+  | "updatedAt"
+  | "version"
+  | "subjectId"
+  | "policyId"
+  | "dateOfBirth"
 >;
 
 export interface IConsentDataAdapter {

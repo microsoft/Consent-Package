@@ -84,7 +84,8 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
     const hasRole = !!formData.roleId;
 
     // For proxy role, validate managed subjects
-    const hasManagedSubjects = !formData.isProxy || formData.managedSubjects.length > 0;
+    const hasManagedSubjects =
+      !formData.isProxy || formData.managedSubjects.length > 0;
     const hasValidManagedSubjects = formData.managedSubjects.every(
       (subject) =>
         subject.name?.trim().length > 0 &&
@@ -94,7 +95,9 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
     );
 
     const baseValidation = hasName && hasDob && hasRole;
-    const proxyValidation = formData.isProxy ? hasManagedSubjects && hasValidManagedSubjects : true;
+    const proxyValidation = formData.isProxy
+      ? hasManagedSubjects && hasValidManagedSubjects
+      : true;
     setIsFormValid(baseValidation && proxyValidation);
   };
 
@@ -175,6 +178,7 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
         return {
           subjectId: subject.id,
           policyId: policy.id,
+          dateOfBirth: subject.dob,
           consenter: {
             type: "proxy",
             userId: formData.name,
@@ -194,6 +198,7 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
       const consentInput: CreateConsentInput = {
         subjectId: formData.name,
         policyId: policy.id,
+        dateOfBirth: formData.dob,
         consenter: {
           type: "self",
           userId: formData.name,

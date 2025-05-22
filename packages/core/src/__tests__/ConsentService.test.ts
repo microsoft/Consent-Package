@@ -49,16 +49,18 @@ describe("ConsentService", () => {
   describe("grantConsent", () => {
     it("should create a new consent record with granted status when no prior consent exists", async () => {
       // Arrange
-      const mockConsentInput = {
+      const mockConsentInput: CreateConsentInput = {
         subjectId: "user123",
         policyId: "policy456",
+        dateOfBirth: new Date("1990-01-01"),
         consenter: {
-          type: "self" as const,
+          type: "self",
           userId: "user123",
         },
         grantedScopes: ["email", "profile"],
+        revokedScopes: ["notifications"],
         metadata: {
-          consentMethod: "digital_form" as const,
+          consentMethod: "digital_form",
           ipAddress: "127.0.0.1",
           userAgent: "Mozilla/5.0",
         },
@@ -98,6 +100,7 @@ describe("ConsentService", () => {
         policyId: "policy456",
         status: "granted",
         consentedAt: mockDate,
+        dateOfBirth: mockConsentInput.dateOfBirth,
         consenter: {
           type: "self",
           userId: "user123",
@@ -135,6 +138,7 @@ describe("ConsentService", () => {
         status: "granted",
         version: 1,
         consentedAt: mockDate,
+        dateOfBirth: mockConsentInput.dateOfBirth,
         consenter: {
           type: "self",
           userId: "user123",
@@ -849,6 +853,7 @@ describe("ConsentService", () => {
       const mockConsentInput: CreateConsentInput = {
         subjectId: "user-initial",
         policyId: "policy-initial",
+        dateOfBirth: new Date("2000-01-01"),
         consenter: {
           type: "self" as const,
           userId: "user-initial",
@@ -886,6 +891,7 @@ describe("ConsentService", () => {
         policyId: mockConsentInput.policyId,
         status: "granted",
         consentedAt: mockDate,
+        dateOfBirth: mockConsentInput.dateOfBirth,
         consenter: mockConsentInput.consenter,
         grantedScopes: {
           read: { grantedAt: mockDate },
@@ -918,6 +924,7 @@ describe("ConsentService", () => {
         status: "granted",
         version: 1,
         consentedAt: mockDate,
+        dateOfBirth: mockConsentInput.dateOfBirth,
         consenter: mockConsentInput.consenter,
         grantedScopes: {
           read: { grantedAt: mockDate },
@@ -945,6 +952,7 @@ describe("ConsentService", () => {
         version: 2,
         status: "granted",
         consentedAt: mockDate,
+        dateOfBirth: new Date("1990-01-01"),
         consenter: { type: "self", userId: subjectId },
         grantedScopes: { read: { grantedAt: mockDate } },
         metadata: { consentMethod: "digital_form" },

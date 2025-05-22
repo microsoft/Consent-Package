@@ -108,6 +108,7 @@ describe("IndexedDBDataAdapter - Consent Methods", () => {
         status: "granted",
         version: 1,
         consentedAt: consentedAtDate,
+        dateOfBirth: new Date("1990-01-01"),
         consenter: { type: "self", userId: "user1" },
         grantedScopes: {
           scope1: { grantedAt: consentedAtDate },

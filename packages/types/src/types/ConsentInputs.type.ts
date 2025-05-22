@@ -1,6 +1,7 @@
 export interface CreateConsentInput {
   subjectId: string;
   policyId: string;
+  dateOfBirth?: Date;
   consenter: {
     type: "self" | "proxy";
     userId: string;

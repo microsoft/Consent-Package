@@ -11,6 +11,7 @@ export interface ConsentRecord {
   readonly status: ConsentStatus;
   readonly consentedAt: Date;
   readonly revokedAt?: Date;
+  readonly dateOfBirth?: Date;
   readonly consenter: {
     readonly type: ConsenterType;
     readonly userId: string;
