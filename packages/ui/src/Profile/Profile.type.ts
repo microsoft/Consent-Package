@@ -35,6 +35,7 @@ export interface ProfileProps {
   isManagingSubjects?: boolean;
   onProfileUpdate(profileId: string, updates: Partial<ProfileData>): void;
   onManagedSubjectSelect(profileId: string): void;
+  subjectIdToDisplayName(subjectId: string): string;
 }
 
 export interface SubjectForConsentUpdate {

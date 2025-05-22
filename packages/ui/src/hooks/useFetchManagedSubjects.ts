@@ -28,7 +28,8 @@ export default function useFetchManagedSubjects(
   updateStatus: (updates: Partial<StatusState>) => void,
   setProfileData: (
     updater: (prev: ProfileData | null) => ProfileData | null
-  ) => void
+  ) => void,
+  subjectIdToDisplayName: (subjectId: string) => string
 ): FetchManagedSubjectsResult {
   // Fetch consents for a specific subject
   const fetchConsentsForSubject = useCallback(
@@ -80,7 +81,7 @@ export default function useFetchManagedSubjects(
         ) {
           subjectsFromProxyConsents.set(consent.subjectId, {
             id: consent.subjectId,
-            name: `Managed Subject (${consent.subjectId.substring(0, 6)})`,
+            name: subjectIdToDisplayName(consent.subjectId),
             relationship:
               consent.consenter.proxyDetails.relationship || "Managed",
             ageGroup: {
@@ -102,7 +103,7 @@ export default function useFetchManagedSubjects(
     } finally {
       updateStatus({ isLoadingProxySubjects: false });
     }
-  }, [profileId, updateStatus]);
+  }, [profileId, updateStatus, subjectIdToDisplayName]);
 
   // Load proxy subjects with their consents
   useEffect(() => {

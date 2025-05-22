@@ -93,8 +93,8 @@ const ConsentReview = ({
         formData.managedSubjects.length > 0 && (
           <div className={styles.section}>
             <Text className={styles.sectionTitle}>Managed Subjects</Text>
-            {formData.managedSubjects.map((subject) => (
-              <div key={subject.id} className={styles.section}>
+            {formData.managedSubjects.map((subject, index) => (
+              <div key={`subject-${index}`} className={styles.section}>
                 <Text>Name: {subject.name}</Text>
                 <Text>Date of Birth: {subject.dob?.toLocaleDateString()}</Text>
                 <Text>Age: {formatAge(subject.age)}</Text>

@@ -33,6 +33,7 @@ export const Profile: React.FC<ProfileProps> = ({
   profileData: initialProfileData,
   onProfileUpdate,
   onManagedSubjectSelect,
+  subjectIdToDisplayName,
 }) => {
   const [selectedTab, setSelectedTab] = useState(PROFILE_TABS.PERSONAL);
   const [selectedSubject, setSelectedSubject] = useState<ManagedSubject | null>(
@@ -46,7 +47,12 @@ export const Profile: React.FC<ProfileProps> = ({
     useConsents(profileData, updateStatus);
 
   // Initialize the managed subjects fetching hook
-  useFetchManagedSubjects(profileData?.id, updateStatus, setProfileData);
+  useFetchManagedSubjects(
+    profileData?.id,
+    updateStatus,
+    setProfileData,
+    subjectIdToDisplayName
+  );
 
   useEffect(() => {
     setProfileData(

@@ -8,7 +8,7 @@ import {
   Button,
   tokens,
 } from "@fluentui/react-components";
-import type { ChangeEvent } from "react";
+import type { ChangeEvent, FocusEvent } from "react";
 import type { Policy } from "@open-source-consent/types";
 import type {
   ConsentFlowFormData,
@@ -19,6 +19,16 @@ interface ConsentWelcomeProps {
   policy: Policy;
   formData: ConsentFlowFormData;
   onFormDataChange(formData: ConsentFlowFormData): void;
+  /**
+   * Function to get a subject ID based on the subject's name.
+   * The consumer of this component is responsible for determining how subject IDs are generated
+   * and provided including any authentication, authentication, or verification
+   */
+  getSubjectId(name: string): string;
+  /**
+   * Convert a subject ID to a display name.
+   */
+  subjectIdToDisplayName(subjectId: string): string;
 }
 
 const useStyles = makeStyles({
@@ -62,6 +72,8 @@ const ConsentWelcome = ({
   formData,
   policy,
   onFormDataChange,
+  getSubjectId,
+  subjectIdToDisplayName,
 }: ConsentWelcomeProps): JSX.Element => {
   const styles = useStyles();
 
@@ -78,7 +90,7 @@ const ConsentWelcome = ({
       managedSubjects: [
         ...formData.managedSubjects,
         {
-          id: crypto.randomUUID(),
+          id: "",
           name: "",
           ageRangeId: "",
         },
@@ -87,27 +99,56 @@ const ConsentWelcome = ({
     onFormDataChange(newFormData);
   };
 
-  const handleRemoveSubject = (id: string): void => {
+  const handleRemoveSubject = (index: number): void => {
     const newFormData = {
       ...formData,
-      managedSubjects: formData.managedSubjects.filter(
-        (subject) => subject.id !== id
-      ),
+      managedSubjects: formData.managedSubjects.filter((_, i) => i !== index),
     };
     onFormDataChange(newFormData);
   };
 
   const handleManagedSubjectChange = (
-    id: string,
+    index: number,
     updates: Partial<ConsentFlowManagedSubject>
   ): void => {
     const newFormData = {
       ...formData,
-      managedSubjects: formData.managedSubjects.map((subject) =>
-        subject.id === id ? { ...subject, ...updates } : subject
-      ),
+      managedSubjects: formData.managedSubjects.map((subject, i) => {
+        if (i === index) {
+          return { ...subject, ...updates };
+        }
+        return subject;
+      }),
     };
     onFormDataChange(newFormData);
+  };
+
+  const handleManagedSubjectBlur = (
+    index: number,
+    e: FocusEvent<HTMLInputElement>
+  ): void => {
+    const name = e.target.value.trim();
+    if (name === "") return;
+
+    const subject = formData.managedSubjects[index];
+    const newId = getSubjectId(name);
+
+    // Only update if the ID would change
+    if (!subject.id || subject.name !== name) {
+      const newFormData = {
+        ...formData,
+        managedSubjects: formData.managedSubjects.map((subject, i) => {
+          if (i === index) {
+            return {
+              ...subject,
+              id: newId,
+            };
+          }
+          return subject;
+        }),
+      };
+      onFormDataChange(newFormData);
+    }
   };
 
   return (
@@ -155,12 +196,15 @@ const ConsentWelcome = ({
         {formData.isProxy && (
           <div className={styles.managedSubjectsForm}>
             <Text weight="semibold">Consenting on behalf of:</Text>
-            {formData.managedSubjects.map((subject) => (
-              <div key={subject.id} className={styles.managedSubject}>
+            {formData.managedSubjects.map((subject, index) => (
+              <div
+                key={subject.id || `temp-key-${index}`}
+                className={styles.managedSubject}
+              >
                 <div className={styles.managedSubjectHeader}>
                   <Button
                     appearance="subtle"
-                    onClick={() => handleRemoveSubject(subject.id)}
+                    onClick={() => handleRemoveSubject(index)}
                   >
                     Remove
                   </Button>
@@ -169,9 +213,12 @@ const ConsentWelcome = ({
                 <Input
                   value={subject.name}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleManagedSubjectChange(subject.id, {
+                    handleManagedSubjectChange(index, {
                       name: e.target.value,
                     })
+                  }
+                  onBlur={(e: FocusEvent<HTMLInputElement>) =>
+                    handleManagedSubjectBlur(index, e)
                   }
                   required
                 />
@@ -180,7 +227,7 @@ const ConsentWelcome = ({
                   initialDateValue={subject.dob}
                   useDatePicker
                   onChange={(ageRangeId: string, dob?: Date, age?: number) =>
-                    handleManagedSubjectChange(subject.id, {
+                    handleManagedSubjectChange(index, {
                       ageRangeId,
                       dob,
                       age,

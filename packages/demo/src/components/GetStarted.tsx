@@ -280,6 +280,23 @@ export function GetStarted(): JSX.Element {
           onFormDataChange={(data: ConsentFlowFormData): void => {
             setFormData(data);
           }}
+          /**
+           * This function is for demo purposes only.
+           * In real-world applications, the consumer of this component
+           * would likely want to connect this to their own
+           * user management and authentication system.
+           */
+          getSubjectId={(name: string): string => {
+            return name;
+          }}
+          /**
+           * For the demo, the subject ID is the same as the display name.
+           * In real-world applications, you would provide a function that
+           * converts the subject ID to an appropriate display name.
+           */
+          subjectIdToDisplayName={(subjectId: string): string => {
+            return subjectId;
+          }}
         />
       );
     } else if (currentStepId.startsWith("contentSection_")) {
@@ -297,9 +314,9 @@ export function GetStarted(): JSX.Element {
           onChange={(
             scopeId: string,
             isChecked: boolean,
-            subjectId?: string
+            subjectIndex?: number
           ) => {
-            updateScopes(scopeId, isChecked, subjectId);
+            updateScopes(scopeId, isChecked, subjectIndex);
           }}
         />
       );

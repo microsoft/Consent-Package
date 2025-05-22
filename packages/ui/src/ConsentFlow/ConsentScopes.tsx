@@ -13,7 +13,7 @@ import type { PolicyScope } from "@open-source-consent/types";
 interface ConsentScopesProps {
   formData: ConsentFlowFormData;
   availableScopes: readonly PolicyScope[];
-  onChange(scopeId: string, isChecked: boolean, subjectId?: string): void;
+  onChange(scopeId: string, isChecked: boolean, subjectIndex?: number): void;
 }
 
 const useStyles = makeStyles({
@@ -89,7 +89,9 @@ const ConsentScopes = ({
   const styles = useStyles();
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const requiredScopes = availableScopes.filter((scope) => scope.required).map((scope) => scope.key)
+  const requiredScopes = availableScopes
+    .filter((scope) => scope.required)
+    .map((scope) => scope.key);
 
   const {
     isProxy,
@@ -100,12 +102,12 @@ const ConsentScopes = ({
   useEffect(() => {
     if (!isProxy) {
       for (const requiredScope of requiredScopes) {
-        onChange(requiredScope, true)
+        onChange(requiredScope, true);
       }
     } else {
       for (const requiredScope of requiredScopes) {
-        for (const subject of managedSubjects) {
-          onChange(requiredScope, true, subject.id)
+        for (let i = 0; i < managedSubjects.length; i++) {
+          onChange(requiredScope, true, i);
         }
       }
     }
@@ -114,9 +116,9 @@ const ConsentScopes = ({
   const handleScopeChange = (
     scopeId: string,
     isChecked: boolean,
-    subjectId?: string
+    subjectIndex?: number
   ): void => {
-    onChange(scopeId, isChecked, subjectId);
+    onChange(scopeId, isChecked, subjectIndex);
   };
 
   const handleNextSubject = (): void => {
@@ -135,32 +137,35 @@ const ConsentScopes = ({
     setCurrentSlide(index);
   };
 
-  const scopeCheckbox = (scope: PolicyScope, subjectScopes?: string[], subjectId?: string): JSX.Element => {
-    return <>
-      <Checkbox
-        label={`${scope.name}${scope.required ? " (Mandatory)" : ""}`}
-        checked={
-          scope.required ||
-          (subjectScopes?.includes(scope.key) ?? false)
-        }
-        disabled={scope.required}
-        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-          handleScopeChange(scope.key, e.target.checked, subjectId)
-        }
-      />
-      <Text size={200}>{scope.description}</Text>
-    </>
-  }
+  const scopeCheckbox = (
+    scope: PolicyScope,
+    subjectScopes?: string[],
+    subjectIndex?: number
+  ): JSX.Element => {
+    return (
+      <>
+        <Checkbox
+          label={`${scope.name}${scope.required ? " (Mandatory)" : ""}`}
+          checked={
+            scope.required || (subjectScopes?.includes(scope.key) ?? false)
+          }
+          disabled={scope.required}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            handleScopeChange(scope.key, e.target.checked, subjectIndex)
+          }
+        />
+        <Text size={200}>{scope.description}</Text>
+      </>
+    );
+  };
 
   return (
     <div className={styles.root}>
       <Title2 align="center">Select Data Access Permissions</Title2>
       <Text align="center">
-        {
-          requiredScopes.length > 0 ?
-            'Select additional data you wish to authorize for use with this service. Mandatory permissions cannot be modified.' :
-            'Select the data you wish to authorize for use with this service. At least one permission must be enabled to proceed.'
-        }
+        {requiredScopes.length > 0
+          ? "Select additional data you wish to authorize for use with this service. Mandatory permissions cannot be modified."
+          : "Select the data you wish to authorize for use with this service. At least one permission must be enabled to proceed."}
       </Text>
 
       {!isProxy &&
@@ -182,10 +187,14 @@ const ConsentScopes = ({
                 managedSubjects[currentSlide].grantedScopes;
               return (
                 <div
-                  key={`${managedSubjects[currentSlide].id}-${scope.key}`}
+                  key={`subject-${currentSlide}-scope-${scope.key}`}
                   className={styles.scope}
                 >
-                  {scopeCheckbox(scope, currentSubjectGrantedScopes, managedSubjects[currentSlide].id)}
+                  {scopeCheckbox(
+                    scope,
+                    currentSubjectGrantedScopes,
+                    currentSlide
+                  )}
                 </div>
               );
             })}

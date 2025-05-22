@@ -120,6 +120,9 @@ export function ProfilePage(): JSX.Element {
         }
         onProfileUpdate={handleProfileUpdate}
         onManagedSubjectSelect={handleManagedSubjectSelect}
+        subjectIdToDisplayName={(subjectId: string): string => {
+          return subjectId;
+        }}
       />
     </Card>
   );
