@@ -3,7 +3,7 @@ import { useOutletContext, useParams } from "react-router";
 import { Text, Card, makeStyles, Spinner } from "@fluentui/react-components";
 import { Profile } from "@open-source-consent/ui";
 import type { ProfileData } from "@open-source-consent/ui";
-import { fetchUserProfile } from "../utils/userManagement.js"; // Import the fetch function
+import { fetchUserProfile } from "../utils/userManagement.js";
 
 const useStyles = makeStyles({
   root: {
@@ -15,21 +15,21 @@ const useStyles = makeStyles({
   },
   centered: {
     display: "flex",
-    flexDirection: "column", // Align text vertically
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    height: "100%", // Or a fixed height like 300px
+    height: "100%",
     padding: "24px",
   },
 });
 
 interface AppOutletContext {
-  user: ProfileData | null; // This is the logged-in user
+  user: ProfileData | null;
 }
 
 export function ProfilePage(): JSX.Element {
   const styles = useStyles();
-  const { user: loggedInUser } = useOutletContext<AppOutletContext>(); // Renamed for clarity
+  const { user: loggedInUser } = useOutletContext<AppOutletContext>();
   const { userId } = useParams<{ userId: string }>();
 
   const [profileToDisplay, setProfileToDisplay] = useState<ProfileData | null>(
@@ -72,12 +72,10 @@ export function ProfilePage(): JSX.Element {
     updates: Partial<ProfileData>
   ): void => {
     console.info("Profile updated (mock):", { profileId, updates });
-    // Potentially re-fetch or update local state if editable
   };
 
   const handleManagedSubjectSelect = (subjectId: string): void => {
     console.info("Managed subject selected:", subjectId);
-    // Navigate or perform action for managed subject
   };
 
   if (isLoadingProfile) {
@@ -98,8 +96,6 @@ export function ProfilePage(): JSX.Element {
   }
 
   if (!profileToDisplay) {
-    // This case should ideally be covered by the error state if fetch fails
-    // or if fetchUserProfile returns null explicitly for a not-found user.
     return (
       <Card className={`${styles.root} ${styles.centered}`}>
         <Text as="h2">Profile not available.</Text>
@@ -107,10 +103,6 @@ export function ProfilePage(): JSX.Element {
       </Card>
     );
   }
-
-  // The check `currentUser.id !== userId` has been removed.
-  // Now we display the profile fetched based on `userId` from the URL.
-  // `loggedInUser` (the old `currentUser`) can be used for permission checks, e.g., edit button.
 
   return (
     <Card className={styles.root}>
@@ -121,8 +113,6 @@ export function ProfilePage(): JSX.Element {
       <Profile
         profileData={profileToDisplay}
         isManagingSubjects={
-          // Logic for isManagingSubjects might need to consider `loggedInUser` vs `profileToDisplay`
-          // For now, let's assume it's based on the displayed profile's data AND if loggedInUser is the same.
           loggedInUser?.id === profileToDisplay.id &&
           profileToDisplay.role?.id !== "self" &&
           profileToDisplay.managedSubjects &&
@@ -130,7 +120,6 @@ export function ProfilePage(): JSX.Element {
         }
         onProfileUpdate={handleProfileUpdate}
         onManagedSubjectSelect={handleManagedSubjectSelect}
-        // Consider adding an isEditable prop based on `loggedInUser?.id === profileToDisplay.id`
       />
     </Card>
   );

@@ -99,3 +99,64 @@
   flex: 1;
   margin-right: 8px;
 }
+
+.profile-consent-scope-item .fui-Button {
+  margin-left: auto;
+}
+
+.profile-scopes-section-granted {
+  background-color: rgba(0, 255, 0, 0.1);
+  padding: 12px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.profile-scopes-section-revoked .fui-Button {
+  background-color: rgba(0, 150, 0, 0.2);
+  color: black;
+}
+
+.profile-scopes-section-revoked .fui-Button:hover {
+  background-color: rgba(0, 150, 0, 0.5);
+  color: black;
+}
+
+.profile-scopes-section-revoked {
+  background-color: rgba(255, 0, 0, 0.1);
+  padding: 12px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.profile-scopes-section-granted .fui-Button {
+  background-color: rgba(255, 0, 0, 0.2);
+  color: black;
+}
+
+.profile-scopes-section-granted .fui-Button:hover {
+  background-color: rgba(255, 0, 0, 0.5);
+  color: black;
+}
+
+.profile-consent-scopes-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin-top: 4px;
+}
+
+.profile-consent-scope-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.profile-consent-scope-item .fui-Text {
+  flex-grow: 1;
+  margin-right: 8px;
+}
+
+.profile-consent-scope-item .fui-Button {
+  margin-left: auto;
+  flex-shrink: 0;
+}

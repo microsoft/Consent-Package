@@ -54,12 +54,13 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
         const currentGrantedScopesForThisPolicy = getGrantedScopesForPolicy(
           consent.policyId
         );
-        const scopesToDisplay: Array<ScopeDisplayInfo> = [];
+        const grantedDisplayScopes: Array<ScopeDisplayInfo> = [];
+        const revokedDisplayScopes: Array<ScopeDisplayInfo> = [];
 
         if (consent.status === "granted") {
           Object.entries(consent.grantedScopes || {}).forEach(
-            ([scopeId, scopeGrant]) => {
-              scopesToDisplay.push({
+            ([scopeId, _scopeGrantDetails]) => {
+              grantedDisplayScopes.push({
                 id: scopeId,
                 label: scopeId,
                 className: "scope-granted",
@@ -69,64 +70,43 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
           );
           Object.entries(consent.revokedScopes || {}).forEach(
             ([scopeId, scopeRevocation]) => {
-              scopesToDisplay.push({
+              revokedDisplayScopes.push({
                 id: scopeId,
-                label: `${scopeId} (not granted for this version - revoked ${scopeRevocation.revokedAt.toLocaleDateString()})`,
-                className: "scope-revoked-on-granted-record",
+                label: `${scopeId} (revoked ${scopeRevocation.revokedAt.toLocaleDateString()})`,
+                className: "scope-revoked-within-grant",
                 canBeGranted: true,
               });
             }
           );
         } else if (consent.status === "revoked") {
-          Object.entries(consent.revokedScopes || {}).forEach(
-            ([scopeId, scopeRevocation]) => {
-              scopesToDisplay.push({
-                id: scopeId,
-                label: `${scopeId} (revoked ${scopeRevocation.revokedAt.toLocaleDateString()})`,
-                className: "scope-explicitly-revoked",
-                canBeGranted: true,
-              });
-            }
-          );
-          Object.entries(consent.grantedScopes || {}).forEach(
-            ([scopeId, scopeGrant]) => {
-              if (!consent.revokedScopes?.[scopeId]) {
-                scopesToDisplay.push({
-                  id: scopeId,
-                  label: `${scopeId} (implicitly revoked as record is revoked)`,
-                  className: "scope-implicitly-revoked",
-                  canBeGranted: true,
-                });
-              }
-            }
-          );
-        } else if (consent.status === "superseded") {
-          const allSupersededScopeKeys = new Set([
+          const allOriginallyAssociatedScopeIds = new Set([
             ...Object.keys(consent.grantedScopes || {}),
             ...Object.keys(consent.revokedScopes || {}),
           ]);
 
-          allSupersededScopeKeys.forEach((scopeId) => {
-            let label = scopeId;
-            const revokedInfo = consent.revokedScopes?.[scopeId];
-            const grantedInfo = consent.grantedScopes?.[scopeId];
+          allOriginallyAssociatedScopeIds.forEach((scopeId) => {
+            const explicitRevocation = consent.revokedScopes?.[scopeId];
+            let label = "";
+            let className = "";
 
-            if (revokedInfo) {
-              label = `${scopeId} (was revoked on ${revokedInfo.revokedAt.toLocaleDateString()}, record superseded)`;
-            } else if (grantedInfo) {
-              label = `${scopeId} (was granted, record superseded)`;
+            if (explicitRevocation) {
+              label = `${scopeId} (revoked ${explicitRevocation.revokedAt.toLocaleDateString()})`;
+              className = "scope-explicitly-revoked";
+            } else {
+              label = `${scopeId} (revoked as overall consent is revoked)`;
+              className = "scope-implicitly-revoked";
             }
-
-            scopesToDisplay.push({
+            revokedDisplayScopes.push({
               id: scopeId,
               label: label,
-              className: "scope-superseded",
+              className: className,
+              canBeGranted: true,
             });
           });
         }
 
-        scopesToDisplay.sort((a, b) => a.id.localeCompare(b.id));
-
+        grantedDisplayScopes.sort((a, b) => a.id.localeCompare(b.id));
+        revokedDisplayScopes.sort((a, b) => a.id.localeCompare(b.id));
         return (
           <div key={`${consent.id}`} className="profile-consent-item">
             <Text size={400} weight="semibold">
@@ -145,61 +125,78 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
               {consent.status}
             </Badge>
 
-            <ul className="profile-consent-scopes-list">
-              {scopesToDisplay.map((scope) => (
-                <li
-                  key={scope.id}
-                  className={`profile-consent-scope-item ${scope.className || ""}`}
-                >
-                  <Text>{scope.label}</Text>
-                  {scope.canBeRevoked && (
-                    <Button
-                      size="small"
-                      appearance="subtle"
-                      onClick={() =>
-                        onRevokeScope(
-                          consent.id,
-                          consent.policyId,
-                          scope.id,
-                          currentGrantedScopesForThisPolicy
-                        )
-                      }
+            {grantedDisplayScopes.length > 0 && (
+              <div className="profile-scopes-section-granted">
+                <Text weight="medium">Currently Granted Scopes:</Text>
+                <ul className="profile-consent-scopes-list">
+                  {grantedDisplayScopes.map((scope) => (
+                    <li
+                      key={scope.id}
+                      className={`profile-consent-scope-item ${scope.className || ""}`}
                     >
-                      Revoke
-                    </Button>
-                  )}
-                  {scope.canBeGranted && (
-                    <Button
-                      size="small"
-                      appearance="subtle"
-                      onClick={() =>
-                        onGrantScope(
-                          consent.id,
-                          consent.policyId,
-                          scope.id,
-                          currentGrantedScopesForThisPolicy
-                        )
-                      }
+                      <Text>{scope.label}</Text>
+                      {scope.canBeRevoked && (
+                        <Button
+                          size="small"
+                          appearance="primary"
+                          onClick={() =>
+                            onRevokeScope(
+                              consent.id,
+                              consent.policyId,
+                              scope.id,
+                              currentGrantedScopesForThisPolicy
+                            )
+                          }
+                        >
+                          Revoke
+                        </Button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {revokedDisplayScopes.length > 0 && (
+              <div className="profile-scopes-section-revoked">
+                <Text weight="medium">Revoked Scopes:</Text>
+                <ul className="profile-consent-scopes-list">
+                  {revokedDisplayScopes.map((scope) => (
+                    <li
+                      key={scope.id}
+                      className={`profile-consent-scope-item ${scope.className || ""}`}
                     >
-                      Grant
-                    </Button>
-                  )}
-                </li>
-              ))}
-              {scopesToDisplay.length === 0 &&
-                (consent.status === "granted" ||
-                  consent.status === "revoked") && (
-                  <Text as="li">
-                    No specific scopes detailed for this consent event.
-                  </Text>
-                )}
-              {scopesToDisplay.length === 0 &&
-                consent.status === "superseded" && (
-                  <Text as="li">
-                    No specific scopes detailed for this superseded consent.
-                  </Text>
-                )}
-            </ul>
+                      <Text>{scope.label}</Text>
+                      {scope.canBeGranted && (
+                        <Button
+                          size="small"
+                          appearance="outline"
+                          onClick={() =>
+                            onGrantScope(
+                              consent.id,
+                              consent.policyId,
+                              scope.id,
+                              currentGrantedScopesForThisPolicy
+                            )
+                          }
+                        >
+                          Grant
+                        </Button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {grantedDisplayScopes.length === 0 &&
+              revokedDisplayScopes.length === 0 &&
+              (consent.status === "granted" ||
+                consent.status === "revoked") && (
+                <Text as="div" style={{ marginLeft: "16px", marginTop: "8px" }}>
+                  No specific scopes detailed for this consent event.
+                </Text>
+              )}
           </div>
         );
       })}

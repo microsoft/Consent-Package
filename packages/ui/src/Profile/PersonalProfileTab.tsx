@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Button,
   Body1,
@@ -10,9 +10,9 @@ import {
   Avatar,
   Input,
   Label,
-} from '@fluentui/react-components';
-import { EditRegular, EditOffRegular } from '@fluentui/react-icons';
-import type { ProfileData } from './Profile.type.js';
+} from "@fluentui/react-components";
+import { EditRegular, EditOffRegular } from "@fluentui/react-icons";
+import type { ProfileData } from "./Profile.type.js";
 
 interface PersonalProfileTabProps {
   profileData: ProfileData;
@@ -41,7 +41,7 @@ const PersonalProfileTab: React.FC<PersonalProfileTabProps> = ({
   };
 
   const handleInputChange = (field: keyof ProfileData, value: string): void => {
-    setEditedProfile(prev => ({
+    setEditedProfile((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -52,7 +52,8 @@ const PersonalProfileTab: React.FC<PersonalProfileTabProps> = ({
       <CardHeader
         header={
           <Body1>
-            <Avatar name={profileData.name} />&nbsp;
+            <Avatar name={profileData.name} />
+            &nbsp;
             <b>{profileData.name}</b>
           </Body1>
         }
@@ -73,13 +74,9 @@ const PersonalProfileTab: React.FC<PersonalProfileTabProps> = ({
             <Input
               id="name"
               value={editedProfile.name}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
-            />
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              value={editedProfile.email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleInputChange("name", e.target.value)
+              }
             />
             <div className="profile-button-group">
               <Button appearance="primary" onClick={handleSave}>
@@ -93,7 +90,6 @@ const PersonalProfileTab: React.FC<PersonalProfileTabProps> = ({
         ) : (
           <>
             <Text>Name: {profileData.name}</Text>
-            <Text>Email: {profileData.email}</Text>
             <Text>Role: {profileData.role?.label}</Text>
           </>
         )}
@@ -102,4 +98,4 @@ const PersonalProfileTab: React.FC<PersonalProfileTabProps> = ({
   );
 };
 
-export default PersonalProfileTab; 
+export default PersonalProfileTab;
