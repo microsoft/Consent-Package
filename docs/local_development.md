@@ -12,6 +12,35 @@
    brew install azure-functions-core-tools@4
    ```
 
+   ```bash
+   # For Linux:
+   curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+   sudo mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
+   
+   # Ubuntu
+   sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs 2>/dev/null)-prod $(lsb_release -cs 2>/dev/null) main" > /etc/apt/sources.list.d/dotnetdev.list'
+   
+   # Debian
+   sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/debian/$(lsb_release -rs 2>/dev/null | cut -d'.' -f 1)/prod $(lsb_release -cs 2>/dev/null) main" > /etc/apt/sources.list.d/dotnetdev.list'
+   
+   sudo apt-get update
+   sudo apt-get install azure-functions-core-tools-4
+   ```
+
+   ```bash
+   # For Windows:
+   # Option 1 (Recommended):
+   # Install using Azure Functions Core Tools installer (available at link below:
+   
+   # Option 2: Using winget (using PowerShell as Administrator)
+   winget install Microsoft.AzureFunctionsCoreTools
+
+   # Option 3: Using npm
+   npm install -g azure-functions-core-tools@4 --unsafe-perm true
+   ```
+
+   More information is available in [Microsoft's "Develop Azure Functions locally using Core Tools" docs](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=windows%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-typescript).
+
 4. Docker
 
 ## Initial Setup
