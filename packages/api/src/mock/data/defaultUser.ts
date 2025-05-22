@@ -27,6 +27,11 @@ export const defaultMockUser: ProfileData = {
       status: 'granted',
       grantedScopes: {
         basic_profile: {
+          key: 'basic_profile',
+          name: 'Basic Profile',
+          description:
+            'Access to your basic profile information including name and contact details',
+          required: true,
           grantedAt: new Date('2025-05-20T00:00:00Z'),
         },
       },

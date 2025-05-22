@@ -146,7 +146,14 @@ describe('CosmosDBDataAdapter', () => {
         version: 1,
         consentedAt: new Date('2023-01-01'),
         consenter: { type: 'self' as const, userId: 'u1' },
-        grantedScopes: { testScope: { grantedAt: new Date('2023-01-01') } },
+        grantedScopes: {
+          testScope: {
+            key: 'testScope',
+            name: 'Test Scope',
+            description: 'Test Scope',
+            grantedAt: new Date('2023-01-01'),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
 
@@ -240,7 +247,14 @@ describe('CosmosDBDataAdapter', () => {
         version: 1,
         consentedAt: new Date('2023-02-01'),
         consenter: { type: 'self' as const, userId: 'uUpd1' },
-        grantedScopes: { scopeA: { grantedAt: new Date('2023-02-01') } },
+        grantedScopes: {
+          scopeA: {
+            key: 'scopeA',
+            name: 'Scope A',
+            description: 'Scope A',
+            grantedAt: new Date('2023-02-01'),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
       const createdConsent = await dataAdapter.createConsent(initialData);
@@ -351,7 +365,14 @@ describe('CosmosDBDataAdapter', () => {
         version: 1,
         consentedAt: new Date('2023-04-01'),
         consenter: { type: 'self' as const, userId: 'uFind1' },
-        grantedScopes: { findScope: { grantedAt: new Date('2023-04-01') } },
+        grantedScopes: {
+          findScope: {
+            key: 'findScope',
+            name: 'Find Scope',
+            description: 'Find Scope',
+            grantedAt: new Date('2023-04-01'),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
       const createdConsent = await dataAdapter.createConsent(initialData);
@@ -401,7 +422,15 @@ describe('CosmosDBDataAdapter', () => {
         version: 1,
         consentedAt: new Date('2025-05-01'),
         consenter: { type: 'self' as const, userId: targetSubjectId },
-        grantedScopes: { s1: { grantedAt: new Date() } },
+        grantedScopes: {
+          s1: {
+            key: 's1',
+            name: 'S1',
+            description: 'S1 access',
+            required: false,
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
       const consent2Data = {
@@ -411,7 +440,15 @@ describe('CosmosDBDataAdapter', () => {
         version: 2,
         consentedAt: new Date('2025-05-02'),
         consenter: { type: 'self' as const, userId: targetSubjectId },
-        grantedScopes: { s2: { grantedAt: new Date() } },
+        grantedScopes: {
+          s2: {
+            key: 's2',
+            name: 'S2',
+            description: 'S2 access',
+            required: false,
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
       const otherConsentData = {
@@ -421,7 +458,15 @@ describe('CosmosDBDataAdapter', () => {
         version: 1,
         consentedAt: new Date('2025-05-03'),
         consenter: { type: 'self' as const, userId: otherSubjectId },
-        grantedScopes: { s3: { grantedAt: new Date() } },
+        grantedScopes: {
+          s3: {
+            key: 's3',
+            name: 'S3',
+            description: 'S3 access',
+            required: false,
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
 
@@ -470,7 +515,15 @@ describe('CosmosDBDataAdapter', () => {
         version: 1,
         consentedAt: new Date('2023-06-01'),
         consenter: { type: 'self' as const, userId: 'uAll1' },
-        grantedScopes: { all1: { grantedAt: new Date() } },
+        grantedScopes: {
+          all1: {
+            key: 'all1',
+            name: 'All1',
+            description: 'All1 access',
+            required: false,
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
       const consentAll2Data = {
@@ -484,7 +537,15 @@ describe('CosmosDBDataAdapter', () => {
           userId: 'gAll2',
           relation: 'parent',
         },
-        grantedScopes: { all2: { grantedAt: new Date() } },
+        grantedScopes: {
+          all2: {
+            key: 'all2',
+            name: 'All2',
+            description: 'All2 access',
+            required: false,
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
 

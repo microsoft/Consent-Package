@@ -1,3 +1,5 @@
+import type { PolicyScope } from './Policy.type.js';
+
 export type ConsentStatus = 'granted' | 'revoked' | 'superseded';
 export type ConsentMethod = 'digital_form' | undefined;
 export type AgeGroup = 'under13' | '13-17' | '18+';
@@ -20,8 +22,12 @@ export interface ConsentRecord {
       readonly subjectAgeGroup: AgeGroup;
     };
   };
-  readonly grantedScopes: Readonly<Record<string, { grantedAt: Date }>>;
-  readonly revokedScopes?: Readonly<Record<string, { revokedAt: Date }>>;
+  readonly grantedScopes: Readonly<
+    Record<string, PolicyScope & { grantedAt: Date }>
+  >;
+  readonly revokedScopes?: Readonly<
+    Record<string, PolicyScope & { revokedAt: Date }>
+  >;
   readonly metadata: {
     readonly consentMethod: ConsentMethod;
     readonly ipAddress?: string;

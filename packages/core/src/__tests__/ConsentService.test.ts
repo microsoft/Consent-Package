@@ -106,8 +106,20 @@ describe('ConsentService', () => {
           userId: 'user123',
         },
         grantedScopes: {
-          email: { grantedAt: mockDate },
-          profile: { grantedAt: mockDate },
+          email: {
+            key: 'email',
+            name: 'Email',
+            description: 'Access to email',
+            required: false,
+            grantedAt: mockDate,
+          },
+          profile: {
+            key: 'profile',
+            name: 'Profile',
+            description: 'Access to profile',
+            required: false,
+            grantedAt: mockDate,
+          },
         },
         metadata: {
           consentMethod: 'digital_form',
@@ -144,11 +156,26 @@ describe('ConsentService', () => {
           userId: 'user123',
         },
         grantedScopes: {
-          email: { grantedAt: mockDate },
-          profile: { grantedAt: mockDate },
+          email: {
+            key: 'email',
+            name: 'Email',
+            description: 'Access to email',
+            grantedAt: mockDate,
+          },
+          profile: {
+            key: 'profile',
+            name: 'Profile',
+            description: 'Access to profile',
+            grantedAt: mockDate,
+          },
         },
         revokedScopes: {
-          notifications: { revokedAt: mockDate },
+          notifications: {
+            key: 'notifications',
+            name: 'Notifications',
+            description: 'Access to notifications',
+            revokedAt: mockDate,
+          },
         },
         revokedAt: undefined,
         metadata: {
@@ -197,7 +224,12 @@ describe('ConsentService', () => {
         consentedAt: new Date('2024-12-01T00:00:00Z'),
         consenter: { type: 'self', userId: subjectId },
         grantedScopes: {
-          email: { grantedAt: new Date('2024-12-01T00:00:00Z') },
+          email: {
+            key: 'email',
+            name: 'Email',
+            description: 'Access to email',
+            grantedAt: new Date('2024-12-01T00:00:00Z'),
+          },
         },
         metadata: { consentMethod: 'digital_form' },
         createdAt: new Date('2024-12-01T00:00:00Z'),
@@ -224,11 +256,26 @@ describe('ConsentService', () => {
         consentedAt: existingConsent.consentedAt,
         consenter: grantInput.consenter,
         grantedScopes: {
-          email: { grantedAt: mockDate },
-          profile: { grantedAt: mockDate },
+          email: {
+            key: 'email',
+            name: 'Email',
+            description: 'Access to email',
+            grantedAt: mockDate,
+          },
+          profile: {
+            key: 'profile',
+            name: 'Profile',
+            description: 'Access to profile',
+            grantedAt: mockDate,
+          },
         },
         revokedScopes: {
-          offline_access: { revokedAt: mockDate },
+          offline_access: {
+            key: 'offline_access',
+            name: 'Offline',
+            description: 'Offline access',
+            revokedAt: mockDate,
+          },
         },
         revokedAt: undefined,
         metadata: {
@@ -274,11 +321,26 @@ describe('ConsentService', () => {
         consentedAt: existingConsent.consentedAt,
         consenter: grantInput.consenter,
         grantedScopes: {
-          email: { grantedAt: mockDate },
-          profile: { grantedAt: mockDate },
+          email: {
+            key: 'email',
+            name: 'Email',
+            description: 'Access to email',
+            grantedAt: mockDate,
+          },
+          profile: {
+            key: 'profile',
+            name: 'Profile',
+            description: 'Access to profile',
+            grantedAt: mockDate,
+          },
         },
         revokedScopes: {
-          offline_access: { revokedAt: mockDate },
+          offline_access: {
+            key: 'offline_access',
+            name: 'Offline',
+            description: 'Offline access',
+            revokedAt: mockDate,
+          },
         },
         revokedAt: undefined,
         metadata: {
@@ -298,6 +360,23 @@ describe('ConsentService', () => {
       // Arrange
       const subjectId = 'user-revoked';
       const policyId = 'policy-revoked';
+
+      // Mock policy for the test
+      const mockPolicy: Policy = {
+        id: policyId,
+        policyGroupId: 'groupRevoked',
+        version: 1,
+        status: 'active',
+        effectiveDate: new Date('2024-11-01'),
+        title: 'Revoked Test Policy',
+        contentSections: [{ title: 's1', content: 'c1', description: 'd1' }],
+        availableScopes: [
+          { key: 'email', name: 'Email', description: 'Access to email' },
+        ],
+        createdAt: new Date('2024-11-01'),
+        updatedAt: new Date('2024-11-01'),
+      };
+
       const revokedConsent: ConsentRecord = {
         id: 'revokedConsent123',
         subjectId,
@@ -307,7 +386,12 @@ describe('ConsentService', () => {
         consentedAt: new Date('2024-11-01T00:00:00Z'),
         consenter: { type: 'self', userId: subjectId },
         grantedScopes: {
-          email: { grantedAt: new Date('2024-11-01T00:00:00Z') },
+          email: {
+            key: 'email',
+            name: 'Email',
+            description: 'Access to email',
+            grantedAt: new Date('2024-11-01T00:00:00Z'),
+          },
         },
         revokedAt: new Date('2024-11-15T00:00:00Z'),
         metadata: { consentMethod: 'digital_form' },
@@ -327,6 +411,11 @@ describe('ConsentService', () => {
         mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
       ).mockResolvedValue(revokedConsent);
 
+      // Mock the policy adapter
+      (
+        (mockDataAdapter as unknown as IDataAdapter).findPolicyById as any
+      ).mockResolvedValue(mockPolicy);
+
       // Act & Assert
       await expect(
         consentService.grantConsent(grantInput),
@@ -341,6 +430,23 @@ describe('ConsentService', () => {
       // Arrange
       const subjectId = 'user-superseded-latest';
       const policyId = 'policy-superseded-latest';
+
+      // Mock policy for the test
+      const mockPolicy: Policy = {
+        id: policyId,
+        policyGroupId: 'groupSuperseded',
+        version: 1,
+        status: 'active',
+        effectiveDate: new Date('2024-10-01'),
+        title: 'Superseded Test Policy',
+        contentSections: [{ title: 's1', content: 'c1', description: 'd1' }],
+        availableScopes: [
+          { key: 'email', name: 'Email', description: 'Access to email' },
+        ],
+        createdAt: new Date('2024-10-01'),
+        updatedAt: new Date('2024-10-01'),
+      };
+
       const supersededConsent: ConsentRecord = {
         id: 'supersededConsent456',
         subjectId,
@@ -350,7 +456,12 @@ describe('ConsentService', () => {
         consentedAt: new Date('2024-10-01T00:00:00Z'),
         consenter: { type: 'self', userId: subjectId },
         grantedScopes: {
-          email: { grantedAt: new Date('2024-10-01T00:00:00Z') },
+          email: {
+            key: 'email',
+            name: 'Email',
+            description: 'Access to email',
+            grantedAt: new Date('2024-10-01T00:00:00Z'),
+          },
         },
         metadata: { consentMethod: 'digital_form' },
         createdAt: new Date('2024-10-01T00:00:00Z'),
@@ -368,6 +479,11 @@ describe('ConsentService', () => {
       (
         mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
       ).mockResolvedValue(supersededConsent);
+
+      // Mock the policy adapter
+      (
+        (mockDataAdapter as unknown as IDataAdapter).findPolicyById as any
+      ).mockResolvedValue(mockPolicy);
 
       // Act & Assert
       await expect(
@@ -440,7 +556,12 @@ describe('ConsentService', () => {
           },
         },
         grantedScopes: {
-          app_usage: { grantedAt: mockDate },
+          app_usage: {
+            key: 'app_usage',
+            name: 'App Usage',
+            description: 'Tracks app usage',
+            grantedAt: mockDate,
+          },
         },
         metadata: {
           consentMethod: 'digital_form',
@@ -478,10 +599,20 @@ describe('ConsentService', () => {
           },
         },
         grantedScopes: {
-          app_usage: { grantedAt: mockDate },
+          app_usage: {
+            key: 'app_usage',
+            name: 'App Usage',
+            description: 'Tracks app usage',
+            grantedAt: mockDate,
+          },
         },
         revokedScopes: {
-          location: { revokedAt: mockDate },
+          location: {
+            key: 'location',
+            name: 'Location',
+            description: 'Access to location',
+            revokedAt: mockDate,
+          },
         },
         revokedAt: undefined,
         metadata: {
@@ -526,7 +657,12 @@ describe('ConsentService', () => {
         consentedAt: new Date('2024-12-01T00:00:00Z'),
         consenter: { type: 'self', userId: subjectId },
         grantedScopes: {
-          email: { grantedAt: new Date('2024-12-01T00:00:00Z') },
+          email: {
+            key: 'email',
+            name: 'Email',
+            description: 'Access to email',
+            grantedAt: new Date('2024-12-01T00:00:00Z'),
+          },
         },
         metadata: { consentMethod: 'digital_form' },
         createdAt: new Date('2024-12-01T00:00:00Z'),
@@ -595,7 +731,13 @@ describe('ConsentService', () => {
           userId: 'user123',
         },
         grantedScopes: {
-          email: { grantedAt: new Date('2024-12-15') },
+          email: {
+            key: 'email',
+            name: 'Email',
+            description: 'Access to email',
+            required: false,
+            grantedAt: new Date('2024-12-15'),
+          },
         },
         metadata: {
           consentMethod: 'digital_form',
@@ -648,8 +790,20 @@ describe('ConsentService', () => {
             userId: 'user123',
           },
           grantedScopes: {
-            email: { grantedAt: new Date('2024-12-15') },
-            profile: { grantedAt: new Date('2024-12-15') },
+            email: {
+              key: 'email',
+              name: 'Email',
+              description: 'Access to email',
+              required: false,
+              grantedAt: new Date('2024-12-15'),
+            },
+            profile: {
+              key: 'profile',
+              name: 'Profile',
+              description: 'Access to profile',
+              required: false,
+              grantedAt: new Date('2024-12-15'),
+            },
           },
           metadata: {
             consentMethod: 'digital_form',
@@ -669,10 +823,22 @@ describe('ConsentService', () => {
             userId: 'user123',
           },
           grantedScopes: {
-            location: { grantedAt: new Date('2024-12-16') },
+            location: {
+              key: 'location',
+              name: 'Location',
+              description: 'Access to location',
+              required: false,
+              grantedAt: new Date('2024-12-16'),
+            },
           },
           revokedScopes: {
-            location: { revokedAt: new Date('2024-12-17') },
+            location: {
+              key: 'location',
+              name: 'Location',
+              description: 'Access to location',
+              required: false,
+              revokedAt: new Date('2024-12-17'),
+            },
           },
           metadata: {
             consentMethod: 'digital_form',
@@ -759,7 +925,15 @@ describe('ConsentService', () => {
           status: 'revoked',
           consentedAt: mockDate,
           consenter: { type: 'self', userId: subjectId },
-          grantedScopes: { email: { grantedAt: mockDate } },
+          grantedScopes: {
+            email: {
+              key: 'email',
+              name: 'Email',
+              description: 'Access to email',
+              required: false,
+              grantedAt: mockDate,
+            },
+          },
           metadata: { consentMethod: 'digital_form' },
           createdAt: mockDate,
           updatedAt: mockDate,
@@ -789,7 +963,13 @@ describe('ConsentService', () => {
           consentedAt: mockDate,
           consenter: { type: 'self', userId: subjectId },
           grantedScopes: {
-            email: { grantedAt: mockDate },
+            email: {
+              key: 'email',
+              name: 'Email',
+              description: 'Access to email',
+              required: false,
+              grantedAt: mockDate,
+            },
             // profile is not granted
           },
           revokedScopes: {
@@ -824,11 +1004,29 @@ describe('ConsentService', () => {
           consentedAt: mockDate,
           consenter: { type: 'self', userId: subjectId },
           grantedScopes: {
-            email: { grantedAt: mockDate },
-            profile: { grantedAt: mockDate },
+            email: {
+              key: 'email',
+              name: 'Email',
+              description: 'Access to email',
+              required: false,
+              grantedAt: mockDate,
+            },
+            profile: {
+              key: 'profile',
+              name: 'Profile',
+              description: 'Access to profile',
+              required: false,
+              grantedAt: mockDate,
+            },
           },
           revokedScopes: {
-            profile: { revokedAt: mockDate }, // profile is explicitly revoked
+            profile: {
+              key: 'profile',
+              name: 'Profile',
+              description: 'Access to profile',
+              required: false,
+              revokedAt: mockDate,
+            }, // profile is explicitly revoked
           },
           metadata: { consentMethod: 'digital_form' },
           createdAt: mockDate,
@@ -894,8 +1092,18 @@ describe('ConsentService', () => {
         dateOfBirth: mockConsentInput.dateOfBirth,
         consenter: mockConsentInput.consenter,
         grantedScopes: {
-          read: { grantedAt: mockDate },
-          write: { grantedAt: mockDate },
+          read: {
+            key: 'read',
+            name: 'Read',
+            description: 'Read access',
+            grantedAt: mockDate,
+          },
+          write: {
+            key: 'write',
+            name: 'Write',
+            description: 'Write access',
+            grantedAt: mockDate,
+          },
         },
         metadata: mockConsentInput.metadata,
         createdAt: mockDate,
@@ -927,11 +1135,26 @@ describe('ConsentService', () => {
         dateOfBirth: mockConsentInput.dateOfBirth,
         consenter: mockConsentInput.consenter,
         grantedScopes: {
-          read: { grantedAt: mockDate },
-          write: { grantedAt: mockDate },
+          read: {
+            key: 'read',
+            name: 'Read',
+            description: 'Read access',
+            grantedAt: mockDate,
+          },
+          write: {
+            key: 'write',
+            name: 'Write',
+            description: 'Write access',
+            grantedAt: mockDate,
+          },
         },
         revokedScopes: {
-          delete: { revokedAt: mockDate },
+          delete: {
+            key: 'delete',
+            name: 'Delete',
+            description: 'Delete access',
+            revokedAt: mockDate,
+          },
         },
         revokedAt: undefined,
         metadata: mockConsentInput.metadata,
@@ -954,7 +1177,15 @@ describe('ConsentService', () => {
         consentedAt: mockDate,
         dateOfBirth: new Date('1990-01-01'),
         consenter: { type: 'self', userId: subjectId },
-        grantedScopes: { read: { grantedAt: mockDate } },
+        grantedScopes: {
+          read: {
+            key: 'read',
+            name: 'Read',
+            description: 'Read access',
+            required: false,
+            grantedAt: mockDate,
+          },
+        },
         metadata: { consentMethod: 'digital_form' },
         createdAt: mockDate,
         updatedAt: mockDate,
@@ -1065,7 +1296,15 @@ describe('ConsentService', () => {
       status: 'superseded',
       consentedAt: new Date('2023-01-01'),
       consenter: { type: 'self', userId: subjectId },
-      grantedScopes: { d: { grantedAt: new Date() } },
+      grantedScopes: {
+        d: {
+          key: 'd',
+          name: 'D',
+          description: 'D access',
+          required: false,
+          grantedAt: new Date(),
+        },
+      },
       metadata: { consentMethod: 'digital_form' },
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -1078,7 +1317,15 @@ describe('ConsentService', () => {
       status: 'granted',
       consentedAt: new Date('2023-01-02'),
       consenter: { type: 'self', userId: subjectId },
-      grantedScopes: { d: { grantedAt: new Date() } },
+      grantedScopes: {
+        d: {
+          key: 'd',
+          name: 'D',
+          description: 'D access',
+          required: false,
+          grantedAt: new Date(),
+        },
+      },
       metadata: { consentMethod: 'digital_form' },
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -1091,7 +1338,15 @@ describe('ConsentService', () => {
       status: 'granted',
       consentedAt: new Date('2023-02-01'),
       consenter: { type: 'self', userId: subjectId },
-      grantedScopes: { d: { grantedAt: new Date() } },
+      grantedScopes: {
+        d: {
+          key: 'd',
+          name: 'D',
+          description: 'D access',
+          required: false,
+          grantedAt: new Date(),
+        },
+      },
       metadata: { consentMethod: 'digital_form' },
       createdAt: new Date(),
       updatedAt: new Date(),

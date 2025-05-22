@@ -1,4 +1,4 @@
-import type { ConsentRecord } from '@open-source-consent/types';
+import type { ConsentRecord, PolicyScope } from '@open-source-consent/types';
 
 /**
  * Deserializes date strings within a raw consent object into Date objects.
@@ -21,26 +21,48 @@ export const deserializeConsentRecord = (rawConsent: any): ConsentRecord => {
   }
 
   if (rawConsent.grantedScopes) {
-    const mutableGrantedScopes: Record<string, { grantedAt: Date }> = {};
-    for (const [key, val] of Object.entries(
-      rawConsent.grantedScopes as Record<string, { grantedAt: string }>,
-    )) {
+    const mutableGrantedScopes: Record<
+      string,
+      PolicyScope & { grantedAt: Date }
+    > = {};
+    for (const [key, val] of Object.entries(rawConsent.grantedScopes)) {
+      const scopeData = val as any;
+
+      // Ensure we have all required PolicyScope properties
+      const policyScope: PolicyScope = {
+        key: scopeData.key || key,
+        name: scopeData.name || key,
+        description: scopeData.description || '',
+        required: scopeData.required || false,
+      };
+
       mutableGrantedScopes[key] = {
-        ...(val as object), // Spread other potential properties
-        grantedAt: new Date((val as { grantedAt: string }).grantedAt),
+        ...policyScope,
+        grantedAt: new Date(scopeData.grantedAt),
       };
     }
     deserialized.grantedScopes = mutableGrantedScopes;
   }
 
   if (rawConsent.revokedScopes) {
-    const mutableRevokedScopes: Record<string, { revokedAt: Date }> = {};
-    for (const [key, val] of Object.entries(
-      rawConsent.revokedScopes as Record<string, { revokedAt: string }>,
-    )) {
+    const mutableRevokedScopes: Record<
+      string,
+      PolicyScope & { revokedAt: Date }
+    > = {};
+    for (const [key, val] of Object.entries(rawConsent.revokedScopes)) {
+      const scopeData = val as any;
+
+      // Ensure we have all required PolicyScope properties
+      const policyScope: PolicyScope = {
+        key: scopeData.key || key,
+        name: scopeData.name || key,
+        description: scopeData.description || '',
+        required: scopeData.required || false,
+      };
+
       mutableRevokedScopes[key] = {
-        ...(val as object), // Spread other potential properties
-        revokedAt: new Date((val as { revokedAt: string }).revokedAt),
+        ...policyScope,
+        revokedAt: new Date(scopeData.revokedAt),
       };
     }
     deserialized.revokedScopes = mutableRevokedScopes;

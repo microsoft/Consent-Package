@@ -111,7 +111,13 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
         dateOfBirth: new Date('1990-01-01'),
         consenter: { type: 'self', userId: 'user1' },
         grantedScopes: {
-          scope1: { grantedAt: consentedAtDate },
+          scope1: {
+            key: 'scope1',
+            name: 'Scope 1',
+            description: 'Test scope 1',
+            required: false,
+            grantedAt: consentedAtDate,
+          },
         },
         metadata: { consentMethod: 'digital_form' as const },
       };
@@ -167,7 +173,15 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
           version: 1,
           consentedAt: initialDate,
           consenter: { type: 'self', userId: 'userUpdate' },
-          grantedScopes: { read: { grantedAt: initialDate } },
+          grantedScopes: {
+            read: {
+              key: 'read',
+              name: 'Read Access',
+              description: 'Allow reading data',
+              required: true,
+              grantedAt: initialDate,
+            },
+          },
           metadata: { consentMethod: 'digital_form' as const },
         };
       existingConsent = await dataAdapter.createConsent(consentData);
@@ -245,7 +259,15 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
         version: 1,
         consentedAt: new Date(),
         consenter: { type: 'self', userId: 'userFind' },
-        grantedScopes: { findScope: { grantedAt: new Date() } },
+        grantedScopes: {
+          findScope: {
+            key: 'findScope',
+            name: 'Find Scope',
+            description: 'Test find scope',
+            required: false,
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
       const createdConsent = await dataAdapter.createConsent(inputData);
@@ -279,7 +301,15 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
         version: 1,
         consentedAt: new Date(),
         consenter: { type: 'self', userId: targetSubjectId },
-        grantedScopes: { s1: { grantedAt: new Date() } },
+        grantedScopes: {
+          s1: {
+            key: 's1',
+            name: 'Subject 1 Scope',
+            description: 'Test subject 1 scope',
+            required: false,
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
       const consent2Data: Omit<
@@ -292,7 +322,15 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
         version: 2,
         consentedAt: new Date(),
         consenter: { type: 'self', userId: targetSubjectId },
-        grantedScopes: { s2: { grantedAt: new Date() } },
+        grantedScopes: {
+          s2: {
+            key: 's2',
+            name: 'Subject 2 Scope',
+            description: 'Test subject 2 scope',
+            required: false,
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
       const otherConsentData: Omit<
@@ -300,12 +338,20 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
         'id' | 'createdAt' | 'updatedAt'
       > = {
         subjectId: otherSubjectId,
-        policyId: 'pOther1',
+        policyId: 'pOther',
         status: 'granted',
         version: 1,
         consentedAt: new Date(),
         consenter: { type: 'self', userId: otherSubjectId },
-        grantedScopes: { s3: { grantedAt: new Date() } },
+        grantedScopes: {
+          s3: {
+            key: 's3',
+            name: 'Subject 3 Scope',
+            description: 'Test subject 3 scope',
+            required: true,
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
       consent1 = await dataAdapter.createConsent(consent1Data);
@@ -345,7 +391,15 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
         version: 1,
         consentedAt: new Date(),
         consenter: { type: 'self', userId: 'uAll1' },
-        grantedScopes: { all1: { grantedAt: new Date() } },
+        grantedScopes: {
+          all1: {
+            key: 'all1',
+            name: 'All1',
+            description: 'All1 access',
+            required: false,
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
       const consentAll2Data: Omit<
@@ -365,7 +419,15 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
             subjectAgeGroup: '13-17' as const,
           },
         },
-        grantedScopes: { all2: { grantedAt: new Date() } },
+        grantedScopes: {
+          all2: {
+            key: 'all2',
+            name: 'All2',
+            description: 'All2 access',
+            required: false,
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
       consentAll1 = await dataAdapter.createConsent(consentAll1Data);
@@ -403,7 +465,14 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
         policyId,
         consentedAt: new Date(),
         consenter: { type: 'self' as const, userId: 'userForAllVersions' },
-        grantedScopes: { scopeA: { grantedAt: new Date() } },
+        grantedScopes: {
+          scopeA: {
+            key: 'scopeA',
+            name: 'Scope A',
+            description: 'Scope A',
+            grantedAt: new Date(),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       };
 
@@ -422,7 +491,14 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
         ...commonData,
         status: 'granted',
         version: 2,
-        grantedScopes: { scopeB: { grantedAt: new Date() } },
+        grantedScopes: {
+          scopeB: {
+            key: 'scopeB',
+            name: 'Scope B',
+            description: 'Scope B',
+            grantedAt: new Date(),
+          },
+        },
       });
       await dataAdapter.createConsent({
         ...commonData,
@@ -469,7 +545,14 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
       policyId: policyIdLatestTest,
       consentedAt: new Date(),
       consenter: { type: 'self' as const, userId: 'userForLatestTests' },
-      grantedScopes: { data_processing: { grantedAt: new Date() } },
+      grantedScopes: {
+        data_processing: {
+          key: 'data_processing',
+          name: 'Data Processing',
+          description: 'Data Processing',
+          grantedAt: new Date(),
+        },
+      },
       metadata: { consentMethod: 'digital_form' as const },
     };
 
@@ -489,7 +572,14 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
         ...commonDataForLatest,
         status: 'granted',
         version: 3,
-        grantedScopes: { data_analysis: { grantedAt: new Date() } },
+        grantedScopes: {
+          data_analysis: {
+            key: 'data_analysis',
+            name: 'Data Analysis',
+            description: 'Data Analysis',
+            grantedAt: new Date(),
+          },
+        },
       });
       await dataAdapter.createConsent({
         ...commonDataForLatest,
@@ -530,7 +620,14 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
         status: 'granted',
         consentedAt: initialConsentedAt,
         consenter: { type: 'self', userId: subjectIdForRevokedTest },
-        grantedScopes: { test_scope: { grantedAt: initialConsentedAt } },
+        grantedScopes: {
+          test_scope: {
+            key: 'test_scope',
+            name: 'Test Scope',
+            description: 'Test Scope',
+            grantedAt: initialConsentedAt,
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       });
 
@@ -550,7 +647,14 @@ describe('IndexedDBDataAdapter - Consent Methods', () => {
         consentedAt: new Date(2023, 0, 4),
         revokedAt: new Date(),
         consenter: { type: 'self', userId: subjectIdForRevokedTest },
-        grantedScopes: { test_scope: { grantedAt: new Date(2023, 0, 1) } },
+        grantedScopes: {
+          test_scope: {
+            key: 'test_scope',
+            name: 'Test Scope',
+            description: 'Test Scope',
+            grantedAt: new Date(2023, 0, 1),
+          },
+        },
         metadata: { consentMethod: 'digital_form' as const },
       });
 

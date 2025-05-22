@@ -5,6 +5,7 @@ import type { ConsentRecord } from '@open-source-consent/types';
 interface ScopeDisplayInfo {
   id: string;
   label: string;
+  description?: string;
   className?: string;
   canBeRevoked?: boolean;
   canBeGranted?: boolean;
@@ -59,20 +60,22 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
 
         if (consent.status === 'granted') {
           Object.entries(consent.grantedScopes || {}).forEach(
-            ([scopeId, _scopeGrantDetails]) => {
+            ([scopeId, scopeWithGrant]) => {
               grantedDisplayScopes.push({
                 id: scopeId,
-                label: scopeId,
+                label: scopeWithGrant.name || scopeId,
+                description: scopeWithGrant.description,
                 className: 'scope-granted',
                 canBeRevoked: true,
               });
             },
           );
           Object.entries(consent.revokedScopes || {}).forEach(
-            ([scopeId, scopeRevocation]) => {
+            ([scopeId, scopeWithRevocation]) => {
               revokedDisplayScopes.push({
                 id: scopeId,
-                label: `${scopeId}`,
+                label: scopeWithRevocation.name || scopeId,
+                description: scopeWithRevocation.description,
                 className: 'scope-revoked-within-grant',
                 canBeGranted: true,
               });
@@ -87,18 +90,23 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
           allOriginallyAssociatedScopeIds.forEach((scopeId) => {
             const explicitRevocation = consent.revokedScopes?.[scopeId];
             let label = '';
+            let description = '';
             let className = '';
 
             if (explicitRevocation) {
-              label = `${scopeId} (revoked ${explicitRevocation.revokedAt.toLocaleDateString()})`;
+              label = explicitRevocation.name || scopeId;
+              description = explicitRevocation.description || '';
               className = 'scope-explicitly-revoked';
             } else {
-              label = `${scopeId} (revoked as overall consent is revoked)`;
+              const grantedScope = consent.grantedScopes[scopeId];
+              label = grantedScope?.name || scopeId;
+              description = grantedScope?.description || '';
               className = 'scope-implicitly-revoked';
             }
             revokedDisplayScopes.push({
               id: scopeId,
               label: label,
+              description: description,
               className: className,
               canBeGranted: true,
             });
@@ -134,7 +142,14 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
                       key={scope.id}
                       className={`profile-consent-scope-item ${scope.className || ''}`}
                     >
-                      <Text>{scope.label}</Text>
+                      <div>
+                        <Text>{scope.label}</Text>
+                        {scope.description && (
+                          <Text as="div" size={100}>
+                            {scope.description}
+                          </Text>
+                        )}
+                      </div>
                       {scope.canBeRevoked && (
                         <Button
                           size="small"
@@ -166,7 +181,14 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
                       key={scope.id}
                       className={`profile-consent-scope-item ${scope.className || ''}`}
                     >
-                      <Text>{scope.label}</Text>
+                      <div>
+                        <Text>{scope.label}</Text>
+                        {scope.description && (
+                          <Text as="div" size={100}>
+                            {scope.description}
+                          </Text>
+                        )}
+                      </div>
                       {scope.canBeGranted && (
                         <Button
                           size="small"

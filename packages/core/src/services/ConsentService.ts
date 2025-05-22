@@ -14,19 +14,25 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
     revokedScopesInput: string[] | undefined,
     policyId: string,
     timestamp: Date,
-  ): Promise<Record<string, { revokedAt: Date }>> {
+  ): Promise<Record<string, PolicyScope & { revokedAt: Date }>> {
     let finalRevokedScopeKeys: string[];
+    const policyScopesMap: Record<string, PolicyScope> = {};
+
+    const policyAdapter = this.adapter as IDataAdapter;
+    const policy = await policyAdapter.findPolicyById(policyId);
+    if (!policy || !policy.availableScopes) {
+      throw new Error(
+        `Cannot determine revoked scopes: Policy ${policyId} not found or has no available scopes.`,
+      );
+    }
+
+    policy.availableScopes.forEach((scope: PolicyScope) => {
+      policyScopesMap[scope.key] = scope;
+    });
 
     if (revokedScopesInput) {
       finalRevokedScopeKeys = revokedScopesInput;
     } else {
-      const policyAdapter = this.adapter as IDataAdapter;
-      const policy = await policyAdapter.findPolicyById(policyId);
-      if (!policy || !policy.availableScopes) {
-        throw new Error(
-          `Cannot determine revoked scopes: Policy ${policyId} not found or has no available scopes.`,
-        );
-      }
       const policyAvailableScopes = policy.availableScopes.map(
         (scope: PolicyScope) => scope.key,
       );
@@ -35,9 +41,15 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
       );
     }
 
-    const map: Record<string, { revokedAt: Date }> = {};
-    finalRevokedScopeKeys.forEach((scope) => {
-      map[scope] = { revokedAt: timestamp };
+    const map: Record<string, PolicyScope & { revokedAt: Date }> = {};
+    finalRevokedScopeKeys.forEach((scopeKey) => {
+      const policyScope = policyScopesMap[scopeKey];
+      if (policyScope) {
+        map[scopeKey] = {
+          ...policyScope,
+          revokedAt: timestamp,
+        };
+      }
     });
     return map;
   }
@@ -50,9 +62,32 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
   async grantConsent(input: CreateConsentInput): Promise<ConsentRecord> {
     const operationTimestamp = new Date();
 
-    const inputGrantedScopesMap: Record<string, { grantedAt: Date }> = {};
-    input.grantedScopes.forEach((scope) => {
-      inputGrantedScopesMap[scope] = { grantedAt: operationTimestamp };
+    const policyAdapter = this.adapter as IDataAdapter;
+    const policy = await policyAdapter.findPolicyById(input.policyId);
+    if (!policy || !policy.availableScopes) {
+      throw new Error(
+        `Cannot grant consent: Policy ${input.policyId} not found or has no available scopes.`,
+      );
+    }
+
+    // Create a map of policy scopes by key for easier lookup
+    const policyScopesMap: Record<string, PolicyScope> = {};
+    policy.availableScopes.forEach((scope: PolicyScope) => {
+      policyScopesMap[scope.key] = scope;
+    });
+
+    const inputGrantedScopesMap: Record<
+      string,
+      PolicyScope & { grantedAt: Date }
+    > = {};
+    input.grantedScopes.forEach((scopeKey) => {
+      const policyScope = policyScopesMap[scopeKey];
+      if (policyScope) {
+        inputGrantedScopesMap[scopeKey] = {
+          ...policyScope,
+          grantedAt: operationTimestamp,
+        };
+      }
     });
 
     const latestConsentRecord =
@@ -139,9 +174,31 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
    */
   async createInitialGrant(input: CreateConsentInput): Promise<ConsentRecord> {
     const now = new Date();
-    const grantedScopesMap: Record<string, { grantedAt: Date }> = {};
-    input.grantedScopes.forEach((scope) => {
-      grantedScopesMap[scope] = { grantedAt: now };
+
+    const policyAdapter = this.adapter as IDataAdapter;
+    const policy = await policyAdapter.findPolicyById(input.policyId);
+    if (!policy || !policy.availableScopes) {
+      throw new Error(
+        `Cannot grant consent: Policy ${input.policyId} not found or has no available scopes.`,
+      );
+    }
+
+    // Create a map of policy scopes by key for easier lookup
+    const policyScopesMap: Record<string, PolicyScope> = {};
+    policy.availableScopes.forEach((scope: PolicyScope) => {
+      policyScopesMap[scope.key] = scope;
+    });
+
+    const grantedScopesMap: Record<string, PolicyScope & { grantedAt: Date }> =
+      {};
+    input.grantedScopes.forEach((scopeKey) => {
+      const policyScope = policyScopesMap[scopeKey];
+      if (policyScope) {
+        grantedScopesMap[scopeKey] = {
+          ...policyScope,
+          grantedAt: now,
+        };
+      }
     });
 
     const revokedScopesMap = await this.getRevokedScopesMap(
