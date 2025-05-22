@@ -1,14 +1,14 @@
-import React from "react";
-import { makeStyles, Text, tokens } from "@fluentui/react-components";
-import type { PolicyContentSection } from "@open-source-consent/types";
+import React from 'react';
+import { makeStyles, Text, tokens } from '@fluentui/react-components';
+import type { PolicyContentSection } from '@open-source-consent/types';
 
 const useStyles = makeStyles({
   section: {
     marginBottom: tokens.spacingVerticalXL,
     paddingBottom: tokens.spacingVerticalXL,
     borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
-    "&:last-child": {
-      borderBottom: "none",
+    '&:last-child': {
+      borderBottom: 'none',
       marginBottom: tokens.spacingVerticalL,
       paddingBottom: tokens.spacingVerticalL,
     },
@@ -22,21 +22,21 @@ const useStyles = makeStyles({
   sectionDescription: {
     marginBottom: tokens.spacingVerticalM,
     color: tokens.colorNeutralForeground2,
-    fontStyle: "italic",
+    fontStyle: 'italic',
   },
   sectionContent: {
     marginTop: tokens.spacingVerticalM,
     color: tokens.colorNeutralForeground1,
     lineHeight: tokens.lineHeightBase500,
     fontSize: tokens.fontSizeBase400,
-    "& p": {
+    '& p': {
       marginBottom: tokens.spacingVerticalS,
     },
-    "& ul, & ol": {
+    '& ul, & ol': {
       marginLeft: tokens.spacingHorizontalXXL,
       marginBottom: tokens.spacingVerticalS,
     },
-    "& li": {
+    '& li': {
       marginBottom: tokens.spacingVerticalXS,
     },
   },

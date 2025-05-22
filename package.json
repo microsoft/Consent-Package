@@ -11,7 +11,8 @@
     "build": "pnpm -r build",
     "clean": "pnpm -r exec -- rm -rf dist",
     "test": "pnpm -r --filter './packages/api' --filter './packages/core' --filter './packages/data-adapter-cosmosdb' --filter './packages/data-adapter-indexeddb' test:coverage",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx && prettier --check \"packages/**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix && prettier --write \"packages/**/*.{js,jsx,ts,tsx}\"",
     "dev": "pnpm --parallel -r dev",
     "prepare": "husky"
   },
@@ -51,6 +52,6 @@
     "pnpm": ">=10.0.0"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "pnpm lint"
+    "*.{js,jsx,ts,tsx}": "pnpm lint:fix"
   }
 }

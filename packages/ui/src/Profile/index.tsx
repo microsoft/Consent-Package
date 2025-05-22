@@ -1,32 +1,32 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   TabList,
   Tab,
   Button,
   Spinner,
   Text,
-} from "@fluentui/react-components";
-import PersonalProfileTab from "./PersonalProfileTab.js";
-import ManagedSubjectsTab from "./ManagedSubjectsTab.js";
-import ConsentsTab from "./ConsentsTab.js";
+} from '@fluentui/react-components';
+import PersonalProfileTab from './PersonalProfileTab.js';
+import ManagedSubjectsTab from './ManagedSubjectsTab.js';
+import ConsentsTab from './ConsentsTab.js';
 import type {
   ProfileProps,
   ProfileData,
   ManagedSubject,
   SubjectForConsentUpdate,
-} from "./Profile.type.js";
-import type { AgeGroup } from "@open-source-consent/types";
-import "./index.css";
+} from './Profile.type.js';
+import type { AgeGroup } from '@open-source-consent/types';
+import './index.css';
 
-import useProfileData from "../hooks/useProfileData.js";
-import useStatus from "../hooks/useStatus.js";
-import useConsents from "../hooks/useConsents.js";
-import useFetchManagedSubjects from "../hooks/useFetchManagedSubjects.js";
+import useProfileData from '../hooks/useProfileData.js';
+import useStatus from '../hooks/useStatus.js';
+import useConsents from '../hooks/useConsents.js';
+import useFetchManagedSubjects from '../hooks/useFetchManagedSubjects.js';
 
 enum PROFILE_TABS {
-  PERSONAL = "personal",
-  MANAGED = "managed",
-  CONSENTS = "consents",
+  PERSONAL = 'personal',
+  MANAGED = 'managed',
+  CONSENTS = 'consents',
 }
 
 export const Profile: React.FC<ProfileProps> = ({
@@ -37,7 +37,7 @@ export const Profile: React.FC<ProfileProps> = ({
 }) => {
   const [selectedTab, setSelectedTab] = useState(PROFILE_TABS.PERSONAL);
   const [selectedSubject, setSelectedSubject] = useState<ManagedSubject | null>(
-    null
+    null,
   );
 
   const { profileData, setProfileData, handleSave, handleSubjectUpdate } =
@@ -51,7 +51,7 @@ export const Profile: React.FC<ProfileProps> = ({
     profileData?.id,
     updateStatus,
     setProfileData,
-    subjectIdToDisplayName
+    subjectIdToDisplayName,
   );
 
   useEffect(() => {
@@ -64,10 +64,10 @@ export const Profile: React.FC<ProfileProps> = ({
               (ms) => ({
                 ...ms,
                 consents: ms.consents || [],
-              })
+              }),
             ),
           }
-        : null
+        : null,
     );
     setSelectedSubject(null);
   }, [initialProfileData, setProfileData]);
@@ -78,11 +78,11 @@ export const Profile: React.FC<ProfileProps> = ({
 
       const updatedProfileData = await updateConsents(
         profileData.id,
-        profileData.managedSubjects
+        profileData.managedSubjects,
       );
       if (updatedProfileData) {
         setProfileData((prev) =>
-          prev ? { ...prev, ...updatedProfileData } : null
+          prev ? { ...prev, ...updatedProfileData } : null,
         );
       }
     };
@@ -96,10 +96,10 @@ export const Profile: React.FC<ProfileProps> = ({
         subjectId,
         setProfileData,
         selectedSubject,
-        (updater) => setSelectedSubject(updater(selectedSubject))
+        (updater) => setSelectedSubject(updater(selectedSubject)),
       );
     },
-    [refreshConsentsForSubject, selectedSubject, setProfileData]
+    [refreshConsentsForSubject, selectedSubject, setProfileData],
   );
 
   const handleScopeChangeAndUpdateConsent = useCallback(
@@ -110,7 +110,7 @@ export const Profile: React.FC<ProfileProps> = ({
       policyId: string,
       scopeId: string,
       currentActiveScopes: string[],
-      action: "grant" | "revoke"
+      action: 'grant' | 'revoke',
     ) => {
       await handleScopeChange(
         subjectForConsent,
@@ -120,10 +120,10 @@ export const Profile: React.FC<ProfileProps> = ({
         scopeId,
         currentActiveScopes,
         action,
-        refreshConsentsForSubjectUI
+        refreshConsentsForSubjectUI,
       );
     },
-    [handleScopeChange, refreshConsentsForSubjectUI]
+    [handleScopeChange, refreshConsentsForSubjectUI],
   );
 
   const handleTabSelect = (_: unknown, data: { value: string }): void => {
@@ -137,20 +137,20 @@ export const Profile: React.FC<ProfileProps> = ({
       }
       handleSave(updates);
     },
-    [onProfileUpdate, handleSave]
+    [onProfileUpdate, handleSave],
   );
 
   const handleSubjectSelect = useCallback(
     (subjectId: string): void => {
       const subject = profileData?.managedSubjects?.find(
-        (s) => s.id === subjectId
+        (s) => s.id === subjectId,
       );
       if (subject) {
         setSelectedSubject(subject);
         if (onManagedSubjectSelect) onManagedSubjectSelect(subjectId);
       }
     },
-    [profileData?.managedSubjects, onManagedSubjectSelect]
+    [profileData?.managedSubjects, onManagedSubjectSelect],
   );
 
   if (!profileData) {
@@ -165,7 +165,7 @@ export const Profile: React.FC<ProfileProps> = ({
     <>
       {status.isLoadingConsents && <Spinner label="Loading consents..." />}
       {status.consentsError && (
-        <div style={{ color: "red" }}>
+        <div style={{ color: 'red' }}>
           <Text>Error loading consents: {status.consentsError}</Text>
         </div>
       )}
@@ -173,7 +173,7 @@ export const Profile: React.FC<ProfileProps> = ({
         <Spinner label="Loading managed subjects..." />
       )}
       {status.proxySubjectsError && (
-        <div style={{ color: "red" }}>
+        <div style={{ color: 'red' }}>
           <Text>
             Error loading managed subjects: {status.proxySubjectsError}
           </Text>
@@ -181,7 +181,7 @@ export const Profile: React.FC<ProfileProps> = ({
       )}
       {status.isSavingConsent && <Spinner label="Saving consent..." />}
       {status.saveConsentError && (
-        <div style={{ color: "red" }}>
+        <div style={{ color: 'red' }}>
           <Text>Error: {status.saveConsentError}</Text>
         </div>
       )}
@@ -208,7 +208,7 @@ export const Profile: React.FC<ProfileProps> = ({
         {statusDisplay}
         <PersonalProfileTab
           profileData={{
-            email: "",
+            email: '',
             role: selectedSubject.ageGroup,
             ...selectedSubject,
           }}
@@ -224,7 +224,7 @@ export const Profile: React.FC<ProfileProps> = ({
               policyId,
               scopeId,
               currentScopes,
-              "grant"
+              'grant',
             );
           }}
           onRevokeScope={(_, policyId, scopeId, currentScopes) => {
@@ -235,7 +235,7 @@ export const Profile: React.FC<ProfileProps> = ({
               policyId,
               scopeId,
               currentScopes,
-              "revoke"
+              'revoke',
             );
           }}
         />
@@ -293,7 +293,7 @@ export const Profile: React.FC<ProfileProps> = ({
                 policyId,
                 scopeId,
                 currentScopes,
-                "grant"
+                'grant',
               );
             }}
             onRevokeScope={(_, policyId, scopeId, currentScopes) => {
@@ -308,7 +308,7 @@ export const Profile: React.FC<ProfileProps> = ({
                 policyId,
                 scopeId,
                 currentScopes,
-                "revoke"
+                'revoke',
               );
             }}
           />

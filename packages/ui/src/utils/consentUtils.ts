@@ -1,4 +1,4 @@
-import type { ConsentRecord } from "@open-source-consent/types";
+import type { ConsentRecord } from '@open-source-consent/types';
 
 /**
  * Deserializes date strings within a raw consent object into Date objects.
@@ -23,7 +23,7 @@ export const deserializeConsentRecord = (rawConsent: any): ConsentRecord => {
   if (rawConsent.grantedScopes) {
     const mutableGrantedScopes: Record<string, { grantedAt: Date }> = {};
     for (const [key, val] of Object.entries(
-      rawConsent.grantedScopes as Record<string, { grantedAt: string }>
+      rawConsent.grantedScopes as Record<string, { grantedAt: string }>,
     )) {
       mutableGrantedScopes[key] = {
         ...(val as object), // Spread other potential properties
@@ -36,7 +36,7 @@ export const deserializeConsentRecord = (rawConsent: any): ConsentRecord => {
   if (rawConsent.revokedScopes) {
     const mutableRevokedScopes: Record<string, { revokedAt: Date }> = {};
     for (const [key, val] of Object.entries(
-      rawConsent.revokedScopes as Record<string, { revokedAt: string }>
+      rawConsent.revokedScopes as Record<string, { revokedAt: string }>,
     )) {
       mutableRevokedScopes[key] = {
         ...(val as object), // Spread other potential properties

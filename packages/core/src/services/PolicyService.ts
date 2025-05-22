@@ -3,8 +3,8 @@ import type {
   Policy,
   CreatePolicyInput,
   NewPolicyVersionDataInput,
-} from "@open-source-consent/types";
-import { BaseService } from "./BaseService.js";
+} from '@open-source-consent/types';
+import { BaseService } from './BaseService.js';
 
 export class PolicyService extends BaseService<IPolicyDataAdapter> {
   /**
@@ -16,7 +16,7 @@ export class PolicyService extends BaseService<IPolicyDataAdapter> {
    * @returns The created policy (either the first version or a new version).
    */
   async createPolicy(
-    data: CreatePolicyInput & { version?: number }
+    data: CreatePolicyInput & { version?: number },
   ): Promise<Policy> {
     // Validation for CreatePolicyInput
     if (
@@ -27,12 +27,12 @@ export class PolicyService extends BaseService<IPolicyDataAdapter> {
       !data.status
     ) {
       throw new Error(
-        "Missing required fields for policy creation: policyGroupId, contentSections, availableScopes, effectiveDate, status."
+        'Missing required fields for policy creation: policyGroupId, contentSections, availableScopes, effectiveDate, status.',
       );
     }
 
     const existingPoliciesInGroup = await this.getAllPolicyVersionsByGroupId(
-      data.policyGroupId
+      data.policyGroupId,
     );
 
     if (existingPoliciesInGroup?.length > 0) {
@@ -50,7 +50,7 @@ export class PolicyService extends BaseService<IPolicyDataAdapter> {
 
       return this.createNewPolicyVersion(
         latestExistingPolicy.id,
-        newDataForVersion
+        newDataForVersion,
       );
     } else {
       // No existing policies in the group, create a new policy
@@ -72,23 +72,23 @@ export class PolicyService extends BaseService<IPolicyDataAdapter> {
    */
   async createNewPolicyVersion(
     policyIdToSupersede: string,
-    newData: NewPolicyVersionDataInput
+    newData: NewPolicyVersionDataInput,
   ): Promise<Policy> {
     const policyToSupersede =
       await this.adapter.findPolicyById(policyIdToSupersede);
 
     if (!policyToSupersede) {
       throw new Error(
-        `Policy with ID ${policyIdToSupersede} not found to supersede.`
+        `Policy with ID ${policyIdToSupersede} not found to supersede.`,
       );
     }
 
     if (
-      policyToSupersede.status !== "active" &&
-      policyToSupersede.status !== "draft"
+      policyToSupersede.status !== 'active' &&
+      policyToSupersede.status !== 'draft'
     ) {
       throw new Error(
-        `Policy ${policyIdToSupersede} cannot be superseded as it is already ${policyToSupersede.status}.`
+        `Policy ${policyIdToSupersede} cannot be superseded as it is already ${policyToSupersede.status}.`,
       );
     }
 
@@ -102,7 +102,7 @@ export class PolicyService extends BaseService<IPolicyDataAdapter> {
       // NewPolicyVersionDataInput omits policyGroupId, version, id, createdAt, updatedAt
       // CreatePolicyInput omits id, createdAt, updatedAt. So it needs policyGroupId, status, effectiveDate etc.
       policyGroupId: policyToSupersede.policyGroupId, // Added this from previous logic
-      status: newData.status || "draft", // Add status, default if not in newData
+      status: newData.status || 'draft', // Add status, default if not in newData
       effectiveDate: newData.effectiveDate, // Add effectiveDate
       // contentSections and availableScopes are in newData from NewPolicyVersionDataInput
     };
@@ -113,14 +113,14 @@ export class PolicyService extends BaseService<IPolicyDataAdapter> {
     try {
       await this.adapter.updatePolicyStatus(
         policyIdToSupersede,
-        "archived", // or 'superseded'
-        policyToSupersede.version
+        'archived', // or 'superseded'
+        policyToSupersede.version,
       );
     } catch (statusUpdateError) {
       // Handle potential error during status update (e.g., log it, but the new policy is already created)
       // This could leave data in an inconsistent state if not handled carefully.
       console.error(
-        `Failed to archive policy ${policyIdToSupersede} after creating new version ${createdPolicy.id}. Error: ${statusUpdateError}`
+        `Failed to archive policy ${policyIdToSupersede} after creating new version ${createdPolicy.id}. Error: ${statusUpdateError}`,
       );
     }
 
@@ -136,18 +136,18 @@ export class PolicyService extends BaseService<IPolicyDataAdapter> {
    */
   async updatePolicyStatus(
     policyId: string,
-    status: Policy["status"],
-    expectedVersion: number
+    status: Policy['status'],
+    expectedVersion: number,
   ): Promise<Policy> {
     if (!policyId || !status) {
       throw new Error(
-        "Policy ID and status are required to update policy status."
+        'Policy ID and status are required to update policy status.',
       );
     }
 
     // Check if the status is valid,
-    if (status !== "active" && status !== "draft" && status !== "archived") {
-      throw new Error("Invalid status provided for policy update.");
+    if (status !== 'active' && status !== 'draft' && status !== 'archived') {
+      throw new Error('Invalid status provided for policy update.');
     }
 
     return this.adapter.updatePolicyStatus(policyId, status, expectedVersion);
@@ -168,7 +168,7 @@ export class PolicyService extends BaseService<IPolicyDataAdapter> {
    * @returns The latest active policy or null if none found.
    */
   async getLatestActivePolicyByGroupId(
-    policyGroupId: string
+    policyGroupId: string,
   ): Promise<Policy | null> {
     return this.adapter.findLatestActivePolicyByGroupId(policyGroupId);
   }
@@ -179,7 +179,7 @@ export class PolicyService extends BaseService<IPolicyDataAdapter> {
    * @returns An array of policies, sorted by version ascending.
    */
   async getAllPolicyVersionsByGroupId(
-    policyGroupId: string
+    policyGroupId: string,
   ): Promise<Policy[]> {
     return this.adapter.findAllPolicyVersionsByGroupId(policyGroupId);
   }

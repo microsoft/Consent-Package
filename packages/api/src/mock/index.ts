@@ -1,3 +1,3 @@
-export * from "./policy.js";
-export * from "./consent.js";
-export * from "./routes.js";
+export * from './policy.js';
+export * from './consent.js';
+export * from './routes.js';

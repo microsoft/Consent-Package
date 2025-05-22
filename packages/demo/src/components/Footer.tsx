@@ -1,48 +1,48 @@
-import { Link } from "react-router";
-import { makeStyles, tokens } from "@fluentui/react-components";
-import { useAuth } from "../utils/useAuth.js";
+import { Link } from 'react-router';
+import { makeStyles, tokens } from '@fluentui/react-components';
+import { useAuth } from '../utils/useAuth.js';
 
 const useStyles = makeStyles({
   footer: {
-    backgroundColor: "var(--color-background)",
+    backgroundColor: 'var(--color-background)',
     borderTop: `var(--border-width) solid var(--color-border)`,
-    padding: "calc(var(--spacing-unit) * 4) 0",
-    marginTop: "auto",
+    padding: 'calc(var(--spacing-unit) * 4) 0',
+    marginTop: 'auto',
   },
   container: {
-    maxWidth: "1200px",
-    margin: "0 auto",
-    padding: "0 calc(var(--spacing-unit) * 2)",
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: "calc(var(--spacing-unit) * 4)",
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '0 calc(var(--spacing-unit) * 2)',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: 'calc(var(--spacing-unit) * 4)',
   },
   section: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "calc(var(--spacing-unit) * 2)",
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 'calc(var(--spacing-unit) * 2)',
   },
   title: {
     fontSize: tokens.fontSizeBase500,
     fontWeight: tokens.fontWeightSemibold,
-    color: "var(--color-text)",
-    marginBottom: "calc(var(--spacing-unit) * 1)",
+    color: 'var(--color-text)',
+    marginBottom: 'calc(var(--spacing-unit) * 1)',
   },
   link: {
-    color: "var(--color-text-light)",
-    textDecoration: "none",
+    color: 'var(--color-text-light)',
+    textDecoration: 'none',
     fontSize: tokens.fontSizeBase300,
-    transition: "color var(--transition-speed) ease",
-    "&:hover": {
-      color: "var(--color-primary)",
+    transition: 'color var(--transition-speed) ease',
+    '&:hover': {
+      color: 'var(--color-primary)',
     },
   },
   copyright: {
-    textAlign: "center",
-    color: "var(--color-text-light)",
+    textAlign: 'center',
+    color: 'var(--color-text-light)',
     fontSize: tokens.fontSizeBase300,
-    marginTop: "calc(var(--spacing-unit) * 4)",
+    marginTop: 'calc(var(--spacing-unit) * 4)',
   },
 });
 
@@ -55,11 +55,15 @@ export function Footer(): JSX.Element {
       <div className={styles.container}>
         <div className={styles.section}>
           <h3 className={styles.title}>Product</h3>
-          {
-            currentUser ?
-            <Link to={`/profile/${currentUser.id}`} className={styles.link}>View Profile</Link> :
-            <Link to="/get-started" className={styles.link}>Get Started</Link>
-          }
+          {currentUser ? (
+            <Link to={`/profile/${currentUser.id}`} className={styles.link}>
+              View Profile
+            </Link>
+          ) : (
+            <Link to="/get-started" className={styles.link}>
+              Get Started
+            </Link>
+          )}
           <Link to="/playground" className={styles.link}>
             Playground
           </Link>

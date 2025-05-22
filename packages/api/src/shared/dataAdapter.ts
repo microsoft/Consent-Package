@@ -1,4 +1,4 @@
-import type { IDataAdapter } from "@open-source-consent/types";
+import type { IDataAdapter } from '@open-source-consent/types';
 
 let globalDataAdapter: IDataAdapter | null = null;
 let initializePromise: Promise<void> | null = null;
@@ -25,7 +25,7 @@ export function setDataAdapter(adapter: IDataAdapter): void {
 export async function getInitializedDataAdapter(): Promise<IDataAdapter> {
   if (!globalDataAdapter) {
     throw new Error(
-      "Data adapter has not been set. Ensure setDataAdapter() is called by the application before using API services."
+      'Data adapter has not been set. Ensure setDataAdapter() is called by the application before using API services.',
     );
   }
 
@@ -33,22 +33,22 @@ export async function getInitializedDataAdapter(): Promise<IDataAdapter> {
   // for the current adapter instance.
   if (
     !initializePromise &&
-    typeof globalDataAdapter.initialize === "function"
+    typeof globalDataAdapter.initialize === 'function'
   ) {
     console.info(
-      `Initializing data adapter: ${globalDataAdapter.constructor.name}...`
+      `Initializing data adapter: ${globalDataAdapter.constructor.name}...`,
     );
     initializePromise = globalDataAdapter
       .initialize()
       .then(() => {
         console.info(
-          `Data adapter '${globalDataAdapter?.constructor?.name}' initialized successfully.`
+          `Data adapter '${globalDataAdapter?.constructor?.name}' initialized successfully.`,
         );
       })
       .catch((err: Error) => {
         console.error(
           `Failed to initialize data adapter '${globalDataAdapter?.constructor?.name}':`,
-          err
+          err,
         );
         initializePromise = null; // Reset on error to allow potential retry if the issue is fixable and initialize is called again.
         throw err; // Re-throw the error to the caller

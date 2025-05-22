@@ -1,11 +1,18 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
-import type { ProfileData } from "@open-source-consent/ui";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  type ReactNode,
+} from 'react';
+import type { ProfileData } from '@open-source-consent/ui';
 import {
   getCurrentUserId,
   login as storeLogin,
   logout as storeLogout,
   fetchUserProfile,
-} from "./userManagement.js";
+} from './userManagement.js';
 
 interface AuthContextType {
   currentUser: ProfileData | null;
@@ -26,7 +33,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }
@@ -59,13 +66,14 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
     // Storage event listener to handle auth changes across tabs
     const handleStorageChange = (e: StorageEvent): void => {
-      if (e.key === "currentUserId") {
+      if (e.key === 'currentUserId') {
         void loadProfile(e.newValue);
       }
     };
 
-    window.addEventListener("storage", handleStorageChange);
-    return (): void => window.removeEventListener("storage", handleStorageChange);
+    window.addEventListener('storage', handleStorageChange);
+    return (): void =>
+      window.removeEventListener('storage', handleStorageChange);
   }, [loadProfile]);
 
   const login = useCallback(
@@ -74,7 +82,7 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       storeLogin(subjectId);
       await loadProfile(subjectId);
     },
-    [loadProfile]
+    [loadProfile],
   );
 
   const logout = useCallback(() => {

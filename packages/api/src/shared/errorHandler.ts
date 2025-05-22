@@ -1,4 +1,4 @@
-import type { InvocationContext, HttpResponseInit } from "@azure/functions";
+import type { InvocationContext, HttpResponseInit } from '@azure/functions';
 
 export interface ErrorHandlingOptions {
   defaultStatus?: number;
@@ -15,12 +15,12 @@ export function handleError(
   context: InvocationContext,
   error: unknown,
   errorPrefix: string,
-  options?: ErrorHandlingOptions
+  options?: ErrorHandlingOptions,
 ): HttpResponseInit {
   context.error(errorPrefix, error);
 
   const defaultStatus = options?.defaultStatus ?? 500;
-  const ultimateFallbackMessage = "An internal server error occurred.";
+  const ultimateFallbackMessage = 'An internal server error occurred.';
 
   if (error instanceof Error) {
     if (options?.customErrorMap) {

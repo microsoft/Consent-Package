@@ -1,1 +1,1 @@
-export * from "./IndexedDBDataAdapter.js";
+export * from './IndexedDBDataAdapter.js';

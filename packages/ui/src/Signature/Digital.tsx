@@ -13,7 +13,9 @@ const Digital: React.FC<DigitalProps> = ({ onSignatureSubmit }) => {
   const [signatureDate, setSignatureDate] = useState<Date | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
-  const handleDigitalSignatureChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleDigitalSignatureChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ): void => {
     // If user needs to re-sign
     setSignatureDate(null);
     setIsChecked(false);
@@ -27,7 +29,7 @@ const Digital: React.FC<DigitalProps> = ({ onSignatureSubmit }) => {
     setSignatureDate(signatureDate);
 
     if (digitalSignature) onSignatureSubmit(digitalSignature, signatureDate);
-  }
+  };
 
   return (
     <div className="digital-signature-container">
@@ -40,14 +42,19 @@ const Digital: React.FC<DigitalProps> = ({ onSignatureSubmit }) => {
       />
       <Checkbox
         checked={isChecked}
-        onChange={(_: ChangeEvent<HTMLInputElement>, data: CheckboxOnChangeData) => setIsChecked(data.checked)}
+        onChange={(
+          _: ChangeEvent<HTMLInputElement>,
+          data: CheckboxOnChangeData,
+        ) => setIsChecked(data.checked)}
         label="I have read and agree to the terms and conditions"
         disabled={!digitalSignature}
       />
-      {digitalSignature && signatureDate ? <div className="signature-capture-container">
-        <span>Signed by: {digitalSignature}</span>
-        <span>Date signed: {signatureDate?.toLocaleDateString()}</span>
-      </div> : null}
+      {digitalSignature && signatureDate ? (
+        <div className="signature-capture-container">
+          <span>Signed by: {digitalSignature}</span>
+          <span>Date signed: {signatureDate?.toLocaleDateString()}</span>
+        </div>
+      ) : null}
       <Button
         appearance="primary"
         onClick={handleSubmit}

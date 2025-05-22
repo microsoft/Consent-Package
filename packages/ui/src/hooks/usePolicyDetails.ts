@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import type { Policy } from "@open-source-consent/types";
-import useFetchPolicy from "./useFetchPolicy.js";
+import { useState, useEffect } from 'react';
+import type { Policy } from '@open-source-consent/types';
+import useFetchPolicy from './useFetchPolicy.js';
 
 interface UsePolicyDetailsResult {
   policy: Policy | null;
@@ -17,7 +17,7 @@ const usePolicyDetails = (policyId?: string): UsePolicyDetailsResult => {
 
   const fetchPolicy = () => {
     if (!policyId) {
-      setError("No Policy ID provided.");
+      setError('No Policy ID provided.');
       setIsLoading(false);
       setPolicy(null);
       return;
@@ -32,7 +32,7 @@ const usePolicyDetails = (policyId?: string): UsePolicyDetailsResult => {
       })
       .catch((err) => {
         console.error(`Error fetching policy ${policyId}:`, err);
-        setError(err.message || "An unknown error occurred");
+        setError(err.message || 'An unknown error occurred');
         setPolicy(null);
       })
       .finally(() => {

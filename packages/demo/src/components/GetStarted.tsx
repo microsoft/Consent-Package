@@ -1,116 +1,116 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo } from 'react';
 import {
   makeStyles,
   Button,
   tokens,
   Text,
   Spinner,
-} from "@fluentui/react-components";
+} from '@fluentui/react-components';
 import {
   ConsentWelcome,
   ConsentScopes,
   ConsentReview,
   useConsentFlow,
   ConsentContentSectionStep,
-} from "@open-source-consent/ui";
-import type { ConsentFlowFormData } from "@open-source-consent/ui";
-import type { PolicyContentSection } from "@open-source-consent/types";
-import { useAuth } from "../utils/useAuth.js";
+} from '@open-source-consent/ui';
+import type { ConsentFlowFormData } from '@open-source-consent/ui';
+import type { PolicyContentSection } from '@open-source-consent/types';
+import { useAuth } from '../utils/useAuth.js';
 
 const useStyles = makeStyles({
   root: {
-    padding: "24px 64px",
-    margin: "0 auto",
-    "@media (max-width: 768px)": {
-      padding: "24px",
+    padding: '24px 64px',
+    margin: '0 auto',
+    '@media (max-width: 768px)': {
+      padding: '24px',
     },
   },
   stepper: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "48px",
-    position: "relative",
-    padding: "0 16px",
-    paddingTop: "4px",
-    overflowX: "auto",
-    "&::before": {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: '48px',
+    position: 'relative',
+    padding: '0 16px',
+    paddingTop: '4px',
+    overflowX: 'auto',
+    '&::before': {
       content: '""',
-      position: "absolute",
-      top: "20px",
-      left: "40px",
-      right: "40px",
-      height: "3px",
+      position: 'absolute',
+      top: '20px',
+      left: '40px',
+      right: '40px',
+      height: '3px',
       backgroundColor: tokens.colorNeutralStroke1,
       zIndex: 0,
-      transition: "background-color 0.3s ease",
+      transition: 'background-color 0.3s ease',
     },
   },
   step: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    position: "relative",
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    position: 'relative',
     zIndex: 1,
-    transition: "transform 0.2s ease",
-    minWidth: "80px",
-    textAlign: "center",
-    "&:hover": {
-      transform: "translateY(-2px)",
+    transition: 'transform 0.2s ease',
+    minWidth: '80px',
+    textAlign: 'center',
+    '&:hover': {
+      transform: 'translateY(-2px)',
     },
   },
   stepNumber: {
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%",
-    border: "2px solid",
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    border: '2px solid',
     background: tokens.colorNeutralBackground1,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: "12px",
-    transition: "all 0.3s ease",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: '12px',
+    transition: 'all 0.3s ease',
     boxShadow: tokens.shadow2,
-    cursor: "pointer",
+    cursor: 'pointer',
   },
   stepNumberActive: {
     backgroundColor: tokens.colorBrandBackground,
     color: tokens.colorNeutralForegroundInverted,
-    transform: "scale(1.1)",
+    transform: 'scale(1.1)',
   },
   stepLabel: {
-    fontSize: "12px",
+    fontSize: '12px',
     color: tokens.colorNeutralForeground1,
-    transition: "color 0.3s ease",
+    transition: 'color 0.3s ease',
   },
   slide: {
-    minHeight: "400px",
-    display: "flex",
-    flexDirection: "column",
+    minHeight: '400px',
+    display: 'flex',
+    flexDirection: 'column',
   },
   navigation: {
-    marginTop: "auto",
-    display: "flex",
-    justifyContent: "flex-end",
-    paddingTop: "24px",
-    "& button:first-child": {
-      marginRight: "8px",
+    marginTop: 'auto',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    paddingTop: '24px',
+    '& button:first-child': {
+      marginRight: '8px',
     },
   },
   loading: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "400px",
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '400px',
   },
 });
 
 const baseSteps = [
-  { id: "welcome" as const, label: "Welcome" },
-  { id: "scopes" as const, label: "Scopes" },
-  { id: "review" as const, label: "Review & Sign" },
+  { id: 'welcome' as const, label: 'Welcome' },
+  { id: 'scopes' as const, label: 'Scopes' },
+  { id: 'review' as const, label: 'Review & Sign' },
 ] as const;
 
-type StepId = (typeof baseSteps)[number]["id"] | `contentSection_${number}`;
+type StepId = (typeof baseSteps)[number]['id'] | `contentSection_${number}`;
 
 interface Step {
   id: StepId;
@@ -128,13 +128,13 @@ export function GetStarted(): JSX.Element {
     setFormData,
     updateScopes,
     saveConsent,
-  } = useConsentFlow("sample-group-1");
+  } = useConsentFlow('sample-group-1');
   const { isLoading: isAuthLoading, login } = useAuth();
 
   const isPageLoading = isLoading || isAuthLoading;
 
   const dynamicSteps = useMemo<Step[]>(() => {
-    if (!policy) return baseSteps.filter((step) => step.id === "welcome");
+    if (!policy) return baseSteps.filter((step) => step.id === 'welcome');
 
     const contentSectionSteps: Step[] = policy.contentSections.map(
       (section: PolicyContentSection, index) => ({
@@ -143,27 +143,27 @@ export function GetStarted(): JSX.Element {
           section.title.length > 15
             ? `${section.title.substring(0, 12)}...`
             : section.title,
-      })
+      }),
     );
 
     return [
-      baseSteps.find((s) => s.id === "welcome")!,
+      baseSteps.find((s) => s.id === 'welcome')!,
       ...contentSectionSteps,
-      ...baseSteps.filter((s) => s.id !== "welcome"),
+      ...baseSteps.filter((s) => s.id !== 'welcome'),
     ];
   }, [policy]);
 
-  const [currentStepId, setCurrentStepId] = useState<StepId>("welcome");
+  const [currentStepId, setCurrentStepId] = useState<StepId>('welcome');
 
   const currentStepIndex = useMemo(
     () => dynamicSteps.findIndex((step) => step.id === currentStepId),
-    [dynamicSteps, currentStepId]
+    [dynamicSteps, currentStepId],
   );
 
   const isStepValid = useMemo(() => {
-    const isReviewStep = currentStepId === "review";
-    const isContentSectionStep = currentStepId.startsWith("contentSection_");
-    const isScopesStep = currentStepId === "scopes";
+    const isReviewStep = currentStepId === 'review';
+    const isContentSectionStep = currentStepId.startsWith('contentSection_');
+    const isScopesStep = currentStepId === 'scopes';
 
     if (isContentSectionStep) {
       return true;
@@ -179,7 +179,7 @@ export function GetStarted(): JSX.Element {
           .map((s) => s.key);
         if (requiredScopeKeys.length > 0) {
           hasRequiredScopes = requiredScopeKeys.every((key) =>
-            formData.grantedScopes?.includes(key)
+            formData.grantedScopes?.includes(key),
           );
         }
       } else if (policy && formData.isProxy) {
@@ -190,8 +190,8 @@ export function GetStarted(): JSX.Element {
         if (requiredScopeKeys.length > 0) {
           hasRequiredScopes = formData.managedSubjects.every((subject) =>
             requiredScopeKeys.every((key) =>
-              subject.grantedScopes?.includes(key)
-            )
+              subject.grantedScopes?.includes(key),
+            ),
           );
         }
       }
@@ -214,13 +214,13 @@ export function GetStarted(): JSX.Element {
             // Will push to '/' because of routing rules
             await login(subjectId);
           } catch (err) {
-            console.error("Login failed:", err);
-            alert("Unable to login. Please contact support.");
+            console.error('Login failed:', err);
+            alert('Unable to login. Please contact support.');
           }
         }
       } else {
-        console.error("saveConsent function is not available.");
-        alert("Unable to save consent. Please contact support.");
+        console.error('saveConsent function is not available.');
+        alert('Unable to save consent. Please contact support.');
       }
     }
   };
@@ -234,19 +234,19 @@ export function GetStarted(): JSX.Element {
 
   const handleStepClick = (stepId: StepId): void => {
     const targetStepIndex = dynamicSteps.findIndex(
-      (step) => step.id === stepId
+      (step) => step.id === stepId,
     );
 
     if (!isStepValid) return;
 
-    if (stepId === "welcome") {
+    if (stepId === 'welcome') {
       setCurrentStepId(stepId);
       return;
     }
 
     if (targetStepIndex <= currentStepIndex + 1) {
-      if ((stepId === "scopes" || stepId === "review") && !isStepValid) {
-        console.warn("Cannot proceed, form is not valid.");
+      if ((stepId === 'scopes' || stepId === 'review') && !isStepValid) {
+        console.warn('Cannot proceed, form is not valid.');
         return;
       }
       setCurrentStepId(stepId);
@@ -272,7 +272,7 @@ export function GetStarted(): JSX.Element {
       );
     }
 
-    if (currentStepId === "welcome") {
+    if (currentStepId === 'welcome') {
       return (
         <ConsentWelcome
           formData={formData}
@@ -299,14 +299,14 @@ export function GetStarted(): JSX.Element {
           }}
         />
       );
-    } else if (currentStepId.startsWith("contentSection_")) {
-      const sectionIndex = parseInt(currentStepId.split("_")[1], 10);
+    } else if (currentStepId.startsWith('contentSection_')) {
+      const sectionIndex = parseInt(currentStepId.split('_')[1], 10);
       const section = policy.contentSections[sectionIndex];
       if (section) {
         return <ConsentContentSectionStep section={section} />;
       }
       return <Text>Content section not found.</Text>;
-    } else if (currentStepId === "scopes") {
+    } else if (currentStepId === 'scopes') {
       return (
         <ConsentScopes
           formData={formData}
@@ -314,13 +314,13 @@ export function GetStarted(): JSX.Element {
           onChange={(
             scopeId: string,
             isChecked: boolean,
-            subjectIndex?: number
+            subjectIndex?: number,
           ) => {
             updateScopes(scopeId, isChecked, subjectIndex);
           }}
         />
       );
-    } else if (currentStepId === "review") {
+    } else if (currentStepId === 'review') {
       return (
         <ConsentReview
           policy={policy}
@@ -349,7 +349,7 @@ export function GetStarted(): JSX.Element {
           >
             <div
               className={`${styles.stepNumber} ${
-                currentStepIndex === index ? styles.stepNumberActive : ""
+                currentStepIndex === index ? styles.stepNumberActive : ''
               }`}
             >
               {index + 1}
@@ -372,18 +372,17 @@ export function GetStarted(): JSX.Element {
           onClick={handleNext}
           disabled={
             isPageLoading ||
-            (
-              (currentStepId === "welcome" || currentStepId === "review") && !isStepValid) ||
-              (!currentStepId.startsWith("contentSection_") && !isStepValid
-            )
+            ((currentStepId === 'welcome' || currentStepId === 'review') &&
+              !isStepValid) ||
+            (!currentStepId.startsWith('contentSection_') && !isStepValid)
           }
         >
           {isPageLoading && currentStepIndex === dynamicSteps.length - 1 ? (
             <Spinner size="tiny" />
           ) : currentStepIndex === dynamicSteps.length - 1 ? (
-            "Finish"
+            'Finish'
           ) : (
-            "Next"
+            'Next'
           )}
         </Button>
       </div>

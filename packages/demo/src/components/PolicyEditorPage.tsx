@@ -1,11 +1,11 @@
-import React from "react";
-import { useNavigate, useParams } from "react-router";
+import React from 'react';
+import { useNavigate, useParams } from 'react-router';
 import {
   usePolicyEditor,
   PolicyMetadataForm,
   PolicyContentSectionEditor,
   PolicyScopeEditor,
-} from "@open-source-consent/ui";
+} from '@open-source-consent/ui';
 import {
   Button,
   Card,
@@ -14,20 +14,20 @@ import {
   tokens,
   Title3,
   Subtitle2,
-} from "@fluentui/react-components";
+} from '@fluentui/react-components';
 
 const useStyles = makeStyles({
   root: {
-    padding: "24px",
-    maxWidth: "800px",
-    margin: "0 auto",
-    display: "flex",
-    flexDirection: "column",
+    padding: '24px',
+    maxWidth: '800px',
+    margin: '0 auto',
+    display: 'flex',
+    flexDirection: 'column',
     gap: tokens.spacingVerticalXXL,
   },
   form: {
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
     gap: tokens.spacingVerticalL,
   },
   card: {
@@ -40,8 +40,8 @@ const useStyles = makeStyles({
     marginBottom: tokens.spacingVerticalM,
   },
   buttonContainer: {
-    display: "flex",
-    justifyContent: "flex-end",
+    display: 'flex',
+    justifyContent: 'flex-end',
     gap: tokens.spacingHorizontalM,
     marginTop: tokens.spacingVerticalL,
   },
@@ -69,7 +69,7 @@ const PolicyEditorPage: React.FC = () => {
   const styles = useStyles();
   const navigate = useNavigate();
   const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
@@ -84,7 +84,7 @@ const PolicyEditorPage: React.FC = () => {
 
   const handleCheckboxChange = (
     name: keyof typeof formData,
-    checked: boolean
+    checked: boolean,
   ) => {
     setFormData({ ...formData, [name]: checked });
   };
@@ -111,7 +111,7 @@ const PolicyEditorPage: React.FC = () => {
             <Title3>
               {policyId
                 ? `Edit Policy (ID: ${policy?.id || policyId})`
-                : "Create New Policy"}
+                : 'Create New Policy'}
             </Title3>
           }
         />
@@ -170,7 +170,7 @@ const PolicyEditorPage: React.FC = () => {
 
           <div className={styles.buttonContainer}>
             <Button type="submit" appearance="primary">
-              {policyId ? "Save Changes" : "Create Policy"}
+              {policyId ? 'Save Changes' : 'Create Policy'}
             </Button>
           </div>
         </form>

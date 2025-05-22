@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from 'react-router';
 import {
   makeStyles,
   shorthands,
@@ -8,8 +8,8 @@ import {
   MenuList,
   MenuItem,
   MenuPopover,
-} from "@fluentui/react-components";
-import type { ProfileData } from "@open-source-consent/ui";
+} from '@fluentui/react-components';
+import type { ProfileData } from '@open-source-consent/ui';
 
 interface UserMenuProps {
   user: ProfileData;
@@ -19,9 +19,9 @@ interface UserMenuProps {
 
 const useStyles = makeStyles({
   userDisplay: {
-    display: "flex",
-    alignItems: "center",
-    ...shorthands.gap("8px"),
+    display: 'flex',
+    alignItems: 'center',
+    ...shorthands.gap('8px'),
   },
 });
 
@@ -50,8 +50,8 @@ export function UserMenu({
           <Persona
             name={user.name}
             secondaryText={user.email}
-            avatar={{ color: "colorful" }}
-            presence={{ status: "available" }}
+            avatar={{ color: 'colorful' }}
+            presence={{ status: 'available' }}
           />
         </MenuTrigger>
         <MenuPopover>

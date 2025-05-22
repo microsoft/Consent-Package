@@ -1,15 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   createMockContext,
   type MockRequest,
   initializeTestEnvironment,
-} from "./utils";
+} from './utils';
 
-vi.mock("@azure/functions");
-vi.mock("../shared/dataAdapter.js");
-vi.mock("@open-source-consent/core");
+vi.mock('@azure/functions');
+vi.mock('../shared/dataAdapter.js');
+vi.mock('@open-source-consent/core');
 
-describe("listPolicies function", () => {
+describe('listPolicies function', () => {
   let registeredHandlers: Record<string, Function>;
   let policyServiceMocks: any;
 
@@ -18,16 +18,16 @@ describe("listPolicies function", () => {
     vi.resetModules();
 
     const env: any = await initializeTestEnvironment([
-      "../functions/listPolicies.js",
+      '../functions/listPolicies.js',
     ]);
     registeredHandlers = env.registeredHandlers;
     policyServiceMocks = env.policyServiceMocks;
   });
 
-  it("should return a list of policies", async () => {
+  it('should return a list of policies', async () => {
     const mockPolicies = [
-      { id: "policy1", version: "1" },
-      { id: "policy2", version: "3" },
+      { id: 'policy1', version: '1' },
+      { id: 'policy2', version: '3' },
     ];
     policyServiceMocks.listPolicies.mockResolvedValue(mockPolicies);
 
@@ -41,10 +41,10 @@ describe("listPolicies function", () => {
     expect(policyServiceMocks.listPolicies).toHaveBeenCalled();
   });
 
-  it("should handle database initialization failure", async () => {
-    const dataAdapterModule = await import("../shared/dataAdapter.js");
+  it('should handle database initialization failure', async () => {
+    const dataAdapterModule = await import('../shared/dataAdapter.js');
     (dataAdapterModule.getInitializedDataAdapter as any).mockRejectedValueOnce(
-      new Error("Database connection failed.")
+      new Error('Database connection failed.'),
     );
 
     const request: MockRequest = {};
@@ -53,13 +53,13 @@ describe("listPolicies function", () => {
     const result = await registeredHandlers.listPolicies(request, context);
 
     expect(result.status).toBe(500);
-    expect(result.jsonBody).toEqual({ error: "Database connection failed." });
+    expect(result.jsonBody).toEqual({ error: 'Database connection failed.' });
     expect(context.error).toHaveBeenCalled();
   });
 
-  it("should handle service error when listing policies", async () => {
+  it('should handle service error when listing policies', async () => {
     policyServiceMocks.listPolicies.mockRejectedValueOnce(
-      new Error("Service unavailable")
+      new Error('Service unavailable'),
     );
 
     const request: MockRequest = {};
@@ -68,12 +68,12 @@ describe("listPolicies function", () => {
     const result = await registeredHandlers.listPolicies(request, context);
 
     expect(result.status).toBe(500);
-    expect(result.jsonBody).toEqual({ error: "Service unavailable" });
+    expect(result.jsonBody).toEqual({ error: 'Service unavailable' });
     expect(context.error).toHaveBeenCalled();
   });
 
-  it("should handle non-Error object in service error", async () => {
-    policyServiceMocks.listPolicies.mockRejectedValueOnce("String error");
+  it('should handle non-Error object in service error', async () => {
+    policyServiceMocks.listPolicies.mockRejectedValueOnce('String error');
 
     const request: MockRequest = {};
     const context = createMockContext();
@@ -82,7 +82,7 @@ describe("listPolicies function", () => {
 
     expect(result.status).toBe(500);
     expect(result.jsonBody).toEqual({
-      error: "An internal server error occurred while listing policies.",
+      error: 'An internal server error occurred while listing policies.',
     });
     expect(context.error).toHaveBeenCalled();
   });

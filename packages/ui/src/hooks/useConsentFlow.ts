@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import type {
   Policy,
   PolicyScope,
   CreateConsentInput,
-} from "@open-source-consent/types";
-import type { ConsentFlowFormData } from "../ConsentFlow/ConsentFlow.type.js";
-import { getAgeGroup } from "../utils/ageUtils.js";
+} from '@open-source-consent/types';
+import type { ConsentFlowFormData } from '../ConsentFlow/ConsentFlow.type.js';
+import { getAgeGroup } from '../utils/ageUtils.js';
 
 interface UseConsentFlowResult {
   policy: Policy | null;
@@ -17,7 +17,7 @@ interface UseConsentFlowResult {
   updateScopes(
     scopeId: string,
     isChecked: boolean,
-    subjectIndex?: number
+    subjectIndex?: number,
   ): void;
   saveConsent(): Promise<void>;
 }
@@ -32,11 +32,11 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ConsentFlowFormData>({
-    name: "",
-    ageRangeId: "",
+    name: '',
+    ageRangeId: '',
     dob: undefined,
     age: undefined,
-    roleId: "",
+    roleId: '',
     isProxy: false,
     managedSubjects: [],
     grantedScopes: [],
@@ -52,11 +52,11 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error(
-              `Latest active policy for group ID "${policyGroupId}" not found.`
+              `Latest active policy for group ID "${policyGroupId}" not found.`,
             );
           }
           throw new Error(
-            `Failed to fetch policy: ${response.status} ${response.statusText}`
+            `Failed to fetch policy: ${response.status} ${response.statusText}`,
           );
         }
         return response.json();
@@ -65,8 +65,8 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
         setPolicy(data);
       })
       .catch((err) => {
-        console.error("Error fetching policy:", err);
-        setError(err.message || "An unknown error occurred");
+        console.error('Error fetching policy:', err);
+        setError(err.message || 'An unknown error occurred');
         setPolicy(null); // Set policy to null on error
       })
       .finally(() => {
@@ -91,7 +91,7 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
         subject.name?.trim().length > 0 &&
         subject.id?.trim().length > 0 &&
         subject.age !== undefined &&
-        subject.age >= 0
+        subject.age >= 0,
     );
 
     const baseValidation = hasName && hasDob && hasRole;
@@ -104,14 +104,14 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
   const updateScopes = (
     scopeId: string,
     isChecked: boolean,
-    subjectIndex?: number
+    subjectIndex?: number,
   ): void => {
     if (!policy || !formData) return;
 
     const updatedFormData = { ...formData };
 
     const allAvailableScopeKeys = policy.availableScopes.map(
-      (scope: PolicyScope) => scope.key
+      (scope: PolicyScope) => scope.key,
     );
     const requiredScopeKeys = policy.availableScopes
       .filter((scope: PolicyScope) => scope.required)
@@ -133,7 +133,7 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
       }
 
       const newRevokedScopes = allAvailableScopeKeys.filter(
-        (key) => !newScopes.includes(key)
+        (key) => !newScopes.includes(key),
       );
 
       updatedFormData.managedSubjects[subjectIndex] = {
@@ -152,7 +152,7 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
       }
 
       const newRevokedScopes = allAvailableScopeKeys.filter(
-        (key) => !newScopes.includes(key)
+        (key) => !newScopes.includes(key),
       );
       updatedFormData.grantedScopes = newScopes;
       updatedFormData.revokedScopes = newRevokedScopes;
@@ -163,7 +163,7 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
 
   const saveConsent = async (): Promise<void> => {
     if (!policy || !isFormValid) {
-      setError("Policy not loaded or form is invalid. Cannot save consent.");
+      setError('Policy not loaded or form is invalid. Cannot save consent.');
       return;
     }
 
@@ -180,7 +180,7 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
           policyId: policy.id,
           dateOfBirth: subject.dob,
           consenter: {
-            type: "proxy",
+            type: 'proxy',
             userId: formData.name,
             proxyDetails: {
               relationship: formData.roleId,
@@ -190,7 +190,7 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
           grantedScopes: subject.grantedScopes || [],
           revokedScopes: subject.revokedScopes || [],
           metadata: {
-            consentMethod: "digital_form",
+            consentMethod: 'digital_form',
           },
         };
       });
@@ -200,13 +200,13 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
         policyId: policy.id,
         dateOfBirth: formData.dob,
         consenter: {
-          type: "self",
+          type: 'self',
           userId: formData.name,
         },
         grantedScopes: formData.grantedScopes || [],
         revokedScopes: formData.revokedScopes || [],
         metadata: {
-          consentMethod: "digital_form",
+          consentMethod: 'digital_form',
         },
       };
       consentsToCreate.push(consentInput);
@@ -214,10 +214,10 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
 
     try {
       for (const consentInput of consentsToCreate) {
-        const response = await fetch("/api/consents", {
-          method: "POST",
+        const response = await fetch('/api/consents', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(consentInput),
         });
@@ -227,13 +227,13 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
           throw new Error(
             `Failed to save consent: ${response.status} ${
               errorBody || response.statusText
-            }`
+            }`,
           );
         }
       }
     } catch (err: any) {
-      console.error("Error saving consent:", err);
-      setError(err.message || "An unknown error occurred while saving.");
+      console.error('Error saving consent:', err);
+      setError(err.message || 'An unknown error occurred while saving.');
     } finally {
       setIsLoading(false);
     }

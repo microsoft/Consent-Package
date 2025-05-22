@@ -1,1 +1,1 @@
-export * as mock from "./mock/index.js";
+export * as mock from './mock/index.js';

@@ -1,5 +1,5 @@
-import { makeStyles, Title2, tokens } from "@fluentui/react-components";
-import type { PolicyContentSection } from "@open-source-consent/types";
+import { makeStyles, Title2, tokens } from '@fluentui/react-components';
+import type { PolicyContentSection } from '@open-source-consent/types';
 
 interface ConsentContentSectionStepProps {
   section: PolicyContentSection;
@@ -7,26 +7,26 @@ interface ConsentContentSectionStepProps {
 
 const useStyles = makeStyles({
   root: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "24px",
-    marginBottom: "32px",
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '24px',
+    marginBottom: '32px',
   },
   sectionHeader: {
-    paddingBottom: "8px",
+    paddingBottom: '8px',
     borderBottom: `1px solid ${tokens.colorNeutralStroke1}`,
   },
   content: {
-    "& ul, & ol": {
-      paddingLeft: "20px",
-      margin: "8px 0",
+    '& ul, & ol': {
+      paddingLeft: '20px',
+      margin: '8px 0',
     },
-    "& li": {
-      marginBottom: "4px",
+    '& li': {
+      marginBottom: '4px',
     },
-    "& h4, & h5, & h6": {
-      marginTop: "12px",
-      marginBottom: "4px",
+    '& h4, & h5, & h6': {
+      marginTop: '12px',
+      marginBottom: '4px',
       fontWeight: tokens.fontWeightSemibold,
     },
   },

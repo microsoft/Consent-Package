@@ -12,7 +12,7 @@ interface SignatureProps {
 const Signature: React.FC<SignatureProps> = ({
   onSignatureSubmit,
   canvasHeight = 200,
-  isDrawnSignature = false
+  isDrawnSignature = false,
 }) => {
   return (
     <div className="signature-root">

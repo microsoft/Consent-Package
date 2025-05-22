@@ -7,13 +7,13 @@ import {
   beforeAll,
   afterAll,
   afterEach,
-} from "vitest";
-import { IndexedDBDataAdapter } from "../IndexedDBDataAdapter.js";
-import type { Policy, CreatePolicyInput } from "@open-source-consent/types";
-import "fake-indexeddb/auto";
+} from 'vitest';
+import { IndexedDBDataAdapter } from '../IndexedDBDataAdapter.js';
+import type { Policy, CreatePolicyInput } from '@open-source-consent/types';
+import 'fake-indexeddb/auto';
 
-const DB_NAME = "OpenSourceConsentDB";
-const POLICY_STORE_NAME = "policies";
+const DB_NAME = 'OpenSourceConsentDB';
+const POLICY_STORE_NAME = 'policies';
 
 let dataAdapter: IndexedDBDataAdapter;
 
@@ -25,22 +25,22 @@ async function deleteTestDatabase(): Promise<void> {
     };
     request.onerror = (event) => {
       const error = (event.target as IDBRequest).error;
-      console.error("[Test Policy Debug] deleteTestDatabase: Error -", error);
+      console.error('[Test Policy Debug] deleteTestDatabase: Error -', error);
       reject(error);
     };
     request.onblocked = (event) => {
-      console.warn("[Test Policy Debug] deleteTestDatabase: Blocked -", event);
+      console.warn('[Test Policy Debug] deleteTestDatabase: Blocked -', event);
       const err = new Error(
-        "Database deletion blocked. Please ensure all connections are closed."
+        'Database deletion blocked. Please ensure all connections are closed.',
       );
-      if (dataAdapter && typeof dataAdapter.close === "function") {
+      if (dataAdapter && typeof dataAdapter.close === 'function') {
         console.warn(
-          "[Test Policy Debug] deleteTestDatabase: Attempting to close adapter DB due to block before rejecting."
+          '[Test Policy Debug] deleteTestDatabase: Attempting to close adapter DB due to block before rejecting.',
         );
         void dataAdapter.close().catch((closeErr) => {
           console.error(
-            "[Test Policy Debug] deleteTestDatabase: Error during adapter close on block:",
-            closeErr
+            '[Test Policy Debug] deleteTestDatabase: Error during adapter close on block:',
+            closeErr,
           );
         });
       }
@@ -49,7 +49,7 @@ async function deleteTestDatabase(): Promise<void> {
   });
 }
 
-describe("IndexedDBDataAdapter - Policy Methods", () => {
+describe('IndexedDBDataAdapter - Policy Methods', () => {
   beforeAll(async () => {
     dataAdapter = new IndexedDBDataAdapter();
 
@@ -57,13 +57,13 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
       .close()
       .catch((err) =>
         console.warn(
-          "[Test Policy Debug] beforeAll: Pre-emptive adapter close failed (normal if no prior DB):",
-          err
-        )
+          '[Test Policy Debug] beforeAll: Pre-emptive adapter close failed (normal if no prior DB):',
+          err,
+        ),
       );
 
     await deleteTestDatabase().catch((err) =>
-      console.warn("[Test Policy Debug] beforeAll: Pre-delete DB failed:", err)
+      console.warn('[Test Policy Debug] beforeAll: Pre-delete DB failed:', err),
     );
     await dataAdapter.initialize();
   }, 30000);
@@ -74,16 +74,16 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
         .close()
         .catch((err) =>
           console.warn(
-            "[Test Policy Debug] afterAll: Adapter close failed:",
-            err
-          )
+            '[Test Policy Debug] afterAll: Adapter close failed:',
+            err,
+          ),
         );
     }
     await deleteTestDatabase().catch((err) =>
       console.error(
-        "[Test Policy Debug] afterAll: Post-test delete DB failed:",
-        err
-      )
+        '[Test Policy Debug] afterAll: Post-test delete DB failed:',
+        err,
+      ),
     );
   }, 30000);
 
@@ -94,7 +94,7 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
     } catch (error) {
       console.error(
         `[Test Policy Debug] beforeEach: Failed to clear store '${POLICY_STORE_NAME}':`,
-        error
+        error,
       );
       throw error;
     }
@@ -104,22 +104,22 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
     vi.restoreAllMocks();
   });
 
-  describe("createPolicy", () => {
-    it("should create a policy record with auto-generated fields", async () => {
+  describe('createPolicy', () => {
+    it('should create a policy record with auto-generated fields', async () => {
       const policyInput: CreatePolicyInput = {
-        title: "Policy A",
-        policyGroupId: "group1",
+        title: 'Policy A',
+        policyGroupId: 'group1',
         version: 1,
-        status: "draft",
-        effectiveDate: new Date("2025-01-01T00:00:00.000Z"),
+        status: 'draft',
+        effectiveDate: new Date('2025-01-01T00:00:00.000Z'),
         contentSections: [
-          { title: "Intro", description: "Welcome", content: "Details..." },
+          { title: 'Intro', description: 'Welcome', content: 'Details...' },
         ],
         availableScopes: [
           {
-            key: "read_data",
-            name: "Read Data",
-            description: "Allows reading.",
+            key: 'read_data',
+            name: 'Read Data',
+            description: 'Allows reading.',
           },
         ],
       };
@@ -133,25 +133,25 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
       expect(createdPolicy.version).toBe(policyInput.version);
       expect(createdPolicy.status).toBe(policyInput.status);
       expect(new Date(createdPolicy.effectiveDate).toISOString()).toBe(
-        policyInput.effectiveDate.toISOString()
+        policyInput.effectiveDate.toISOString(),
       );
       expect(createdPolicy.contentSections).toEqual(
-        policyInput.contentSections
+        policyInput.contentSections,
       );
       expect(createdPolicy.availableScopes).toEqual(
-        policyInput.availableScopes
+        policyInput.availableScopes,
       );
 
       expect(createdPolicy.createdAt).toBeInstanceOf(Date);
       expect(createdPolicy.updatedAt).toBeInstanceOf(Date);
       expect(createdPolicy.createdAt.getTime()).toEqual(
-        createdPolicy.updatedAt.getTime()
+        createdPolicy.updatedAt.getTime(),
       );
       expect(createdPolicy.createdAt.getTime()).toBeGreaterThanOrEqual(
-        beforeCreateTimestamp - 1000
+        beforeCreateTimestamp - 1000,
       );
       expect(createdPolicy.createdAt.getTime()).toBeLessThanOrEqual(
-        afterCreateTimestamp + 1000
+        afterCreateTimestamp + 1000,
       );
 
       const fetchedPolicy = await dataAdapter.findPolicyById(createdPolicy.id);
@@ -160,13 +160,13 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
     });
   });
 
-  describe("findPolicyById", () => {
-    it("should return a policy record when found", async () => {
+  describe('findPolicyById', () => {
+    it('should return a policy record when found', async () => {
       const policyInput: CreatePolicyInput = {
-        title: "Policy A",
-        policyGroupId: "groupFind",
+        title: 'Policy A',
+        policyGroupId: 'groupFind',
         version: 1,
-        status: "active",
+        status: 'active',
         effectiveDate: new Date(),
         contentSections: [],
         availableScopes: [],
@@ -178,35 +178,35 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
       expect(foundPolicy).toEqual(createdPolicy);
     });
 
-    it("should return null if policy is not found", async () => {
-      const foundPolicy = await dataAdapter.findPolicyById("non-existent-id");
+    it('should return null if policy is not found', async () => {
+      const foundPolicy = await dataAdapter.findPolicyById('non-existent-id');
       expect(foundPolicy).toBeNull();
     });
   });
 
-  describe("updatePolicyStatus", () => {
+  describe('updatePolicyStatus', () => {
     let policyToUpdate: Policy;
-    const initialEffectiveDate = new Date("2025-03-01T00:00:00.000Z");
+    const initialEffectiveDate = new Date('2025-03-01T00:00:00.000Z');
 
     beforeEach(async () => {
       const initialPolicyData: CreatePolicyInput = {
-        title: "Policy A",
-        policyGroupId: "groupUpdate",
+        title: 'Policy A',
+        policyGroupId: 'groupUpdate',
         version: 1,
-        status: "draft",
+        status: 'draft',
         effectiveDate: initialEffectiveDate,
         contentSections: [
-          { title: "Initial", content: "Content", description: "Desc" },
+          { title: 'Initial', content: 'Content', description: 'Desc' },
         ],
         availableScopes: [
-          { key: "scope1", name: "Scope 1", description: "Desc 1" },
+          { key: 'scope1', name: 'Scope 1', description: 'Desc 1' },
         ],
       };
       policyToUpdate = await dataAdapter.createPolicy(initialPolicyData);
     });
 
     it("should update a policy's status without incrementing version, and update 'updatedAt'", async () => {
-      const newStatus = "active";
+      const newStatus = 'active';
       const expectedVersionBeforeUpdate = policyToUpdate.version;
 
       await new Promise((resolve) => setTimeout(resolve, 50));
@@ -215,7 +215,7 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
       const updatedPolicy = await dataAdapter.updatePolicyStatus(
         policyToUpdate.id,
         newStatus,
-        expectedVersionBeforeUpdate
+        expectedVersionBeforeUpdate,
       );
       const afterUpdateTimestamp = Date.now();
 
@@ -224,60 +224,60 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
       expect(updatedPolicy.version).toBe(expectedVersionBeforeUpdate);
       expect(updatedPolicy.updatedAt).toBeInstanceOf(Date);
       expect(updatedPolicy.updatedAt.getTime()).toBeGreaterThan(
-        policyToUpdate.updatedAt.getTime()
+        policyToUpdate.updatedAt.getTime(),
       );
       expect(updatedPolicy.updatedAt.getTime()).toBeGreaterThanOrEqual(
-        beforeUpdateTimestamp - 1000
+        beforeUpdateTimestamp - 1000,
       );
       expect(updatedPolicy.updatedAt.getTime()).toBeLessThanOrEqual(
-        afterUpdateTimestamp + 1000
+        afterUpdateTimestamp + 1000,
       );
       expect(updatedPolicy.createdAt.getTime()).toEqual(
-        policyToUpdate.createdAt.getTime()
+        policyToUpdate.createdAt.getTime(),
       );
       expect(updatedPolicy.policyGroupId).toBe(policyToUpdate.policyGroupId);
       expect(new Date(updatedPolicy.effectiveDate).toISOString()).toBe(
-        initialEffectiveDate.toISOString()
+        initialEffectiveDate.toISOString(),
       );
 
       const fetchedPolicy = await dataAdapter.findPolicyById(policyToUpdate.id);
       expect(fetchedPolicy).toEqual(updatedPolicy);
     });
 
-    it("should throw error if policy for status update is not found", async () => {
+    it('should throw error if policy for status update is not found', async () => {
       await expect(
-        dataAdapter.updatePolicyStatus("non-existent-id", "active", 1)
+        dataAdapter.updatePolicyStatus('non-existent-id', 'active', 1),
       ).rejects.toThrow(/^Policy with id .* not found/);
     });
 
-    it("should throw error on version mismatch during status update", async () => {
+    it('should throw error on version mismatch during status update', async () => {
       const incorrectVersion = policyToUpdate.version + 5;
       await expect(
         dataAdapter.updatePolicyStatus(
           policyToUpdate.id,
-          "archived",
-          incorrectVersion
-        )
+          'archived',
+          incorrectVersion,
+        ),
       ).rejects.toThrow(
-        `Optimistic concurrency check failed for policy ${policyToUpdate.id}. Expected version ${incorrectVersion}, found ${policyToUpdate.version}.`
+        `Optimistic concurrency check failed for policy ${policyToUpdate.id}. Expected version ${incorrectVersion}, found ${policyToUpdate.version}.`,
       );
     });
   });
 
-  describe("findAllPolicyVersionsByGroupId", () => {
-    const P_GROUP_ID = "groupForAllVersions";
+  describe('findAllPolicyVersionsByGroupId', () => {
+    const P_GROUP_ID = 'groupForAllVersions';
     let p1v1: Policy, p1v2: Policy;
     const commonVersionData: Omit<
       CreatePolicyInput,
-      "policyGroupId" | "version" | "status"
+      'policyGroupId' | 'version' | 'status'
     > = {
-      title: "Policy A",
-      effectiveDate: new Date("2025-05-01T00:00:00.000Z"),
+      title: 'Policy A',
+      effectiveDate: new Date('2025-05-01T00:00:00.000Z'),
       contentSections: [
-        { title: "All Versions", content: "Content", description: "Desc" },
+        { title: 'All Versions', content: 'Content', description: 'Desc' },
       ],
       availableScopes: [
-        { key: "v_scope", name: "V Scope", description: "Desc" },
+        { key: 'v_scope', name: 'V Scope', description: 'Desc' },
       ],
     };
 
@@ -286,23 +286,23 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
         ...commonVersionData,
         policyGroupId: P_GROUP_ID,
         version: 1,
-        status: "draft",
+        status: 'draft',
       });
       p1v2 = await dataAdapter.createPolicy({
         ...commonVersionData,
         policyGroupId: P_GROUP_ID,
         version: 2,
-        status: "active",
+        status: 'active',
       });
       await dataAdapter.createPolicy({
         ...commonVersionData,
-        policyGroupId: "otherGroup",
+        policyGroupId: 'otherGroup',
         version: 1,
-        status: "active",
+        status: 'active',
       });
     });
 
-    it("should return all versions of policies for a given group ID, ordered by version ASC", async () => {
+    it('should return all versions of policies for a given group ID, ordered by version ASC', async () => {
       const versions =
         await dataAdapter.findAllPolicyVersionsByGroupId(P_GROUP_ID);
       expect(versions.length).toBe(2);
@@ -312,27 +312,27 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
       expect(versions[1].version).toBe(2);
     });
 
-    it("should return an empty array if the policy group ID does not exist", async () => {
+    it('should return an empty array if the policy group ID does not exist', async () => {
       const versions =
-        await dataAdapter.findAllPolicyVersionsByGroupId("nonExistentGroup");
+        await dataAdapter.findAllPolicyVersionsByGroupId('nonExistentGroup');
       expect(versions).toEqual([]);
     });
   });
 
-  describe("findLatestActivePolicyByGroupId", () => {
-    const P_GROUP_ID_1 = "latestActiveGroup1";
-    const P_GROUP_ID_NO_ACTIVE = "noActiveGroup";
+  describe('findLatestActivePolicyByGroupId', () => {
+    const P_GROUP_ID_1 = 'latestActiveGroup1';
+    const P_GROUP_ID_NO_ACTIVE = 'noActiveGroup';
     const commonPolicyDetails: Omit<
       CreatePolicyInput,
-      "policyGroupId" | "version" | "status"
+      'policyGroupId' | 'version' | 'status'
     > = {
-      title: "Policy A",
-      effectiveDate: new Date("2025-04-01T00:00:00.000Z"),
+      title: 'Policy A',
+      effectiveDate: new Date('2025-04-01T00:00:00.000Z'),
       contentSections: [
-        { title: "Latest Active", content: "Test", description: "Desc" },
+        { title: 'Latest Active', content: 'Test', description: 'Desc' },
       ],
       availableScopes: [
-        { key: "la_scope", name: "LA Scope", description: "Desc" },
+        { key: 'la_scope', name: 'LA Scope', description: 'Desc' },
       ],
     };
     let activeV2: Policy;
@@ -342,113 +342,113 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
         ...commonPolicyDetails,
         policyGroupId: P_GROUP_ID_1,
         version: 1,
-        status: "draft",
+        status: 'draft',
       });
       activeV2 = await dataAdapter.createPolicy({
         ...commonPolicyDetails,
         policyGroupId: P_GROUP_ID_1,
         version: 2,
-        status: "active",
+        status: 'active',
       });
       await dataAdapter.createPolicy({
         ...commonPolicyDetails,
         policyGroupId: P_GROUP_ID_1,
         version: 3,
-        status: "archived",
+        status: 'archived',
       });
       await dataAdapter.createPolicy({
         ...commonPolicyDetails,
-        policyGroupId: "otherGroupWithActive",
+        policyGroupId: 'otherGroupWithActive',
         version: 1,
-        status: "active",
+        status: 'active',
       });
       await dataAdapter.createPolicy({
         ...commonPolicyDetails,
         policyGroupId: P_GROUP_ID_NO_ACTIVE,
         version: 1,
-        status: "draft",
+        status: 'draft',
       });
       await dataAdapter.createPolicy({
         ...commonPolicyDetails,
         policyGroupId: P_GROUP_ID_NO_ACTIVE,
         version: 2,
-        status: "archived",
+        status: 'archived',
       });
     });
 
-    it("should return the latest active policy for a given group ID", async () => {
+    it('should return the latest active policy for a given group ID', async () => {
       const latestActive =
         await dataAdapter.findLatestActivePolicyByGroupId(P_GROUP_ID_1);
       expect(latestActive).not.toBeNull();
       expect(latestActive!.id).toBe(activeV2.id);
       expect(latestActive!.version).toBe(2);
-      expect(latestActive!.status).toBe("active");
+      expect(latestActive!.status).toBe('active');
     });
 
-    it("should return null if no active policy exists for the group ID", async () => {
+    it('should return null if no active policy exists for the group ID', async () => {
       const latestActive =
         await dataAdapter.findLatestActivePolicyByGroupId(P_GROUP_ID_NO_ACTIVE);
       expect(latestActive).toBeNull();
     });
 
-    it("should return null if the policy group ID does not exist", async () => {
+    it('should return null if the policy group ID does not exist', async () => {
       const latestActive = await dataAdapter.findLatestActivePolicyByGroupId(
-        "nonExistentGroupForLatest"
+        'nonExistentGroupForLatest',
       );
       expect(latestActive).toBeNull();
     });
   });
 
-  describe("listPolicies", () => {
+  describe('listPolicies', () => {
     let p_A_v2: Policy, p_A_v1: Policy, p_B_v1: Policy;
     const commonListData: Omit<
       CreatePolicyInput,
-      "policyGroupId" | "version" | "status"
+      'policyGroupId' | 'version' | 'status'
     > = {
-      title: "Policy A",
-      effectiveDate: new Date("2025-06-01T00:00:00.000Z"),
+      title: 'Policy A',
+      effectiveDate: new Date('2025-06-01T00:00:00.000Z'),
       contentSections: [
-        { title: "List", content: "Content", description: "Desc" },
+        { title: 'List', content: 'Content', description: 'Desc' },
       ],
       availableScopes: [
-        { key: "list_scope", name: "List Scope", description: "Desc" },
+        { key: 'list_scope', name: 'List Scope', description: 'Desc' },
       ],
     };
-    const P_GROUP_LIST_A = "listPGroupA";
-    const P_GROUP_LIST_B = "listPGroupB";
+    const P_GROUP_LIST_A = 'listPGroupA';
+    const P_GROUP_LIST_B = 'listPGroupB';
 
     beforeEach(async () => {
       p_B_v1 = await dataAdapter.createPolicy({
         ...commonListData,
         policyGroupId: P_GROUP_LIST_B,
         version: 1,
-        status: "active",
-        title: "Policy B",
+        status: 'active',
+        title: 'Policy B',
       });
       p_A_v1 = await dataAdapter.createPolicy({
         ...commonListData,
         policyGroupId: P_GROUP_LIST_A,
         version: 1,
-        status: "draft",
-        title: "Policy A",
+        status: 'draft',
+        title: 'Policy A',
       });
       p_A_v2 = await dataAdapter.createPolicy({
         ...commonListData,
         policyGroupId: P_GROUP_LIST_A,
         version: 2,
-        status: "active",
-        title: "Policy A",
+        status: 'active',
+        title: 'Policy A',
       });
       await dataAdapter.createPolicy({
         ...commonListData,
-        policyGroupId: "listPGroupC",
+        policyGroupId: 'listPGroupC',
         version: 1,
-        status: "draft",
-        title: "Policy C",
+        status: 'draft',
+        title: 'Policy C',
       });
     });
 
-    it("should return all policies, ordered by policyGroupId ASC, then version DESC", async () => {
+    it('should return all policies, ordered by policyGroupId ASC, then version DESC', async () => {
       const allPolicies = await dataAdapter.listPolicies();
 
       expect(allPolicies.length).toBeGreaterThanOrEqual(3);
@@ -471,7 +471,7 @@ describe("IndexedDBDataAdapter - Policy Methods", () => {
       }
     });
 
-    it("should return an empty array if no policies exist", async () => {
+    it('should return an empty array if no policies exist', async () => {
       const dbOpenRequest = indexedDB.open(DB_NAME);
       await new Promise<void>((resolve, reject) => {
         dbOpenRequest.onsuccess = async (event) => {

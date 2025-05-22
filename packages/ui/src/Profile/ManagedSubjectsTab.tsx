@@ -58,19 +58,26 @@ const ManagedSubjectsTab: React.FC<ManagedSubjectsTabProps> = ({
     <div className="profile-managed-subjects-grid">
       {managedSubjects.map((subject) => (
         <Card key={subject.id} className="profile-card">
-          <CardHeader header={
-            <>
-              <Avatar name={subject.name} />&nbsp;
-              <Text size={500} weight="semibold">{subject.name}</Text>
-            </>
-          }/>
+          <CardHeader
+            header={
+              <>
+                <Avatar name={subject.name} />
+                &nbsp;
+                <Text size={500} weight="semibold">
+                  {subject.name}
+                </Text>
+              </>
+            }
+          />
           <CardPreview>
             {editingSubjectId === subject.id ? (
               <div className="profile-form-group">
                 <Text>Relationship:</Text>
                 <Input
                   value={editedRelationship}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setEditedRelationship(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setEditedRelationship(e.target.value)
+                  }
                 />
               </div>
             ) : (
@@ -87,10 +94,7 @@ const ManagedSubjectsTab: React.FC<ManagedSubjectsTabProps> = ({
                 >
                   Save
                 </Button>
-                <Button
-                  appearance="secondary"
-                  onClick={handleCancelClick}
-                >
+                <Button appearance="secondary" onClick={handleCancelClick}>
                   Cancel
                 </Button>
               </div>
@@ -117,4 +121,4 @@ const ManagedSubjectsTab: React.FC<ManagedSubjectsTabProps> = ({
   );
 };
 
-export default ManagedSubjectsTab; 
+export default ManagedSubjectsTab;

@@ -7,13 +7,13 @@ import {
   beforeAll,
   afterAll,
   afterEach,
-} from "vitest";
-import { IndexedDBDataAdapter } from "../IndexedDBDataAdapter.js";
-import type { ConsentRecord } from "@open-source-consent/types";
-import "fake-indexeddb/auto";
+} from 'vitest';
+import { IndexedDBDataAdapter } from '../IndexedDBDataAdapter.js';
+import type { ConsentRecord } from '@open-source-consent/types';
+import 'fake-indexeddb/auto';
 
-const DB_NAME = "OpenSourceConsentDB";
-const CONSENT_STORE_NAME = "consents";
+const DB_NAME = 'OpenSourceConsentDB';
+const CONSENT_STORE_NAME = 'consents';
 
 let dataAdapter: IndexedDBDataAdapter;
 
@@ -25,22 +25,22 @@ async function deleteTestDatabase(): Promise<void> {
     };
     request.onerror = (event) => {
       const error = (event.target as IDBRequest).error;
-      console.error("[Test Debug] deleteTestDatabase: Error -", error);
+      console.error('[Test Debug] deleteTestDatabase: Error -', error);
       reject(error);
     };
     request.onblocked = (event) => {
-      console.warn("[Test Debug] deleteTestDatabase: Blocked -", event);
+      console.warn('[Test Debug] deleteTestDatabase: Blocked -', event);
       const err = new Error(
-        "Database deletion blocked. Please ensure all connections are closed."
+        'Database deletion blocked. Please ensure all connections are closed.',
       );
-      if (dataAdapter && typeof dataAdapter.close === "function") {
+      if (dataAdapter && typeof dataAdapter.close === 'function') {
         console.warn(
-          "[Test Debug] deleteTestDatabase: Attempting to close adapter DB due to block before rejecting."
+          '[Test Debug] deleteTestDatabase: Attempting to close adapter DB due to block before rejecting.',
         );
         void dataAdapter.close().catch((closeErr) => {
           console.error(
-            "[Test Debug] deleteTestDatabase: Error during adapter close on block:",
-            closeErr
+            '[Test Debug] deleteTestDatabase: Error during adapter close on block:',
+            closeErr,
           );
         });
       }
@@ -49,22 +49,22 @@ async function deleteTestDatabase(): Promise<void> {
   });
 }
 
-describe("IndexedDBDataAdapter - Consent Methods", () => {
+describe('IndexedDBDataAdapter - Consent Methods', () => {
   beforeAll(async () => {
     dataAdapter = new IndexedDBDataAdapter();
     await dataAdapter
       .close()
       .catch((err) =>
         console.warn(
-          "[Test Debug] beforeAll: Pre-emptive adapter close failed (normal if no prior DB):",
-          err
-        )
+          '[Test Debug] beforeAll: Pre-emptive adapter close failed (normal if no prior DB):',
+          err,
+        ),
       );
     await deleteTestDatabase().catch((err) =>
       console.warn(
-        "[Test Debug] beforeAll: Pre-delete DB failed (may not exist or was blocked):",
-        err
-      )
+        '[Test Debug] beforeAll: Pre-delete DB failed (may not exist or was blocked):',
+        err,
+      ),
     );
     await dataAdapter.initialize();
   }, 30000);
@@ -74,11 +74,11 @@ describe("IndexedDBDataAdapter - Consent Methods", () => {
       await dataAdapter
         .close()
         .catch((err) =>
-          console.warn("[Test Debug] afterAll: Adapter close failed:", err)
+          console.warn('[Test Debug] afterAll: Adapter close failed:', err),
         );
     }
     await deleteTestDatabase().catch((err) =>
-      console.error("[Test Debug] afterAll: Post-test delete DB failed:", err)
+      console.error('[Test Debug] afterAll: Post-test delete DB failed:', err),
     );
   }, 30000);
 
@@ -89,7 +89,7 @@ describe("IndexedDBDataAdapter - Consent Methods", () => {
     } catch (error) {
       console.error(
         `[Test Debug] beforeEach: Failed to clear store '${CONSENT_STORE_NAME}':`,
-        error
+        error,
       );
       throw error;
     }
@@ -99,21 +99,21 @@ describe("IndexedDBDataAdapter - Consent Methods", () => {
     vi.restoreAllMocks();
   });
 
-  describe("createConsent", () => {
-    it("should create a consent record with auto-generated fields", async () => {
+  describe('createConsent', () => {
+    it('should create a consent record with auto-generated fields', async () => {
       const consentedAtDate = new Date(2024, 0, 1, 10, 0, 0);
-      const inputData: Omit<ConsentRecord, "id" | "createdAt" | "updatedAt"> = {
-        subjectId: "subject1",
-        policyId: "policy1",
-        status: "granted",
+      const inputData: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt'> = {
+        subjectId: 'subject1',
+        policyId: 'policy1',
+        status: 'granted',
         version: 1,
         consentedAt: consentedAtDate,
-        dateOfBirth: new Date("1990-01-01"),
-        consenter: { type: "self", userId: "user1" },
+        dateOfBirth: new Date('1990-01-01'),
+        consenter: { type: 'self', userId: 'user1' },
         grantedScopes: {
           scope1: { grantedAt: consentedAtDate },
         },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
 
       const beforeCreateTimestamp = Date.now();
@@ -133,53 +133,53 @@ describe("IndexedDBDataAdapter - Consent Methods", () => {
       expect(createdConsent.createdAt).toBeInstanceOf(Date);
       expect(createdConsent.updatedAt).toBeInstanceOf(Date);
       expect(createdConsent.createdAt.getTime()).toBe(
-        createdConsent.updatedAt.getTime()
+        createdConsent.updatedAt.getTime(),
       );
       expect(createdConsent.createdAt.getTime()).toBeGreaterThanOrEqual(
-        beforeCreateTimestamp - 1000
+        beforeCreateTimestamp - 1000,
       );
       expect(createdConsent.createdAt.getTime()).toBeLessThanOrEqual(
-        afterCreateTimestamp + 1000
+        afterCreateTimestamp + 1000,
       );
 
       const fetchedConsent = await dataAdapter.findConsentById(
-        createdConsent.id
+        createdConsent.id,
       );
       expect(fetchedConsent).not.toBeNull();
       expect(fetchedConsent).toEqual(createdConsent);
     });
 
-    it("should throw error if database is not initialized (difficult to test reliably after beforeAll)", () => {
+    it('should throw error if database is not initialized (difficult to test reliably after beforeAll)', () => {
       expect(true).toBe(true);
     });
   });
 
-  describe("updateConsentStatus", () => {
+  describe('updateConsentStatus', () => {
     let existingConsent: ConsentRecord;
     const initialDate = new Date(2024, 0, 1, 12, 0, 0);
 
     beforeEach(async () => {
-      const consentData: Omit<ConsentRecord, "id" | "createdAt" | "updatedAt"> =
+      const consentData: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt'> =
         {
-          subjectId: "subjectUpdate",
-          policyId: "policyUpdate",
-          status: "granted",
+          subjectId: 'subjectUpdate',
+          policyId: 'policyUpdate',
+          status: 'granted',
           version: 1,
           consentedAt: initialDate,
-          consenter: { type: "self", userId: "userUpdate" },
+          consenter: { type: 'self', userId: 'userUpdate' },
           grantedScopes: { read: { grantedAt: initialDate } },
-          metadata: { consentMethod: "digital_form" as const },
+          metadata: { consentMethod: 'digital_form' as const },
         };
       existingConsent = await dataAdapter.createConsent(consentData);
       expect(existingConsent.createdAt).toBeInstanceOf(Date);
       expect(existingConsent.updatedAt).toBeInstanceOf(Date);
       expect(existingConsent.createdAt.getTime()).toEqual(
-        existingConsent.updatedAt.getTime()
+        existingConsent.updatedAt.getTime(),
       );
     });
 
     it("should update a consent record's status and updatedAt", async () => {
-      const newStatus = "revoked";
+      const newStatus = 'revoked';
 
       await new Promise((resolve) => setTimeout(resolve, 50));
       const beforeUpdateTimestamp = Date.now();
@@ -187,7 +187,7 @@ describe("IndexedDBDataAdapter - Consent Methods", () => {
       const updatedConsent = await dataAdapter.updateConsentStatus(
         existingConsent.id,
         newStatus,
-        existingConsent.version
+        existingConsent.version,
       );
       const afterUpdateTimestamp = Date.now();
 
@@ -195,58 +195,58 @@ describe("IndexedDBDataAdapter - Consent Methods", () => {
       expect(updatedConsent.status).toBe(newStatus);
       expect(updatedConsent.version).toBe(existingConsent.version);
       expect(updatedConsent.createdAt.getTime()).toEqual(
-        existingConsent.createdAt.getTime()
+        existingConsent.createdAt.getTime(),
       );
 
       expect(updatedConsent.updatedAt).toBeInstanceOf(Date);
       expect(updatedConsent.updatedAt.getTime()).toBeGreaterThan(
-        existingConsent.updatedAt.getTime()
+        existingConsent.updatedAt.getTime(),
       );
       expect(updatedConsent.updatedAt.getTime()).toBeGreaterThanOrEqual(
-        beforeUpdateTimestamp - 1000
+        beforeUpdateTimestamp - 1000,
       );
       expect(updatedConsent.updatedAt.getTime()).toBeLessThanOrEqual(
-        afterUpdateTimestamp + 1000
+        afterUpdateTimestamp + 1000,
       );
 
       const fetchedConsent = await dataAdapter.findConsentById(
-        existingConsent.id
+        existingConsent.id,
       );
       expect(fetchedConsent).toEqual(updatedConsent);
     });
 
-    it("should throw error when consent is not found for status update", async () => {
-      const nonExistentId = "nonexistent-id";
+    it('should throw error when consent is not found for status update', async () => {
+      const nonExistentId = 'nonexistent-id';
       await expect(
-        dataAdapter.updateConsentStatus(nonExistentId, "revoked", 1)
+        dataAdapter.updateConsentStatus(nonExistentId, 'revoked', 1),
       ).rejects.toThrow(`Consent record with id ${nonExistentId} not found`);
     });
 
-    it("should throw error on version mismatch during status update", async () => {
+    it('should throw error on version mismatch during status update', async () => {
       const incorrectVersion = existingConsent.version + 1;
       await expect(
         dataAdapter.updateConsentStatus(
           existingConsent.id,
-          "revoked",
-          incorrectVersion
-        )
+          'revoked',
+          incorrectVersion,
+        ),
       ).rejects.toThrow(
-        `Optimistic concurrency check failed for consent record ${existingConsent.id}. Expected version ${incorrectVersion}, found ${existingConsent.version}.`
+        `Optimistic concurrency check failed for consent record ${existingConsent.id}. Expected version ${incorrectVersion}, found ${existingConsent.version}.`,
       );
     });
   });
 
-  describe("findConsentById", () => {
-    it("should return consent record when found", async () => {
-      const inputData: Omit<ConsentRecord, "id" | "createdAt" | "updatedAt"> = {
-        subjectId: "subjectFind",
-        policyId: "policyFind",
-        status: "granted",
+  describe('findConsentById', () => {
+    it('should return consent record when found', async () => {
+      const inputData: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt'> = {
+        subjectId: 'subjectFind',
+        policyId: 'policyFind',
+        status: 'granted',
         version: 1,
         consentedAt: new Date(),
-        consenter: { type: "self", userId: "userFind" },
+        consenter: { type: 'self', userId: 'userFind' },
         grantedScopes: { findScope: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       const createdConsent = await dataAdapter.createConsent(inputData);
 
@@ -255,65 +255,65 @@ describe("IndexedDBDataAdapter - Consent Methods", () => {
       expect(result).toEqual(createdConsent);
     });
 
-    it("should return null when consent is not found", async () => {
+    it('should return null when consent is not found', async () => {
       const result = await dataAdapter.findConsentById(
-        "nonexistent-id-for-find"
+        'nonexistent-id-for-find',
       );
       expect(result).toBeNull();
     });
   });
 
-  describe("findConsentsBySubject", () => {
-    const targetSubjectId = "subjectWithMultipleConsents";
-    const otherSubjectId = "subjectWithOtherConsents";
+  describe('findConsentsBySubject', () => {
+    const targetSubjectId = 'subjectWithMultipleConsents';
+    const otherSubjectId = 'subjectWithOtherConsents';
     let consent1: ConsentRecord, consent2: ConsentRecord;
 
     beforeEach(async () => {
       const consent1Data: Omit<
         ConsentRecord,
-        "id" | "createdAt" | "updatedAt"
+        'id' | 'createdAt' | 'updatedAt'
       > = {
         subjectId: targetSubjectId,
-        policyId: "pSub1",
-        status: "granted",
+        policyId: 'pSub1',
+        status: 'granted',
         version: 1,
         consentedAt: new Date(),
-        consenter: { type: "self", userId: targetSubjectId },
+        consenter: { type: 'self', userId: targetSubjectId },
         grantedScopes: { s1: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       const consent2Data: Omit<
         ConsentRecord,
-        "id" | "createdAt" | "updatedAt"
+        'id' | 'createdAt' | 'updatedAt'
       > = {
         subjectId: targetSubjectId,
-        policyId: "pSub2",
-        status: "revoked",
+        policyId: 'pSub2',
+        status: 'revoked',
         version: 2,
         consentedAt: new Date(),
-        consenter: { type: "self", userId: targetSubjectId },
+        consenter: { type: 'self', userId: targetSubjectId },
         grantedScopes: { s2: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       const otherConsentData: Omit<
         ConsentRecord,
-        "id" | "createdAt" | "updatedAt"
+        'id' | 'createdAt' | 'updatedAt'
       > = {
         subjectId: otherSubjectId,
-        policyId: "pOther1",
-        status: "granted",
+        policyId: 'pOther1',
+        status: 'granted',
         version: 1,
         consentedAt: new Date(),
-        consenter: { type: "self", userId: otherSubjectId },
+        consenter: { type: 'self', userId: otherSubjectId },
         grantedScopes: { s3: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       consent1 = await dataAdapter.createConsent(consent1Data);
       consent2 = await dataAdapter.createConsent(consent2Data);
       await dataAdapter.createConsent(otherConsentData);
     });
 
-    it("should return all consents for a given subjectId, sorted by version", async () => {
+    it('should return all consents for a given subjectId, sorted by version', async () => {
       const results = await dataAdapter.findConsentsBySubject(targetSubjectId);
       expect(results).not.toBeNull();
       expect(results.length).toBe(2);
@@ -324,123 +324,123 @@ describe("IndexedDBDataAdapter - Consent Methods", () => {
       });
     });
 
-    it("should return an empty array if no consents exist for the subjectId", async () => {
+    it('should return an empty array if no consents exist for the subjectId', async () => {
       const results =
-        await dataAdapter.findConsentsBySubject("nonExistentSubject");
+        await dataAdapter.findConsentsBySubject('nonExistentSubject');
       expect(results).toEqual([]);
     });
   });
 
-  describe("getAllConsents", () => {
+  describe('getAllConsents', () => {
     let consentAll1: ConsentRecord, consentAll2: ConsentRecord;
 
     beforeEach(async () => {
       const consentAll1Data: Omit<
         ConsentRecord,
-        "id" | "createdAt" | "updatedAt"
+        'id' | 'createdAt' | 'updatedAt'
       > = {
         subjectId: `getAllSubject1-${Date.now()}`,
-        policyId: "pAll1",
-        status: "granted",
+        policyId: 'pAll1',
+        status: 'granted',
         version: 1,
         consentedAt: new Date(),
-        consenter: { type: "self", userId: "uAll1" },
+        consenter: { type: 'self', userId: 'uAll1' },
         grantedScopes: { all1: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       const consentAll2Data: Omit<
         ConsentRecord,
-        "id" | "createdAt" | "updatedAt"
+        'id' | 'createdAt' | 'updatedAt'
       > = {
         subjectId: `getAllSubject2-${Date.now()}`,
-        policyId: "pAll2",
-        status: "revoked",
+        policyId: 'pAll2',
+        status: 'revoked',
         version: 1,
         consentedAt: new Date(),
         consenter: {
-          type: "proxy",
-          userId: "gAll2",
+          type: 'proxy',
+          userId: 'gAll2',
           proxyDetails: {
-            relationship: "parent",
-            subjectAgeGroup: "13-17" as const,
+            relationship: 'parent',
+            subjectAgeGroup: '13-17' as const,
           },
         },
         grantedScopes: { all2: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       consentAll1 = await dataAdapter.createConsent(consentAll1Data);
       consentAll2 = await dataAdapter.createConsent(consentAll2Data);
     });
 
-    it("should return all consents", async () => {
+    it('should return all consents', async () => {
       const allConsents = await dataAdapter.getAllConsents();
       expect(allConsents).not.toBeNull();
       expect(allConsents.length).toBeGreaterThanOrEqual(2);
       expect(allConsents.find((c) => c.id === consentAll1.id)).toEqual(
-        consentAll1
+        consentAll1,
       );
       expect(allConsents.find((c) => c.id === consentAll2.id)).toEqual(
-        consentAll2
+        consentAll2,
       );
       allConsents.forEach((consent) => {
         expect(consent.id).toEqual(expect.any(String));
       });
     });
 
-    it("should return an empty array if no consents exist", async () => {
+    it('should return an empty array if no consents exist', async () => {
       await dataAdapter.clearStore(CONSENT_STORE_NAME);
       const allConsents = await dataAdapter.getAllConsents();
       expect(allConsents).toEqual([]);
     });
   });
 
-  describe("findAllConsentVersionsBySubjectAndPolicy", () => {
-    it("should find all versions of consents for a subject and policy, ordered by version ascending", async () => {
-      const subjectId = "subjectForAllVersions";
-      const policyId = "policyForAllVersions";
+  describe('findAllConsentVersionsBySubjectAndPolicy', () => {
+    it('should find all versions of consents for a subject and policy, ordered by version ascending', async () => {
+      const subjectId = 'subjectForAllVersions';
+      const policyId = 'policyForAllVersions';
       const commonData = {
         subjectId,
         policyId,
         consentedAt: new Date(),
-        consenter: { type: "self" as const, userId: "userForAllVersions" },
+        consenter: { type: 'self' as const, userId: 'userForAllVersions' },
         grantedScopes: { scopeA: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
 
       const consentV1 = await dataAdapter.createConsent({
         ...commonData,
-        status: "granted",
+        status: 'granted',
         version: 1,
       });
       const consentV3 = await dataAdapter.createConsent({
         ...commonData,
-        status: "revoked",
+        status: 'revoked',
         version: 3,
         revokedAt: new Date(),
       });
       const consentV2 = await dataAdapter.createConsent({
         ...commonData,
-        status: "granted",
+        status: 'granted',
         version: 2,
         grantedScopes: { scopeB: { grantedAt: new Date() } },
       });
       await dataAdapter.createConsent({
         ...commonData,
-        policyId: "otherPolicy",
-        status: "granted",
+        policyId: 'otherPolicy',
+        status: 'granted',
         version: 1,
       });
       await dataAdapter.createConsent({
         ...commonData,
-        subjectId: "otherSubject",
-        status: "granted",
+        subjectId: 'otherSubject',
+        status: 'granted',
         version: 1,
       });
 
       const results =
         await dataAdapter.findAllConsentVersionsBySubjectAndPolicy(
           subjectId,
-          policyId
+          policyId,
         );
 
       expect(results).toHaveLength(3);
@@ -450,94 +450,94 @@ describe("IndexedDBDataAdapter - Consent Methods", () => {
       expect(results[2]).toEqual(expect.objectContaining(consentV3));
     });
 
-    it("should return an empty array if no consents match", async () => {
+    it('should return an empty array if no consents match', async () => {
       const results =
         await dataAdapter.findAllConsentVersionsBySubjectAndPolicy(
-          "nonExistentSubject",
-          "nonExistentPolicy"
+          'nonExistentSubject',
+          'nonExistentPolicy',
         );
       expect(results).toHaveLength(0);
     });
   });
 
-  describe("findLatestConsentBySubjectAndPolicy", () => {
-    const subjectIdLatestTest = "subjectForLatestTests";
-    const policyIdLatestTest = "policyForLatestTests";
+  describe('findLatestConsentBySubjectAndPolicy', () => {
+    const subjectIdLatestTest = 'subjectForLatestTests';
+    const policyIdLatestTest = 'policyForLatestTests';
 
     const commonDataForLatest = {
       subjectId: subjectIdLatestTest,
       policyId: policyIdLatestTest,
       consentedAt: new Date(),
-      consenter: { type: "self" as const, userId: "userForLatestTests" },
+      consenter: { type: 'self' as const, userId: 'userForLatestTests' },
       grantedScopes: { data_processing: { grantedAt: new Date() } },
-      metadata: { consentMethod: "digital_form" as const },
+      metadata: { consentMethod: 'digital_form' as const },
     };
 
-    it("should find the latest version of consent for a subject and policy", async () => {
+    it('should find the latest version of consent for a subject and policy', async () => {
       await dataAdapter.createConsent({
         ...commonDataForLatest,
-        status: "granted",
+        status: 'granted',
         version: 1,
       });
       await dataAdapter.createConsent({
         ...commonDataForLatest,
-        status: "revoked",
+        status: 'revoked',
         version: 2,
         revokedAt: new Date(),
       });
       const v3LatestGranted = await dataAdapter.createConsent({
         ...commonDataForLatest,
-        status: "granted",
+        status: 'granted',
         version: 3,
         grantedScopes: { data_analysis: { grantedAt: new Date() } },
       });
       await dataAdapter.createConsent({
         ...commonDataForLatest,
-        policyId: "otherPolicyForLatest",
-        status: "granted",
+        policyId: 'otherPolicyForLatest',
+        status: 'granted',
         version: 4,
       });
 
       const latestConsent =
         await dataAdapter.findLatestConsentBySubjectAndPolicy(
           subjectIdLatestTest,
-          policyIdLatestTest
+          policyIdLatestTest,
         );
 
       expect(latestConsent).not.toBeNull();
       expect(latestConsent!.id).toBe(v3LatestGranted.id);
       expect(latestConsent!.version).toBe(3);
-      expect(latestConsent!.status).toBe("granted");
+      expect(latestConsent!.status).toBe('granted');
     });
 
-    it("should return null if no consent matches subject and policy", async () => {
+    it('should return null if no consent matches subject and policy', async () => {
       const latest = await dataAdapter.findLatestConsentBySubjectAndPolicy(
-        "noSubDefinitely",
-        "noPolDefinitely"
+        'noSubDefinitely',
+        'noPolDefinitely',
       );
       expect(latest).toBeNull();
     });
 
     it("should return the latest even if it's revoked (status is irrelevant for latest version)", async () => {
-      const subjectIdForRevokedTest = "subjectForRevokedLatest";
-      const policyIdForRevokedTest = "policyForRevokedLatest";
+      const subjectIdForRevokedTest = 'subjectForRevokedLatest';
+      const policyIdForRevokedTest = 'policyForRevokedLatest';
       const initialConsentedAt = new Date(2023, 0, 1);
 
       const v3Granted = await dataAdapter.createConsent({
         subjectId: subjectIdForRevokedTest,
         policyId: policyIdForRevokedTest,
         version: 3,
-        status: "granted",
+        status: 'granted',
         consentedAt: initialConsentedAt,
-        consenter: { type: "self", userId: subjectIdForRevokedTest },
+        consenter: { type: 'self', userId: subjectIdForRevokedTest },
         grantedScopes: { test_scope: { grantedAt: initialConsentedAt } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       });
 
       await dataAdapter.updateConsentStatus(
         v3Granted.id,
-        "revoked",
-        v3Granted.version
+        'revoked',
+        v3Granted.version,
       );
 
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -546,22 +546,22 @@ describe("IndexedDBDataAdapter - Consent Methods", () => {
         subjectId: subjectIdForRevokedTest,
         policyId: policyIdForRevokedTest,
         version: 4,
-        status: "revoked",
+        status: 'revoked',
         consentedAt: new Date(2023, 0, 4),
         revokedAt: new Date(),
-        consenter: { type: "self", userId: subjectIdForRevokedTest },
+        consenter: { type: 'self', userId: subjectIdForRevokedTest },
         grantedScopes: { test_scope: { grantedAt: new Date(2023, 0, 1) } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       });
 
       const latest = await dataAdapter.findLatestConsentBySubjectAndPolicy(
         subjectIdForRevokedTest,
-        policyIdForRevokedTest
+        policyIdForRevokedTest,
       );
       expect(latest).not.toBeNull();
       expect(latest!.id).toBe(v4LatestRevoked.id);
       expect(latest!.version).toBe(4);
-      expect(latest!.status).toBe("revoked");
+      expect(latest!.status).toBe('revoked');
     });
   });
 });

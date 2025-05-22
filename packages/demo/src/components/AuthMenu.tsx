@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
-import { Button, Persona } from "@fluentui/react-components";
-import { useAuth } from "../utils/useAuth.js";
-import { LoginForm } from "./LoginForm.js";
-import { UserMenu } from "./UserMenu.js";
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { Button, Persona } from '@fluentui/react-components';
+import { useAuth } from '../utils/useAuth.js';
+import { LoginForm } from './LoginForm.js';
+import { UserMenu } from './UserMenu.js';
 
 export function AuthMenu(): JSX.Element {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export function AuthMenu(): JSX.Element {
       await login(subjectId);
       setIsLoginModalOpen(false);
     } catch (error) {
-      console.error("Login submission via modal failed:", error);
+      console.error('Login submission via modal failed:', error);
       setIsLoginModalOpen(false);
       throw error;
     }
@@ -24,7 +24,7 @@ export function AuthMenu(): JSX.Element {
   const handlePerformLogout = () => {
     logout();
     setIsLoginModalOpen(false);
-    void navigate("/");
+    void navigate('/');
   };
 
   if (isLoading) {

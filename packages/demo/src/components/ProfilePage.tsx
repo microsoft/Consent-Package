@@ -1,25 +1,25 @@
-import { useEffect, useState } from "react";
-import { useOutletContext, useParams } from "react-router";
-import { Text, Card, makeStyles, Spinner } from "@fluentui/react-components";
-import { Profile } from "@open-source-consent/ui";
-import type { ProfileData } from "@open-source-consent/ui";
-import { fetchUserProfile } from "../utils/userManagement.js";
+import { useEffect, useState } from 'react';
+import { useOutletContext, useParams } from 'react-router';
+import { Text, Card, makeStyles, Spinner } from '@fluentui/react-components';
+import { Profile } from '@open-source-consent/ui';
+import type { ProfileData } from '@open-source-consent/ui';
+import { fetchUserProfile } from '../utils/userManagement.js';
 
 const useStyles = makeStyles({
   root: {
-    padding: "24px",
-    margin: "16px",
-    "@media (max-width: 768px)": {
-      padding: "24px",
+    padding: '24px',
+    margin: '16px',
+    '@media (max-width: 768px)': {
+      padding: '24px',
     },
   },
   centered: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100%",
-    padding: "24px",
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    padding: '24px',
   },
 });
 
@@ -33,14 +33,14 @@ export function ProfilePage(): JSX.Element {
   const { userId } = useParams<{ userId: string }>();
 
   const [profileToDisplay, setProfileToDisplay] = useState<ProfileData | null>(
-    null
+    null,
   );
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userId) {
-      setError("No user ID provided in the URL.");
+      setError('No user ID provided in the URL.');
       setIsLoadingProfile(false);
       return;
     }
@@ -53,12 +53,12 @@ export function ProfilePage(): JSX.Element {
         if (fetchedProfile) {
           setProfileToDisplay(fetchedProfile);
         } else {
-          setError("Profile not found.");
+          setError('Profile not found.');
         }
       } catch (err) {
-        console.error("Failed to fetch profile:", err);
+        console.error('Failed to fetch profile:', err);
         setError(
-          err instanceof Error ? err.message : "An unknown error occurred."
+          err instanceof Error ? err.message : 'An unknown error occurred.',
         );
       }
       setIsLoadingProfile(false);
@@ -69,19 +69,19 @@ export function ProfilePage(): JSX.Element {
 
   const handleProfileUpdate = (
     profileId: string,
-    updates: Partial<ProfileData>
+    updates: Partial<ProfileData>,
   ): void => {
-    console.info("Profile updated (mock):", { profileId, updates });
+    console.info('Profile updated (mock):', { profileId, updates });
   };
 
   const handleManagedSubjectSelect = (subjectId: string): void => {
-    console.info("Managed subject selected:", subjectId);
+    console.info('Managed subject selected:', subjectId);
   };
 
   if (isLoadingProfile) {
     return (
       <Card className={`${styles.root} ${styles.centered}`}>
-        <Spinner label={`Loading profile for ${userId || "user"}...`} />
+        <Spinner label={`Loading profile for ${userId || 'user'}...`} />
       </Card>
     );
   }
@@ -114,7 +114,7 @@ export function ProfilePage(): JSX.Element {
         profileData={profileToDisplay}
         isManagingSubjects={
           loggedInUser?.id === profileToDisplay.id &&
-          profileToDisplay.role?.id !== "self" &&
+          profileToDisplay.role?.id !== 'self' &&
           profileToDisplay.managedSubjects &&
           profileToDisplay.managedSubjects.length > 0
         }

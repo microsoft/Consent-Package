@@ -1,2 +1,2 @@
-export * from "./services/ConsentService.js";
-export * from "./services/PolicyService.js";
+export * from './services/ConsentService.js';
+export * from './services/PolicyService.js';

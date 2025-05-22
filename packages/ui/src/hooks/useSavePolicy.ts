@@ -1,13 +1,13 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 import type {
   Policy,
   CreatePolicyInput,
   NewPolicyVersionDataInput,
-} from "@open-source-consent/types";
+} from '@open-source-consent/types';
 
 interface SavePolicyResult {
   savePolicy(
-    policyData: CreatePolicyInput | NewPolicyVersionDataInput
+    policyData: CreatePolicyInput | NewPolicyVersionDataInput,
   ): Promise<Policy>;
 }
 
@@ -20,16 +20,16 @@ export default function useSavePolicy(): SavePolicyResult {
    */
   const savePolicy = useCallback(
     async (
-      policyData: CreatePolicyInput | NewPolicyVersionDataInput
+      policyData: CreatePolicyInput | NewPolicyVersionDataInput,
     ): Promise<Policy> => {
       try {
-        const endpoint = "/api/policies";
-        const method = "POST";
+        const endpoint = '/api/policies';
+        const method = 'POST';
 
         const response = await fetch(endpoint, {
           method: method,
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(policyData),
         });
@@ -37,17 +37,17 @@ export default function useSavePolicy(): SavePolicyResult {
         if (!response.ok) {
           const errorBody = await response.text();
           throw new Error(
-            `Failed to save policy: ${response.status} ${errorBody || response.statusText}`
+            `Failed to save policy: ${response.status} ${errorBody || response.statusText}`,
           );
         }
 
         return await response.json();
       } catch (err: any) {
-        console.error("Error saving policy:", err);
+        console.error('Error saving policy:', err);
         throw err;
       }
     },
-    []
+    [],
   );
 
   return {

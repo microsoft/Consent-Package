@@ -1,3 +1,3 @@
-import { useAuth } from "./AuthContext.js";
+import { useAuth } from './AuthContext.js';
 
 export { useAuth };

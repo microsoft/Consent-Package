@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Button,
   Table,
@@ -11,12 +11,12 @@ import {
   tokens,
   Tag,
   Text,
-} from "@fluentui/react-components";
-import type { Policy } from "@open-source-consent/types";
+} from '@fluentui/react-components';
+import type { Policy } from '@open-source-consent/types';
 
 const useStyles = makeStyles({
   actionsCell: {
-    display: "flex",
+    display: 'flex',
     gap: tokens.spacingHorizontalS,
   },
 });
@@ -35,7 +35,7 @@ const PolicyTable: React.FC<PolicyTableProps> = ({
   const styles = useStyles();
 
   const formatDate = (date: Date | string | undefined): string => {
-    if (!date) return "N/A";
+    if (!date) return 'N/A';
     return date instanceof Date
       ? date.toLocaleDateString()
       : new Date(date).toLocaleDateString();
@@ -79,7 +79,7 @@ const PolicyTable: React.FC<PolicyTableProps> = ({
               >
                 View
               </Button>
-              {policy.status === "active" && (
+              {policy.status === 'active' && (
                 <Button
                   appearance="primary"
                   size="small"

@@ -1,11 +1,11 @@
-import React from "react";
-import { useParams, Link } from "react-router";
+import React from 'react';
+import { useParams, Link } from 'react-router';
 import {
   usePolicyDetails,
   PolicyMetadataDisplay,
   PolicySectionDisplay,
   PolicyScopeDisplay,
-} from "@open-source-consent/ui";
+} from '@open-source-consent/ui';
 import {
   makeStyles,
   shorthands,
@@ -14,28 +14,28 @@ import {
   Button,
   Spinner,
   Text,
-} from "@fluentui/react-components";
-import type { PolicyContentSection } from "@open-source-consent/types";
+} from '@fluentui/react-components';
+import type { PolicyContentSection } from '@open-source-consent/types';
 
 const useStyles = makeStyles({
   root: {
-    padding: "24px 64px",
-    margin: "0 auto",
-    maxWidth: "900px",
-    "@media (max-width: 768px)": {
-      padding: "24px",
+    padding: '24px 64px',
+    margin: '0 auto',
+    maxWidth: '900px',
+    '@media (max-width: 768px)': {
+      padding: '24px',
     },
   },
   card: {
-    ...shorthands.padding("32px"),
+    ...shorthands.padding('32px'),
     boxShadow: tokens.shadow8,
     borderRadius: tokens.borderRadiusLarge,
     backgroundColor: tokens.colorNeutralBackground1,
   },
   headerContainer: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: tokens.spacingVerticalXXL,
     paddingBottom: tokens.spacingVerticalL,
     borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
@@ -45,14 +45,14 @@ const useStyles = makeStyles({
     color: tokens.colorNeutralForeground1,
   },
   loading: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "400px",
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '400px',
   },
   backButtonContainer: {
-    display: "flex",
-    justifyContent: "center",
+    display: 'flex',
+    justifyContent: 'center',
     marginTop: tokens.spacingVerticalXXL,
   },
 });
@@ -77,7 +77,7 @@ const PolicyViewPage: React.FC = () => {
       <div className={styles.root}>
         <Card className={styles.card}>
           <Text size={500} weight="semibold">
-            {error || "Policy not found."}
+            {error || 'Policy not found.'}
           </Text>
           <br />
           <Link to="/policies">
@@ -98,7 +98,7 @@ const PolicyViewPage: React.FC = () => {
       <Card className={styles.card}>
         <div className={styles.headerContainer}>
           <Text as="h1" size={800} weight="semibold" className={styles.title}>
-            {policy.title || "Policy Details"}
+            {policy.title || 'Policy Details'}
           </Text>
           <Link to={`/policy/edit/${policy.id}`}>
             <Button appearance="primary">Edit Policy</Button>
@@ -110,7 +110,7 @@ const PolicyViewPage: React.FC = () => {
         {policy.contentSections.map(
           (section: PolicyContentSection, index: number) => (
             <PolicySectionDisplay key={index} section={section} />
-          )
+          ),
         )}
 
         {policy.availableScopes && policy.availableScopes.length > 0 && (

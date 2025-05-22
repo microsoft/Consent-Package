@@ -1,23 +1,23 @@
-import { app } from "@azure/functions";
+import { app } from '@azure/functions';
 import type {
   HttpRequest,
   HttpResponseInit,
   InvocationContext,
-} from "@azure/functions";
-import type { ConsentService } from "@open-source-consent/core";
-import type { CreateConsentInput } from "@open-source-consent/types";
-import { createHttpHandler } from "../shared/httpHandler.js";
+} from '@azure/functions';
+import type { ConsentService } from '@open-source-consent/core';
+import type { CreateConsentInput } from '@open-source-consent/types';
+import { createHttpHandler } from '../shared/httpHandler.js';
 import {
   handleError,
   type ErrorHandlingOptions,
-} from "../shared/errorHandler.js";
-import { createConsentService } from "../shared/factories.js";
+} from '../shared/errorHandler.js';
+import { createConsentService } from '../shared/factories.js';
 
 async function executeCreateConsentLogic(
   request: HttpRequest,
   context: InvocationContext,
   consentService: ConsentService,
-  endpointDefaultMessage?: string
+  endpointDefaultMessage?: string,
 ): Promise<HttpResponseInit> {
   try {
     const body = (await request.json()) as CreateConsentInput;
@@ -30,22 +30,22 @@ async function executeCreateConsentLogic(
       defaultMessage: endpointDefaultMessage,
       customErrorMap: [
         {
-          check: (err) => err.message.includes("modified"),
+          check: (err) => err.message.includes('modified'),
           status: 409,
-          message: "",
+          message: '',
           useActualErrorMessage: true,
         },
       ],
     };
-    return handleError(context, error, "Error creating consent:", errorOptions);
+    return handleError(context, error, 'Error creating consent:', errorOptions);
   }
 }
 
-app.http("createConsent", {
-  methods: ["POST"],
-  authLevel: "anonymous",
-  route: "consent",
+app.http('createConsent', {
+  methods: ['POST'],
+  authLevel: 'anonymous',
+  route: 'consent',
   handler: createHttpHandler(createConsentService, executeCreateConsentLogic, {
-    defaultMessage: "An error occurred while creating the consent.",
+    defaultMessage: 'An error occurred while creating the consent.',
   }),
 });

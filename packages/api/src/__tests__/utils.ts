@@ -1,4 +1,4 @@
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
 export interface MockRequest {
   url?: string;
@@ -20,9 +20,9 @@ export const createMockContext = (): MockContext => ({
 export const setupMockDataAdapter = (mockData?: any) => {
   const getAllConsents = vi.fn().mockResolvedValue(
     mockData || [
-      { id: "test-consent-1", status: "granted" },
-      { id: "test-consent-2", status: "revoked" },
-    ]
+      { id: 'test-consent-1', status: 'granted' },
+      { id: 'test-consent-2', status: 'revoked' },
+    ],
   );
 
   const dataAdapter = {
@@ -38,42 +38,42 @@ export const setupMockConsentService = (mockImplementation?: any) => {
   const defaultImplementation = {
     grantConsent: vi
       .fn()
-      .mockResolvedValue({ id: "new-consent-id", status: "granted" }),
+      .mockResolvedValue({ id: 'new-consent-id', status: 'granted' }),
     getConsentDetails: vi.fn().mockImplementation((id) => {
-      if (id === "test-consent-id") {
-        return Promise.resolve({ id: "test-consent-id", status: "granted" });
+      if (id === 'test-consent-id') {
+        return Promise.resolve({ id: 'test-consent-id', status: 'granted' });
       }
-      if (id === "not-found") {
+      if (id === 'not-found') {
         return Promise.resolve(null);
       }
-      if (id === "error-id") {
-        return Promise.reject(new Error("Failed to retrieve consent"));
+      if (id === 'error-id') {
+        return Promise.reject(new Error('Failed to retrieve consent'));
       }
-      return Promise.resolve({ id, status: "granted" });
+      return Promise.resolve({ id, status: 'granted' });
     }),
     getLatestConsentVersionsForSubject: vi
       .fn()
       .mockImplementation((subjectId) => {
-        if (subjectId === "test-subject-id") {
+        if (subjectId === 'test-subject-id') {
           return Promise.resolve([
             {
-              id: "active-consent-1",
-              status: "granted",
-              subjectId: "test-subject-id",
+              id: 'active-consent-1',
+              status: 'granted',
+              subjectId: 'test-subject-id',
             },
             {
-              id: "active-consent-2",
-              status: "granted",
-              subjectId: "test-subject-id",
+              id: 'active-consent-2',
+              status: 'granted',
+              subjectId: 'test-subject-id',
             },
           ]);
         }
-        if (subjectId === "empty-subject") {
+        if (subjectId === 'empty-subject') {
           return Promise.resolve([]);
         }
-        if (subjectId === "error-subject") {
+        if (subjectId === 'error-subject') {
           return Promise.reject(
-            new Error("Failed to retrieve active consents")
+            new Error('Failed to retrieve active consents'),
           );
         }
         return Promise.resolve([]);
@@ -93,70 +93,70 @@ export const setupMockConsentService = (mockImplementation?: any) => {
 export const setupMockPolicyService = (mockImplementation?: any) => {
   const defaultImplementation = {
     createPolicy: vi.fn().mockResolvedValue({
-      id: "mock-policy-id",
-      status: "draft",
+      id: 'mock-policy-id',
+      status: 'draft',
       version: 1,
-      policyGroupId: "mock-group",
+      policyGroupId: 'mock-group',
     }),
     getPolicyById: vi.fn().mockImplementation((id: string) => {
-      if (id === "found-policy-id") {
+      if (id === 'found-policy-id') {
         return Promise.resolve({
           id,
-          status: "active",
+          status: 'active',
           version: 1,
-          policyGroupId: "mock-group",
+          policyGroupId: 'mock-group',
         });
       }
-      if (id === "not-found-policy-id") {
+      if (id === 'not-found-policy-id') {
         return Promise.resolve(null);
       }
-      if (id === "error-policy-id") {
-        return Promise.reject(new Error("Failed to retrieve policy"));
+      if (id === 'error-policy-id') {
+        return Promise.reject(new Error('Failed to retrieve policy'));
       }
       return Promise.resolve({
         id,
-        status: "draft",
+        status: 'draft',
         version: 1,
-        policyGroupId: "mock-group",
+        policyGroupId: 'mock-group',
       });
     }),
     getAllPolicyVersionsByGroupId: vi
       .fn()
       .mockImplementation((policyGroupId: string) => {
-        if (policyGroupId === "error-group-id") {
-          return Promise.reject(new Error("Failed to retrieve versions"));
+        if (policyGroupId === 'error-group-id') {
+          return Promise.reject(new Error('Failed to retrieve versions'));
         }
         return Promise.resolve([
-          { id: "version-1", policyGroupId, version: 1, status: "archived" },
-          { id: "version-2", policyGroupId, version: 2, status: "active" },
+          { id: 'version-1', policyGroupId, version: 1, status: 'archived' },
+          { id: 'version-2', policyGroupId, version: 2, status: 'active' },
         ]);
       }),
     getLatestActivePolicyByGroupId: vi
       .fn()
       .mockImplementation((policyGroupId: string) => {
-        if (policyGroupId === "no-active-policy-group") {
+        if (policyGroupId === 'no-active-policy-group') {
           return Promise.resolve(null);
         }
-        if (policyGroupId === "error-finding-latest-group") {
+        if (policyGroupId === 'error-finding-latest-group') {
           return Promise.reject(
-            new Error("Failed to find latest active policy")
+            new Error('Failed to find latest active policy'),
           );
         }
         return Promise.resolve({
-          id: "latest-active-id",
+          id: 'latest-active-id',
           policyGroupId,
-          status: "active",
+          status: 'active',
           version: 2,
         });
       }),
     listPolicies: vi.fn().mockResolvedValue([
       {
-        id: "policy-A",
-        status: "active",
+        id: 'policy-A',
+        status: 'active',
         version: 1,
-        policyGroupId: "group-A",
+        policyGroupId: 'group-A',
       },
-      { id: "policy-B", status: "draft", version: 2, policyGroupId: "group-B" },
+      { id: 'policy-B', status: 'draft', version: 2, policyGroupId: 'group-B' },
     ]),
     ...mockImplementation,
   };
@@ -185,7 +185,7 @@ export const setupMockAzureFunctions = () => {
 };
 
 export const initializeTestEnvironment = async (
-  functionModulePaths: string[]
+  functionModulePaths: string[],
 ): Promise<{
   registeredHandlers: Record<string, Function>;
   dataAdapter: any;
@@ -203,12 +203,12 @@ export const initializeTestEnvironment = async (
     defaultImplementation: policyServiceMocks,
   } = setupMockPolicyService();
 
-  vi.mocked(await import("@azure/functions")).app.http = httpMock;
+  vi.mocked(await import('@azure/functions')).app.http = httpMock;
   vi.mocked(
-    await import("../shared/dataAdapter.js")
+    await import('../shared/dataAdapter.js'),
   ).getInitializedDataAdapter = getInitializedDataAdapter;
 
-  vi.doMock("@open-source-consent/core", () => ({
+  vi.doMock('@open-source-consent/core', () => ({
     ConsentService: MockConsentService,
     PolicyService: MockPolicyService,
   }));
@@ -234,6 +234,6 @@ export const handleDatabaseError = (error: unknown) => {
   }
   return {
     status: 500,
-    jsonBody: { error: "Unknown error occurred" },
+    jsonBody: { error: 'Unknown error occurred' },
   };
 };

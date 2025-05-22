@@ -1,12 +1,12 @@
-import { PolicyService } from "@open-source-consent/core";
-import { getInitializedDataAdapter } from "../shared/dataAdapter.js";
+import { PolicyService } from '@open-source-consent/core';
+import { getInitializedDataAdapter } from '../shared/dataAdapter.js';
 import type {
   CreatePolicyInput,
   Policy,
   IPolicyDataAdapter,
-} from "@open-source-consent/types";
-import sanitizeHtml from "sanitize-html";
-import { defaultCorePolicyJson } from "./data/defaultPolicy.js";
+} from '@open-source-consent/types';
+import sanitizeHtml from 'sanitize-html';
+import { defaultCorePolicyJson } from './data/defaultPolicy.js';
 
 let policyServiceInstance: PolicyService | null = null;
 
@@ -14,7 +14,7 @@ async function getPolicyService(): Promise<PolicyService> {
   if (!policyServiceInstance) {
     const dataAdapter = await getInitializedDataAdapter();
     policyServiceInstance = PolicyService.getInstance(
-      dataAdapter as IPolicyDataAdapter
+      dataAdapter as IPolicyDataAdapter,
     );
   }
   return policyServiceInstance;
@@ -30,7 +30,7 @@ async function ensureDefaultPolicySeeded(): Promise<void> {
     const policyService = await getPolicyService();
     const existingPolicyForGroup =
       await policyService.getLatestActivePolicyByGroupId(
-        defaultCorePolicyJson.policyGroupId
+        defaultCorePolicyJson.policyGroupId,
       );
 
     if (!existingPolicyForGroup) {
@@ -55,12 +55,12 @@ async function ensureDefaultPolicySeeded(): Promise<void> {
       await policyService.createPolicy(policyToSeed);
     }
   } catch (error) {
-    console.error("[Mock API] Error seeding default policy:", error);
+    console.error('[Mock API] Error seeding default policy:', error);
   }
 }
 
 export async function createPolicy(
-  policyData: CreatePolicyInput
+  policyData: CreatePolicyInput,
 ): Promise<Policy> {
   await ensureDefaultPolicySeeded();
   const policyService = await getPolicyService();
@@ -72,7 +72,7 @@ export async function createPolicy(
     !policyData.contentSections ||
     !policyData.availableScopes
   ) {
-    throw new Error("Missing required fields for policy creation.");
+    throw new Error('Missing required fields for policy creation.');
   }
 
   // Sanitize HTML content before passing to the service
@@ -90,29 +90,29 @@ export async function getPolicyById(policyId: string): Promise<Policy | null> {
   await ensureDefaultPolicySeeded();
   const policyService = await getPolicyService();
   if (!policyId) {
-    throw new Error("Policy ID is required.");
+    throw new Error('Policy ID is required.');
   }
   return policyService.getPolicyById(policyId);
 }
 
 export async function getLatestActivePolicyByGroupId(
-  policyGroupId: string
+  policyGroupId: string,
 ): Promise<Policy | null> {
   await ensureDefaultPolicySeeded();
   const policyService = await getPolicyService();
   if (!policyGroupId) {
-    throw new Error("Policy Group ID is required.");
+    throw new Error('Policy Group ID is required.');
   }
   return policyService.getLatestActivePolicyByGroupId(policyGroupId);
 }
 
 export async function getAllPolicyVersionsByGroupId(
-  policyGroupId: string
+  policyGroupId: string,
 ): Promise<Policy[]> {
   await ensureDefaultPolicySeeded();
   const policyService = await getPolicyService();
   if (!policyGroupId) {
-    throw new Error("Policy Group ID is required.");
+    throw new Error('Policy Group ID is required.');
   }
   return policyService.getAllPolicyVersionsByGroupId(policyGroupId);
 }

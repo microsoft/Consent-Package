@@ -3,7 +3,10 @@ import { tokens, Button } from '@fluentui/react-components';
 import './index.css';
 
 interface DrawingPadProps {
-  onSignatureSubmit(signature: string /* 'data:image/png;base64,<b64_string>' */, date: Date): void;
+  onSignatureSubmit(
+    signature: string /* 'data:image/png;base64,<b64_string>' */,
+    date: Date,
+  ): void;
   canvasHeight: number;
 }
 
@@ -22,9 +25,19 @@ const DrawingPad: React.FC<DrawingPadProps> = ({
     setSignatureDate(signatureDate);
 
     if (drawnSignature) onSignatureSubmit(drawnSignature, signatureDate);
-  }
+  };
 
-  const drawToCanvas = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>): ([canvasContext: CanvasRenderingContext2D, xPosition: number, yPosition: number] | undefined) => {
+  const drawToCanvas = (
+    e:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ):
+    | [
+        canvasContext: CanvasRenderingContext2D,
+        xPosition: number,
+        yPosition: number,
+      ]
+    | undefined => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -32,17 +45,19 @@ const DrawingPad: React.FC<DrawingPadProps> = ({
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = 'touches' in e
-      ? e.touches[0].clientX - rect.left
-      : e.clientX - rect.left;
-    const y = 'touches' in e
-      ? e.touches[0].clientY - rect.top
-      : e.clientY - rect.top;
+    const x =
+      'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+    const y =
+      'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
 
-    return [ctx, x, y]
-  }
+    return [ctx, x, y];
+  };
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>): void => {
+  const startDrawing = (
+    e:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ): void => {
     // If user needs to continue signing after submitting
     setSignatureDate(null);
 
@@ -55,7 +70,11 @@ const DrawingPad: React.FC<DrawingPadProps> = ({
     }
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>): void => {
+  const draw = (
+    e:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ): void => {
     if (!isDrawing) return;
 
     const canvasPoint = drawToCanvas(e);
@@ -141,9 +160,11 @@ const DrawingPad: React.FC<DrawingPadProps> = ({
         onTouchEnd={stopDrawing}
         height={canvasHeight}
       />
-      {drawnSignature && signatureDate ? <div className="signature-capture-container">
-        <span>Date signed: {signatureDate?.toLocaleDateString()}</span>
-      </div> : null}
+      {drawnSignature && signatureDate ? (
+        <div className="signature-capture-container">
+          <span>Date signed: {signatureDate?.toLocaleDateString()}</span>
+        </div>
+      ) : null}
       <div className="signature-controls">
         <Button onClick={clearCanvas}>Clear</Button>
         <Button

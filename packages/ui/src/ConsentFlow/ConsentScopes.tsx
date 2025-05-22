@@ -1,4 +1,4 @@
-import { useState, useEffect, type ChangeEvent } from "react";
+import { useState, useEffect, type ChangeEvent } from 'react';
 import {
   makeStyles,
   Text,
@@ -6,9 +6,9 @@ import {
   Checkbox,
   tokens,
   Button,
-} from "@fluentui/react-components";
-import type { ConsentFlowFormData } from "./ConsentFlow.type.js";
-import type { PolicyScope } from "@open-source-consent/types";
+} from '@fluentui/react-components';
+import type { ConsentFlowFormData } from './ConsentFlow.type.js';
+import type { PolicyScope } from '@open-source-consent/types';
 
 interface ConsentScopesProps {
   formData: ConsentFlowFormData;
@@ -18,65 +18,65 @@ interface ConsentScopesProps {
 
 const useStyles = makeStyles({
   root: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "24px",
-    marginBottom: "32px",
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '24px',
+    marginBottom: '32px',
   },
   scope: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-    padding: "8px",
-    cursor: "pointer",
-    "&:hover": {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    padding: '8px',
+    cursor: 'pointer',
+    '&:hover': {
       backgroundColor: tokens.colorNeutralBackground2,
     },
   },
   subjectSection: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "16px",
-    marginTop: "24px",
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    marginTop: '24px',
   },
   subjectPanel: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "16px",
-    padding: "16px",
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    padding: '16px',
     border: `1px solid ${tokens.colorNeutralStroke1}`,
     borderRadius: tokens.borderRadiusMedium,
     backgroundColor: tokens.colorNeutralBackground1,
   },
   subjectHeader: {
-    paddingBottom: "8px",
+    paddingBottom: '8px',
     borderBottom: `1px solid ${tokens.colorNeutralStroke1}`,
   },
   navigationButtons: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginTop: "16px",
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: '16px',
   },
   slideIndicator: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "8px",
-    marginTop: "8px",
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '8px',
+    marginTop: '8px',
   },
   slideDot: {
-    width: "10px",
-    height: "10px",
-    borderRadius: "50%",
+    width: '10px',
+    height: '10px',
+    borderRadius: '50%',
     backgroundColor: tokens.colorNeutralStroke1,
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-    "&:hover": {
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    '&:hover': {
       backgroundColor: tokens.colorNeutralStroke2,
     },
   },
   activeSlideDot: {
     backgroundColor: tokens.colorBrandBackground,
-    transform: "scale(1.2)",
+    transform: 'scale(1.2)',
     boxShadow: `0 0 0 2px ${tokens.colorBrandBackground}`,
   },
 });
@@ -116,7 +116,7 @@ const ConsentScopes = ({
   const handleScopeChange = (
     scopeId: string,
     isChecked: boolean,
-    subjectIndex?: number
+    subjectIndex?: number,
   ): void => {
     onChange(scopeId, isChecked, subjectIndex);
   };
@@ -140,12 +140,12 @@ const ConsentScopes = ({
   const scopeCheckbox = (
     scope: PolicyScope,
     subjectScopes?: string[],
-    subjectIndex?: number
+    subjectIndex?: number,
   ): JSX.Element => {
     return (
       <>
         <Checkbox
-          label={`${scope.name}${scope.required ? " (Mandatory)" : ""}`}
+          label={`${scope.name}${scope.required ? ' (Mandatory)' : ''}`}
           checked={
             scope.required || (subjectScopes?.includes(scope.key) ?? false)
           }
@@ -164,8 +164,8 @@ const ConsentScopes = ({
       <Title2 align="center">Select Data Access Permissions</Title2>
       <Text align="center">
         {requiredScopes.length > 0
-          ? "Select additional data you wish to authorize for use with this service. Mandatory permissions cannot be modified."
-          : "Select the data you wish to authorize for use with this service. At least one permission must be enabled to proceed."}
+          ? 'Select additional data you wish to authorize for use with this service. Mandatory permissions cannot be modified.'
+          : 'Select the data you wish to authorize for use with this service. At least one permission must be enabled to proceed.'}
       </Text>
 
       {!isProxy &&
@@ -193,7 +193,7 @@ const ConsentScopes = ({
                   {scopeCheckbox(
                     scope,
                     currentSubjectGrantedScopes,
-                    currentSlide
+                    currentSlide,
                   )}
                 </div>
               );
@@ -221,7 +221,7 @@ const ConsentScopes = ({
             {managedSubjects.map((_, index) => (
               <div
                 key={index}
-                className={`${styles.slideDot} ${index === currentSlide ? styles.activeSlideDot : ""}`}
+                className={`${styles.slideDot} ${index === currentSlide ? styles.activeSlideDot : ''}`}
                 onClick={() => handleSlideClick(index)}
               />
             ))}

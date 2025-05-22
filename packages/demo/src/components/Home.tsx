@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from 'react-router';
 import {
   makeStyles,
   tokens,
@@ -6,98 +6,98 @@ import {
   Title1,
   Button,
   Title2,
-} from "@fluentui/react-components";
+} from '@fluentui/react-components';
 import {
   ShieldLockRegular,
   DataTrendingRegular,
   CodeRegular,
-} from "@fluentui/react-icons";
-import { useAuth } from "../utils/useAuth.js";
+} from '@fluentui/react-icons';
+import { useAuth } from '../utils/useAuth.js';
 
 const useStyles = makeStyles({
   root: {
-    backgroundColor: "var(--color-background)",
-    display: "flex",
-    flexDirection: "column",
+    backgroundColor: 'var(--color-background)',
+    display: 'flex',
+    flexDirection: 'column',
   },
   hero: {
-    padding: "calc(var(--spacing-unit) * 12) calc(var(--spacing-unit) * 2)",
-    textAlign: "center",
+    padding: 'calc(var(--spacing-unit) * 12) calc(var(--spacing-unit) * 2)',
+    textAlign: 'center',
     background:
-      "linear-gradient(180deg, var(--color-background) 0%, var(--color-border) 100%)",
+      'linear-gradient(180deg, var(--color-background) 0%, var(--color-border) 100%)',
   },
   heroContent: {
-    display: "flex",
-    flexDirection: "column",
-    maxWidth: "800px",
-    margin: "0 auto",
+    display: 'flex',
+    flexDirection: 'column',
+    maxWidth: '800px',
+    margin: '0 auto',
   },
   title: {
     fontSize: tokens.fontSizeHero800,
     fontWeight: tokens.fontWeightBold,
-    color: "var(--color-text)",
-    marginBottom: "calc(var(--spacing-unit) * 3)",
+    color: 'var(--color-text)',
+    marginBottom: 'calc(var(--spacing-unit) * 3)',
     lineHeight: 1.2,
   },
   description: {
     fontSize: tokens.fontSizeBase500,
-    color: "var(--color-text-light)",
-    marginBottom: "calc(var(--spacing-unit) * 4)",
+    color: 'var(--color-text-light)',
+    marginBottom: 'calc(var(--spacing-unit) * 4)',
     lineHeight: 1.6,
   },
   features: {
-    padding: "calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 2)",
-    backgroundColor: "var(--color-background)",
+    padding: 'calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 2)',
+    backgroundColor: 'var(--color-background)',
   },
   featuresGrid: {
-    display: "grid",
-    maxWidth: "1200px",
-    margin: "0 auto",
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-    gap: "calc(var(--spacing-unit) * 4)",
+    display: 'grid',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+    gap: 'calc(var(--spacing-unit) * 4)',
   },
   featureCard: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    textAlign: "center",
-    padding: "calc(var(--spacing-unit) * 4)",
-    backgroundColor: "var(--color-background)",
-    borderRadius: "var(--border-radius)",
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+    padding: 'calc(var(--spacing-unit) * 4)',
+    backgroundColor: 'var(--color-background)',
+    borderRadius: 'var(--border-radius)',
     border: `var(--border-width) solid var(--color-border)`,
-    cursor: "pointer",
+    cursor: 'pointer',
     transition:
-      "transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease",
-    "&:hover": {
-      transform: "translateY(-4px)",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+      'transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease',
+    '&:hover': {
+      transform: 'translateY(-4px)',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
     },
-    boxShadow: "0 4px 24px 0 rgba(80, 80, 120, 0.1)",
-    gap: "calc(var(--spacing-unit) * 2)",
+    boxShadow: '0 4px 24px 0 rgba(80, 80, 120, 0.1)',
+    gap: 'calc(var(--spacing-unit) * 2)',
   },
   featureIcon: {
-    fontSize: "32px",
-    color: "var(--color-primary)",
+    fontSize: '32px',
+    color: 'var(--color-primary)',
   },
   featureTitle: {
     fontSize: tokens.fontSizeBase500,
     fontWeight: tokens.fontWeightSemibold,
-    color: "var(--color-text)",
-    marginBottom: "calc(var(--spacing-unit) * 2)",
+    color: 'var(--color-text)',
+    marginBottom: 'calc(var(--spacing-unit) * 2)',
   },
   featureDescription: {
     fontSize: tokens.fontSizeBase300,
-    color: "var(--color-text-light)",
+    color: 'var(--color-text-light)',
     lineHeight: 1.6,
   },
   ctaButton: {
-    padding: "calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4)",
-    borderRadius: "calc(var(--spacing-unit) * 3)",
+    padding: 'calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4)',
+    borderRadius: 'calc(var(--spacing-unit) * 3)',
     fontSize: tokens.fontSizeBase400,
     fontWeight: tokens.fontWeightSemibold,
-    transition: "all var(--transition-speed) ease",
-    "&:hover": {
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+    transition: 'all var(--transition-speed) ease',
+    '&:hover': {
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
     },
   },
 });
@@ -127,12 +127,12 @@ export function Home(): JSX.Element {
               if (currentUser) {
                 void navigate(`/profile/${currentUser.id}`);
               } else {
-                void navigate("/get-started");
+                void navigate('/get-started');
               }
             }}
             className={styles.ctaButton}
           >
-            {currentUser ? "View Profile" : "Get Started"}
+            {currentUser ? 'View Profile' : 'Get Started'}
           </Button>
         </div>
       </section>

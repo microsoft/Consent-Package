@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Button,
   Body1,
@@ -10,9 +10,9 @@ import {
   Avatar,
   Input,
   Label,
-} from "@fluentui/react-components";
-import { EditRegular, EditOffRegular } from "@fluentui/react-icons";
-import type { ProfileData } from "./Profile.type.js";
+} from '@fluentui/react-components';
+import { EditRegular, EditOffRegular } from '@fluentui/react-icons';
+import type { ProfileData } from './Profile.type.js';
 
 interface PersonalProfileTabProps {
   profileData: ProfileData;
@@ -75,7 +75,7 @@ const PersonalProfileTab: React.FC<PersonalProfileTabProps> = ({
               id="name"
               value={editedProfile.name}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleInputChange("name", e.target.value)
+                handleInputChange('name', e.target.value)
               }
             />
             <div className="profile-button-group">

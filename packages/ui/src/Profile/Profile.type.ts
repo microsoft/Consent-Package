@@ -1,4 +1,4 @@
-import type { AgeGroup, ConsentRecord } from "@open-source-consent/types";
+import type { AgeGroup, ConsentRecord } from '@open-source-consent/types';
 
 interface BasicInfo {
   id: string;

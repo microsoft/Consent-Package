@@ -1,18 +1,18 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { ConsentService } from "../services/ConsentService.js";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { ConsentService } from '../services/ConsentService.js';
 import type {
   IConsentDataAdapter,
   IDataAdapter,
   Policy,
   ConsentRecord,
   CreateConsentInput,
-} from "@open-source-consent/types";
+} from '@open-source-consent/types';
 
-describe("ConsentService", () => {
+describe('ConsentService', () => {
   let mockDataAdapter: IConsentDataAdapter;
   let consentService: ConsentService;
 
-  const mockDate = new Date("2025-01-01T00:00:00Z");
+  const mockDate = new Date('2025-01-01T00:00:00Z');
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -46,47 +46,47 @@ describe("ConsentService", () => {
     vi.useRealTimers();
   });
 
-  describe("grantConsent", () => {
-    it("should create a new consent record with granted status when no prior consent exists", async () => {
+  describe('grantConsent', () => {
+    it('should create a new consent record with granted status when no prior consent exists', async () => {
       // Arrange
       const mockConsentInput: CreateConsentInput = {
-        subjectId: "user123",
-        policyId: "policy456",
-        dateOfBirth: new Date("1990-01-01"),
+        subjectId: 'user123',
+        policyId: 'policy456',
+        dateOfBirth: new Date('1990-01-01'),
         consenter: {
-          type: "self",
-          userId: "user123",
+          type: 'self',
+          userId: 'user123',
         },
-        grantedScopes: ["email", "profile"],
-        revokedScopes: ["notifications"],
+        grantedScopes: ['email', 'profile'],
+        revokedScopes: ['notifications'],
         metadata: {
-          consentMethod: "digital_form",
-          ipAddress: "127.0.0.1",
-          userAgent: "Mozilla/5.0",
+          consentMethod: 'digital_form',
+          ipAddress: '127.0.0.1',
+          userAgent: 'Mozilla/5.0',
         },
       };
 
       const mockPolicy: Policy = {
-        id: "policy456",
-        policyGroupId: "group1",
+        id: 'policy456',
+        policyGroupId: 'group1',
         version: 1,
-        status: "active",
-        effectiveDate: new Date("2025-01-01"),
-        title: "Test Policy",
+        status: 'active',
+        effectiveDate: new Date('2025-01-01'),
+        title: 'Test Policy',
         contentSections: [
           {
-            title: "section1",
-            content: "content1",
-            description: "Section 1 Description",
+            title: 'section1',
+            content: 'content1',
+            description: 'Section 1 Description',
           },
         ],
         availableScopes: [
-          { key: "email", name: "Email", description: "Access to email" },
-          { key: "profile", name: "Profile", description: "Access to profile" },
+          { key: 'email', name: 'Email', description: 'Access to email' },
+          { key: 'profile', name: 'Profile', description: 'Access to profile' },
           {
-            key: "notifications",
-            name: "Notifications",
-            description: "Access to notifications",
+            key: 'notifications',
+            name: 'Notifications',
+            description: 'Access to notifications',
           }, // Another scope not granted
         ],
         createdAt: mockDate,
@@ -94,32 +94,32 @@ describe("ConsentService", () => {
       };
 
       const mockCreatedConsent: ConsentRecord = {
-        id: "consent789",
+        id: 'consent789',
         version: 1,
-        subjectId: "user123",
-        policyId: "policy456",
-        status: "granted",
+        subjectId: 'user123',
+        policyId: 'policy456',
+        status: 'granted',
         consentedAt: mockDate,
         dateOfBirth: mockConsentInput.dateOfBirth,
         consenter: {
-          type: "self",
-          userId: "user123",
+          type: 'self',
+          userId: 'user123',
         },
         grantedScopes: {
           email: { grantedAt: mockDate },
           profile: { grantedAt: mockDate },
         },
         metadata: {
-          consentMethod: "digital_form",
-          ipAddress: "127.0.0.1",
-          userAgent: "Mozilla/5.0",
+          consentMethod: 'digital_form',
+          ipAddress: '127.0.0.1',
+          userAgent: 'Mozilla/5.0',
         },
         createdAt: mockDate,
         updatedAt: mockDate,
       };
 
       (mockDataAdapter.createConsent as any).mockResolvedValue(
-        mockCreatedConsent
+        mockCreatedConsent,
       );
       (
         mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
@@ -133,15 +133,15 @@ describe("ConsentService", () => {
 
       // Assert
       expect(mockDataAdapter.createConsent).toHaveBeenCalledWith({
-        subjectId: "user123",
-        policyId: "policy456",
-        status: "granted",
+        subjectId: 'user123',
+        policyId: 'policy456',
+        status: 'granted',
         version: 1,
         consentedAt: mockDate,
         dateOfBirth: mockConsentInput.dateOfBirth,
         consenter: {
-          type: "self",
-          userId: "user123",
+          type: 'self',
+          userId: 'user123',
         },
         grantedScopes: {
           email: { grantedAt: mockDate },
@@ -152,75 +152,75 @@ describe("ConsentService", () => {
         },
         revokedAt: undefined,
         metadata: {
-          consentMethod: "digital_form",
-          ipAddress: "127.0.0.1",
-          userAgent: "Mozilla/5.0",
+          consentMethod: 'digital_form',
+          ipAddress: '127.0.0.1',
+          userAgent: 'Mozilla/5.0',
         },
       });
 
       expect(result).toEqual(mockCreatedConsent);
     });
 
-    it("should supersede an existing active consent and create a new version", async () => {
+    it('should supersede an existing active consent and create a new version', async () => {
       // Arrange
-      const subjectId = "user-supersede";
-      const policyId = "policy-supersede";
+      const subjectId = 'user-supersede';
+      const policyId = 'policy-supersede';
       const oldConsentVersion = 1;
 
       const mockPolicySupersede: Policy = {
         id: policyId,
-        policyGroupId: "groupSupersede",
+        policyGroupId: 'groupSupersede',
         version: 1,
-        status: "active",
-        effectiveDate: new Date("2024-12-01"),
-        title: "Supersede Policy",
-        contentSections: [{ title: "s1", content: "c1", description: "d1" }],
+        status: 'active',
+        effectiveDate: new Date('2024-12-01'),
+        title: 'Supersede Policy',
+        contentSections: [{ title: 's1', content: 'c1', description: 'd1' }],
         availableScopes: [
-          { key: "email", name: "Email", description: "Access to email" },
-          { key: "profile", name: "Profile", description: "Access to profile" },
+          { key: 'email', name: 'Email', description: 'Access to email' },
+          { key: 'profile', name: 'Profile', description: 'Access to profile' },
           {
-            key: "offline_access",
-            name: "Offline",
-            description: "Offline access",
+            key: 'offline_access',
+            name: 'Offline',
+            description: 'Offline access',
           },
         ],
-        createdAt: new Date("2024-12-01"),
-        updatedAt: new Date("2024-12-01"),
+        createdAt: new Date('2024-12-01'),
+        updatedAt: new Date('2024-12-01'),
       };
 
       const existingConsent: ConsentRecord = {
-        id: "oldConsent123",
+        id: 'oldConsent123',
         subjectId,
         policyId,
         version: oldConsentVersion,
-        status: "granted",
-        consentedAt: new Date("2024-12-01T00:00:00Z"),
-        consenter: { type: "self", userId: subjectId },
+        status: 'granted',
+        consentedAt: new Date('2024-12-01T00:00:00Z'),
+        consenter: { type: 'self', userId: subjectId },
         grantedScopes: {
-          email: { grantedAt: new Date("2024-12-01T00:00:00Z") },
+          email: { grantedAt: new Date('2024-12-01T00:00:00Z') },
         },
-        metadata: { consentMethod: "digital_form" },
-        createdAt: new Date("2024-12-01T00:00:00Z"),
-        updatedAt: new Date("2024-12-01T00:00:00Z"),
+        metadata: { consentMethod: 'digital_form' },
+        createdAt: new Date('2024-12-01T00:00:00Z'),
+        updatedAt: new Date('2024-12-01T00:00:00Z'),
       };
 
       const grantInput: CreateConsentInput = {
         subjectId,
         policyId,
-        consenter: { type: "self" as const, userId: subjectId },
-        grantedScopes: ["email", "profile"],
+        consenter: { type: 'self' as const, userId: subjectId },
+        grantedScopes: ['email', 'profile'],
         metadata: {
-          consentMethod: "digital_form",
-          ipAddress: "192.168.1.1",
+          consentMethod: 'digital_form',
+          ipAddress: '192.168.1.1',
         },
       };
 
       const newVersionConsent: ConsentRecord = {
-        id: "newConsent456",
+        id: 'newConsent456',
         subjectId,
         policyId,
         version: oldConsentVersion + 1,
-        status: "granted",
+        status: 'granted',
         consentedAt: existingConsent.consentedAt,
         consenter: grantInput.consenter,
         grantedScopes: {
@@ -232,8 +232,8 @@ describe("ConsentService", () => {
         },
         revokedAt: undefined,
         metadata: {
-          consentMethod: "digital_form",
-          ipAddress: "192.168.1.1",
+          consentMethod: 'digital_form',
+          ipAddress: '192.168.1.1',
         },
         createdAt: mockDate,
         updatedAt: mockDate,
@@ -243,14 +243,14 @@ describe("ConsentService", () => {
         mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
       ).mockResolvedValue(existingConsent);
       (mockDataAdapter.findConsentById as any).mockResolvedValue(
-        existingConsent
+        existingConsent,
       );
       (mockDataAdapter.createConsent as any).mockResolvedValue(
-        newVersionConsent
+        newVersionConsent,
       );
       (mockDataAdapter.updateConsentStatus as any).mockResolvedValue({
         ...existingConsent,
-        status: "superseded",
+        status: 'superseded',
       });
       (
         (mockDataAdapter as unknown as IDataAdapter).findPolicyById as any
@@ -261,16 +261,16 @@ describe("ConsentService", () => {
 
       // Assert
       expect(
-        mockDataAdapter.findLatestConsentBySubjectAndPolicy
+        mockDataAdapter.findLatestConsentBySubjectAndPolicy,
       ).toHaveBeenCalledWith(subjectId, policyId);
       expect(mockDataAdapter.findConsentById).toHaveBeenCalledWith(
-        existingConsent.id
+        existingConsent.id,
       );
       expect(mockDataAdapter.createConsent).toHaveBeenCalledWith({
         subjectId: existingConsent.subjectId,
         policyId: existingConsent.policyId,
         version: oldConsentVersion + 1,
-        status: "granted",
+        status: 'granted',
         consentedAt: existingConsent.consentedAt,
         consenter: grantInput.consenter,
         grantedScopes: {
@@ -282,45 +282,45 @@ describe("ConsentService", () => {
         },
         revokedAt: undefined,
         metadata: {
-          consentMethod: "digital_form",
-          ipAddress: "192.168.1.1",
+          consentMethod: 'digital_form',
+          ipAddress: '192.168.1.1',
         },
       });
       expect(mockDataAdapter.updateConsentStatus).toHaveBeenCalledWith(
         existingConsent.id,
-        "superseded",
-        oldConsentVersion
+        'superseded',
+        oldConsentVersion,
       );
       expect(result).toEqual(newVersionConsent);
     });
 
     it("should throw an error if trying to grant consent when the latest is 'revoked'", async () => {
       // Arrange
-      const subjectId = "user-revoked";
-      const policyId = "policy-revoked";
+      const subjectId = 'user-revoked';
+      const policyId = 'policy-revoked';
       const revokedConsent: ConsentRecord = {
-        id: "revokedConsent123",
+        id: 'revokedConsent123',
         subjectId,
         policyId,
         version: 1,
-        status: "revoked", // Key condition
-        consentedAt: new Date("2024-11-01T00:00:00Z"),
-        consenter: { type: "self", userId: subjectId },
+        status: 'revoked', // Key condition
+        consentedAt: new Date('2024-11-01T00:00:00Z'),
+        consenter: { type: 'self', userId: subjectId },
         grantedScopes: {
-          email: { grantedAt: new Date("2024-11-01T00:00:00Z") },
+          email: { grantedAt: new Date('2024-11-01T00:00:00Z') },
         },
-        revokedAt: new Date("2024-11-15T00:00:00Z"),
-        metadata: { consentMethod: "digital_form" },
-        createdAt: new Date("2024-11-01T00:00:00Z"),
-        updatedAt: new Date("2024-11-15T00:00:00Z"),
+        revokedAt: new Date('2024-11-15T00:00:00Z'),
+        metadata: { consentMethod: 'digital_form' },
+        createdAt: new Date('2024-11-01T00:00:00Z'),
+        updatedAt: new Date('2024-11-15T00:00:00Z'),
       };
 
       const grantInput: CreateConsentInput = {
         subjectId,
         policyId,
-        consenter: { type: "self" as const, userId: subjectId },
-        grantedScopes: ["email"],
-        metadata: { consentMethod: "digital_form" },
+        consenter: { type: 'self' as const, userId: subjectId },
+        grantedScopes: ['email'],
+        metadata: { consentMethod: 'digital_form' },
       };
 
       (
@@ -329,9 +329,9 @@ describe("ConsentService", () => {
 
       // Act & Assert
       await expect(
-        consentService.grantConsent(grantInput)
+        consentService.grantConsent(grantInput),
       ).rejects.toThrowError(
-        `Consent record ${revokedConsent.id} for subject ${subjectId} and policy ${policyId} is revoked and cannot be granted again.`
+        `Consent record ${revokedConsent.id} for subject ${subjectId} and policy ${policyId} is revoked and cannot be granted again.`,
       );
       expect(mockDataAdapter.createConsent).not.toHaveBeenCalled();
       expect(mockDataAdapter.updateConsentStatus).not.toHaveBeenCalled();
@@ -339,30 +339,30 @@ describe("ConsentService", () => {
 
     it("should throw an error if trying to grant consent when the latest is 'superseded'", async () => {
       // Arrange
-      const subjectId = "user-superseded-latest";
-      const policyId = "policy-superseded-latest";
+      const subjectId = 'user-superseded-latest';
+      const policyId = 'policy-superseded-latest';
       const supersededConsent: ConsentRecord = {
-        id: "supersededConsent456",
+        id: 'supersededConsent456',
         subjectId,
         policyId,
         version: 1,
-        status: "superseded", // Key condition
-        consentedAt: new Date("2024-10-01T00:00:00Z"),
-        consenter: { type: "self", userId: subjectId },
+        status: 'superseded', // Key condition
+        consentedAt: new Date('2024-10-01T00:00:00Z'),
+        consenter: { type: 'self', userId: subjectId },
         grantedScopes: {
-          email: { grantedAt: new Date("2024-10-01T00:00:00Z") },
+          email: { grantedAt: new Date('2024-10-01T00:00:00Z') },
         },
-        metadata: { consentMethod: "digital_form" },
-        createdAt: new Date("2024-10-01T00:00:00Z"),
-        updatedAt: new Date("2024-10-01T00:00:00Z"), // Date it was superseded
+        metadata: { consentMethod: 'digital_form' },
+        createdAt: new Date('2024-10-01T00:00:00Z'),
+        updatedAt: new Date('2024-10-01T00:00:00Z'), // Date it was superseded
       };
 
       const grantInput: CreateConsentInput = {
         subjectId,
         policyId,
-        consenter: { type: "self" as const, userId: subjectId },
-        grantedScopes: ["email"],
-        metadata: { consentMethod: "digital_form" },
+        consenter: { type: 'self' as const, userId: subjectId },
+        grantedScopes: ['email'],
+        metadata: { consentMethod: 'digital_form' },
       };
 
       (
@@ -371,53 +371,53 @@ describe("ConsentService", () => {
 
       // Act & Assert
       await expect(
-        consentService.grantConsent(grantInput)
+        consentService.grantConsent(grantInput),
       ).rejects.toThrowError(
-        `Consent record ${supersededConsent.id} for subject ${subjectId} and policy ${policyId} is superseded. The latest active should never be superseded, investigate issues with the DB.`
+        `Consent record ${supersededConsent.id} for subject ${subjectId} and policy ${policyId} is superseded. The latest active should never be superseded, investigate issues with the DB.`,
       );
       expect(mockDataAdapter.createConsent).not.toHaveBeenCalled();
       expect(mockDataAdapter.updateConsentStatus).not.toHaveBeenCalled();
     });
 
-    it("should handle proxy consent correctly when no prior consent exists", async () => {
+    it('should handle proxy consent correctly when no prior consent exists', async () => {
       // Arrange
       const mockProxyConsentInput = {
-        subjectId: "child123",
-        policyId: "policy456",
+        subjectId: 'child123',
+        policyId: 'policy456',
         consenter: {
-          type: "proxy" as const,
-          userId: "parent456",
+          type: 'proxy' as const,
+          userId: 'parent456',
           proxyDetails: {
-            relationship: "parent",
-            subjectAgeGroup: "under13" as const,
+            relationship: 'parent',
+            subjectAgeGroup: 'under13' as const,
           },
         },
-        grantedScopes: ["app_usage"],
+        grantedScopes: ['app_usage'],
         metadata: {
-          consentMethod: "digital_form" as const,
+          consentMethod: 'digital_form' as const,
         },
       };
 
       const mockPolicyForProxy: Policy = {
-        id: "policy456",
-        policyGroupId: "groupProxy",
+        id: 'policy456',
+        policyGroupId: 'groupProxy',
         version: 1,
-        status: "active",
-        effectiveDate: new Date("2025-01-01"),
-        title: "Proxy Test Policy",
+        status: 'active',
+        effectiveDate: new Date('2025-01-01'),
+        title: 'Proxy Test Policy',
         contentSections: [
-          { title: "s_proxy", content: "c_proxy", description: "d_proxy" },
+          { title: 's_proxy', content: 'c_proxy', description: 'd_proxy' },
         ],
         availableScopes: [
           {
-            key: "app_usage",
-            name: "App Usage",
-            description: "Tracks app usage",
+            key: 'app_usage',
+            name: 'App Usage',
+            description: 'Tracks app usage',
           },
           {
-            key: "location",
-            name: "Location",
-            description: "Access to location",
+            key: 'location',
+            name: 'Location',
+            description: 'Access to location',
           },
         ],
         createdAt: mockDate,
@@ -425,32 +425,32 @@ describe("ConsentService", () => {
       };
 
       const mockCreatedConsent: ConsentRecord = {
-        id: "consent789",
+        id: 'consent789',
         version: 1,
-        subjectId: "child123",
-        policyId: "policy456",
-        status: "granted",
+        subjectId: 'child123',
+        policyId: 'policy456',
+        status: 'granted',
         consentedAt: mockDate,
         consenter: {
-          type: "proxy",
-          userId: "parent456",
+          type: 'proxy',
+          userId: 'parent456',
           proxyDetails: {
-            relationship: "parent",
-            subjectAgeGroup: "under13",
+            relationship: 'parent',
+            subjectAgeGroup: 'under13',
           },
         },
         grantedScopes: {
           app_usage: { grantedAt: mockDate },
         },
         metadata: {
-          consentMethod: "digital_form",
+          consentMethod: 'digital_form',
         },
         createdAt: mockDate,
         updatedAt: mockDate,
       };
 
       (mockDataAdapter.createConsent as any).mockResolvedValue(
-        mockCreatedConsent
+        mockCreatedConsent,
       );
       (
         mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
@@ -464,17 +464,17 @@ describe("ConsentService", () => {
 
       // Assert
       expect(mockDataAdapter.createConsent).toHaveBeenCalledWith({
-        subjectId: "child123",
-        policyId: "policy456",
-        status: "granted",
+        subjectId: 'child123',
+        policyId: 'policy456',
+        status: 'granted',
         version: 1,
         consentedAt: mockDate,
         consenter: {
-          type: "proxy",
-          userId: "parent456",
+          type: 'proxy',
+          userId: 'parent456',
           proxyDetails: {
-            relationship: "parent",
-            subjectAgeGroup: "under13",
+            relationship: 'parent',
+            subjectAgeGroup: 'under13',
           },
         },
         grantedScopes: {
@@ -485,52 +485,52 @@ describe("ConsentService", () => {
         },
         revokedAt: undefined,
         metadata: {
-          consentMethod: "digital_form",
+          consentMethod: 'digital_form',
         },
       });
 
       expect(result).toEqual(mockCreatedConsent);
     });
 
-    it("should throw an optimistic concurrency error if consent version changes during grant (supersede)", async () => {
+    it('should throw an optimistic concurrency error if consent version changes during grant (supersede)', async () => {
       // Arrange
-      const subjectId = "user-optimistic-lock";
-      const policyId = "policy-optimistic-lock";
+      const subjectId = 'user-optimistic-lock';
+      const policyId = 'policy-optimistic-lock';
       const oldConsentVersion = 1;
       const actualDbVersion = 2; // Simulate version changed in DB
 
       const mockOptimisticPolicy: Policy = {
         id: policyId,
-        policyGroupId: "groupOptLock",
+        policyGroupId: 'groupOptLock',
         version: 1,
-        status: "active",
-        effectiveDate: new Date("2024-12-01"),
-        title: "Optimistic Lock Policy",
+        status: 'active',
+        effectiveDate: new Date('2024-12-01'),
+        title: 'Optimistic Lock Policy',
         contentSections: [
-          { title: "s_opt", content: "c_opt", description: "d_opt" },
+          { title: 's_opt', content: 'c_opt', description: 'd_opt' },
         ],
         availableScopes: [
-          { key: "email", name: "Email", description: "Access to email" },
-          { key: "profile", name: "Profile", description: "Access to profile" },
+          { key: 'email', name: 'Email', description: 'Access to email' },
+          { key: 'profile', name: 'Profile', description: 'Access to profile' },
         ],
-        createdAt: new Date("2024-12-01"),
-        updatedAt: new Date("2024-12-01"),
+        createdAt: new Date('2024-12-01'),
+        updatedAt: new Date('2024-12-01'),
       };
 
       const existingConsent: ConsentRecord = {
-        id: "oldConsentOptimistic123",
+        id: 'oldConsentOptimistic123',
         subjectId,
         policyId,
         version: oldConsentVersion, // This is what grantConsent initially fetches/expects
-        status: "granted",
-        consentedAt: new Date("2024-12-01T00:00:00Z"),
-        consenter: { type: "self", userId: subjectId },
+        status: 'granted',
+        consentedAt: new Date('2024-12-01T00:00:00Z'),
+        consenter: { type: 'self', userId: subjectId },
         grantedScopes: {
-          email: { grantedAt: new Date("2024-12-01T00:00:00Z") },
+          email: { grantedAt: new Date('2024-12-01T00:00:00Z') },
         },
-        metadata: { consentMethod: "digital_form" },
-        createdAt: new Date("2024-12-01T00:00:00Z"),
-        updatedAt: new Date("2024-12-01T00:00:00Z"),
+        metadata: { consentMethod: 'digital_form' },
+        createdAt: new Date('2024-12-01T00:00:00Z'),
+        updatedAt: new Date('2024-12-01T00:00:00Z'),
       };
 
       // This is what supersedeConsent's internal findConsentById will find
@@ -542,19 +542,19 @@ describe("ConsentService", () => {
       const grantInput: CreateConsentInput = {
         subjectId,
         policyId,
-        consenter: { type: "self" as const, userId: subjectId },
-        grantedScopes: ["email", "profile"],
-        metadata: { consentMethod: "digital_form" },
+        consenter: { type: 'self' as const, userId: subjectId },
+        grantedScopes: ['email', 'profile'],
+        metadata: { consentMethod: 'digital_form' },
       };
 
       (
         mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
       ).mockResolvedValue(
-        existingConsent // grantConsent initially sees version 1
+        existingConsent, // grantConsent initially sees version 1
       );
       // supersedeConsent will call findConsentById, make it return the changed version
       (mockDataAdapter.findConsentById as any).mockResolvedValue(
-        consentInDbActuallyHasVersion2
+        consentInDbActuallyHasVersion2,
       );
       (
         (mockDataAdapter as unknown as IDataAdapter).findPolicyById as any
@@ -564,139 +564,139 @@ describe("ConsentService", () => {
       // The supersedeConsent method is called with expectedOldVersion = existingConsent.version (which is 1)
       // but it finds a record with version 2, triggering the error.
       await expect(
-        consentService.grantConsent(grantInput)
+        consentService.grantConsent(grantInput),
       ).rejects.toThrowError(
-        `Optimistic concurrency check failed for consent ${existingConsent.id}. Expected version ${oldConsentVersion}, found ${actualDbVersion}.`
+        `Optimistic concurrency check failed for consent ${existingConsent.id}. Expected version ${oldConsentVersion}, found ${actualDbVersion}.`,
       );
 
       expect(
-        mockDataAdapter.findLatestConsentBySubjectAndPolicy
+        mockDataAdapter.findLatestConsentBySubjectAndPolicy,
       ).toHaveBeenCalledWith(subjectId, policyId);
       expect(mockDataAdapter.findConsentById).toHaveBeenCalledWith(
-        existingConsent.id
+        existingConsent.id,
       );
       expect(mockDataAdapter.createConsent).not.toHaveBeenCalled();
       expect(mockDataAdapter.updateConsentStatus).not.toHaveBeenCalled();
     });
   });
 
-  describe("getConsentDetails", () => {
-    it("should retrieve consent details by id", async () => {
+  describe('getConsentDetails', () => {
+    it('should retrieve consent details by id', async () => {
       // Arrange
       const mockConsent: ConsentRecord = {
-        id: "consent123",
+        id: 'consent123',
         version: 1,
-        subjectId: "user123",
-        policyId: "policy456",
-        status: "granted",
-        consentedAt: new Date("2024-12-15"),
+        subjectId: 'user123',
+        policyId: 'policy456',
+        status: 'granted',
+        consentedAt: new Date('2024-12-15'),
         consenter: {
-          type: "self",
-          userId: "user123",
+          type: 'self',
+          userId: 'user123',
         },
         grantedScopes: {
-          email: { grantedAt: new Date("2024-12-15") },
+          email: { grantedAt: new Date('2024-12-15') },
         },
         metadata: {
-          consentMethod: "digital_form",
+          consentMethod: 'digital_form',
         },
-        createdAt: new Date("2024-12-15"),
-        updatedAt: new Date("2024-12-15"),
+        createdAt: new Date('2024-12-15'),
+        updatedAt: new Date('2024-12-15'),
       };
 
       (mockDataAdapter.findConsentById as any).mockResolvedValue(mockConsent);
 
       // Act
-      const result = await consentService.getConsentDetails("consent123");
+      const result = await consentService.getConsentDetails('consent123');
 
       // Assert
       expect(mockDataAdapter.findConsentById).toHaveBeenCalledWith(
-        "consent123"
+        'consent123',
       );
       expect(result).toEqual(mockConsent);
     });
 
-    it("should return null when consent not found", async () => {
+    it('should return null when consent not found', async () => {
       // Arrange
       (mockDataAdapter.findConsentById as any).mockResolvedValue(null);
 
       // Act
-      const result = await consentService.getConsentDetails("nonexistent");
+      const result = await consentService.getConsentDetails('nonexistent');
 
       // Assert
       expect(mockDataAdapter.findConsentById).toHaveBeenCalledWith(
-        "nonexistent"
+        'nonexistent',
       );
       expect(result).toBeNull();
     });
   });
 
-  describe("getSubjectConsentStatus", () => {
-    it("should return consent status for each requested scope when no policyId is given", async () => {
+  describe('getSubjectConsentStatus', () => {
+    it('should return consent status for each requested scope when no policyId is given', async () => {
       // Arrange
-      const subjectId = "user123";
+      const subjectId = 'user123';
       const mockConsents: ConsentRecord[] = [
         {
-          id: "consent123",
+          id: 'consent123',
           version: 1,
-          subjectId: "user123",
-          policyId: "policy456",
-          status: "granted",
-          consentedAt: new Date("2024-12-15"),
+          subjectId: 'user123',
+          policyId: 'policy456',
+          status: 'granted',
+          consentedAt: new Date('2024-12-15'),
           consenter: {
-            type: "self",
-            userId: "user123",
+            type: 'self',
+            userId: 'user123',
           },
           grantedScopes: {
-            email: { grantedAt: new Date("2024-12-15") },
-            profile: { grantedAt: new Date("2024-12-15") },
+            email: { grantedAt: new Date('2024-12-15') },
+            profile: { grantedAt: new Date('2024-12-15') },
           },
           metadata: {
-            consentMethod: "digital_form",
+            consentMethod: 'digital_form',
           },
-          createdAt: new Date("2024-12-15"),
-          updatedAt: new Date("2024-12-15"),
+          createdAt: new Date('2024-12-15'),
+          updatedAt: new Date('2024-12-15'),
         },
         {
-          id: "consent456",
+          id: 'consent456',
           version: 2,
-          subjectId: "user123",
-          policyId: "policy789",
-          status: "granted",
-          consentedAt: new Date("2024-12-16"),
+          subjectId: 'user123',
+          policyId: 'policy789',
+          status: 'granted',
+          consentedAt: new Date('2024-12-16'),
           consenter: {
-            type: "self",
-            userId: "user123",
+            type: 'self',
+            userId: 'user123',
           },
           grantedScopes: {
-            location: { grantedAt: new Date("2024-12-16") },
+            location: { grantedAt: new Date('2024-12-16') },
           },
           revokedScopes: {
-            location: { revokedAt: new Date("2024-12-17") },
+            location: { revokedAt: new Date('2024-12-17') },
           },
           metadata: {
-            consentMethod: "digital_form",
+            consentMethod: 'digital_form',
           },
-          createdAt: new Date("2024-12-16"),
-          updatedAt: new Date("2024-12-17"),
+          createdAt: new Date('2024-12-16'),
+          updatedAt: new Date('2024-12-17'),
         },
       ];
 
       (mockDataAdapter.findConsentsBySubject as any).mockResolvedValue(
-        mockConsents
+        mockConsents,
       );
 
       // Act
       const result = await consentService.getSubjectConsentStatus(subjectId, [
-        "email",
-        "profile",
-        "location",
-        "camera",
+        'email',
+        'profile',
+        'location',
+        'camera',
       ]);
 
       // Assert
       expect(mockDataAdapter.findConsentsBySubject).toHaveBeenCalledWith(
-        "user123"
+        'user123',
       );
       expect(result).toEqual({
         email: true,
@@ -706,19 +706,19 @@ describe("ConsentService", () => {
       });
     });
 
-    it("should return all false when subject has no consents and no policyId is given", async () => {
+    it('should return all false when subject has no consents and no policyId is given', async () => {
       // Arrange
       (mockDataAdapter.findConsentsBySubject as any).mockResolvedValue([]);
 
       // Act
-      const result = await consentService.getSubjectConsentStatus("user456", [
-        "email",
-        "profile",
+      const result = await consentService.getSubjectConsentStatus('user456', [
+        'email',
+        'profile',
       ]);
 
       // Assert
       expect(mockDataAdapter.findConsentsBySubject).toHaveBeenCalledWith(
-        "user456"
+        'user456',
       );
       expect(result).toEqual({
         email: false,
@@ -726,19 +726,19 @@ describe("ConsentService", () => {
       });
     });
 
-    describe("when policyId is provided", () => {
-      const subjectId = "userWithPolicy";
-      const policyId = "specificPolicy123";
-      const scopes = ["email", "profile", "offline_access"];
+    describe('when policyId is provided', () => {
+      const subjectId = 'userWithPolicy';
+      const policyId = 'specificPolicy123';
+      const scopes = ['email', 'profile', 'offline_access'];
 
-      it("should return all false if no consent record exists for the policy", async () => {
+      it('should return all false if no consent record exists for the policy', async () => {
         (
           mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
         ).mockResolvedValue(null);
         const result = await consentService.getSubjectConsentStatus(
           subjectId,
           scopes,
-          policyId
+          policyId,
         );
         expect(result).toEqual({
           email: false,
@@ -746,21 +746,21 @@ describe("ConsentService", () => {
           offline_access: false,
         });
         expect(
-          mockDataAdapter.findLatestConsentBySubjectAndPolicy
+          mockDataAdapter.findLatestConsentBySubjectAndPolicy,
         ).toHaveBeenCalledWith(subjectId, policyId);
       });
 
       it("should return all false if latest consent for policy is not 'granted'", async () => {
         const revokedConsent: ConsentRecord = {
-          id: "c1",
+          id: 'c1',
           subjectId,
           policyId,
           version: 1,
-          status: "revoked",
+          status: 'revoked',
           consentedAt: mockDate,
-          consenter: { type: "self", userId: subjectId },
+          consenter: { type: 'self', userId: subjectId },
           grantedScopes: { email: { grantedAt: mockDate } },
-          metadata: { consentMethod: "digital_form" },
+          metadata: { consentMethod: 'digital_form' },
           createdAt: mockDate,
           updatedAt: mockDate,
         };
@@ -770,7 +770,7 @@ describe("ConsentService", () => {
         const result = await consentService.getSubjectConsentStatus(
           subjectId,
           scopes,
-          policyId
+          policyId,
         );
         expect(result).toEqual({
           email: false,
@@ -781,13 +781,13 @@ describe("ConsentService", () => {
 
       it("should return true for granted scopes and false for others if latest consent is 'granted'", async () => {
         const grantedConsent: ConsentRecord = {
-          id: "c2",
+          id: 'c2',
           subjectId,
           policyId,
           version: 1,
-          status: "granted",
+          status: 'granted',
           consentedAt: mockDate,
-          consenter: { type: "self", userId: subjectId },
+          consenter: { type: 'self', userId: subjectId },
           grantedScopes: {
             email: { grantedAt: mockDate },
             // profile is not granted
@@ -795,7 +795,7 @@ describe("ConsentService", () => {
           revokedScopes: {
             // offline_access was granted then revoked implicitly by not being in grantedScopes if it was ever sought
           },
-          metadata: { consentMethod: "digital_form" },
+          metadata: { consentMethod: 'digital_form' },
           createdAt: mockDate,
           updatedAt: mockDate,
         };
@@ -804,8 +804,8 @@ describe("ConsentService", () => {
         ).mockResolvedValue(grantedConsent);
         const result = await consentService.getSubjectConsentStatus(
           subjectId,
-          ["email", "profile", "offline_access"],
-          policyId
+          ['email', 'profile', 'offline_access'],
+          policyId,
         );
         expect(result).toEqual({
           email: true,
@@ -814,15 +814,15 @@ describe("ConsentService", () => {
         });
       });
 
-      it("should return false for a scope that is granted but also in revokedScopes", async () => {
+      it('should return false for a scope that is granted but also in revokedScopes', async () => {
         const partiallyRevokedConsent: ConsentRecord = {
-          id: "c3",
+          id: 'c3',
           subjectId,
           policyId,
           version: 2,
-          status: "granted",
+          status: 'granted',
           consentedAt: mockDate,
-          consenter: { type: "self", userId: subjectId },
+          consenter: { type: 'self', userId: subjectId },
           grantedScopes: {
             email: { grantedAt: mockDate },
             profile: { grantedAt: mockDate },
@@ -830,7 +830,7 @@ describe("ConsentService", () => {
           revokedScopes: {
             profile: { revokedAt: mockDate }, // profile is explicitly revoked
           },
-          metadata: { consentMethod: "digital_form" },
+          metadata: { consentMethod: 'digital_form' },
           createdAt: mockDate,
           updatedAt: mockDate,
         };
@@ -839,57 +839,57 @@ describe("ConsentService", () => {
         ).mockResolvedValue(partiallyRevokedConsent);
         const result = await consentService.getSubjectConsentStatus(
           subjectId,
-          ["email", "profile"],
-          policyId
+          ['email', 'profile'],
+          policyId,
         );
         expect(result).toEqual({ email: true, profile: false });
       });
     });
   });
 
-  describe("createInitialGrant", () => {
-    it("should create a new initial consent record directly", async () => {
+  describe('createInitialGrant', () => {
+    it('should create a new initial consent record directly', async () => {
       // Arrange
       const mockConsentInput: CreateConsentInput = {
-        subjectId: "user-initial",
-        policyId: "policy-initial",
-        dateOfBirth: new Date("2000-01-01"),
+        subjectId: 'user-initial',
+        policyId: 'policy-initial',
+        dateOfBirth: new Date('2000-01-01'),
         consenter: {
-          type: "self" as const,
-          userId: "user-initial",
+          type: 'self' as const,
+          userId: 'user-initial',
         },
-        grantedScopes: ["read", "write"],
+        grantedScopes: ['read', 'write'],
         metadata: {
-          consentMethod: "digital_form" as const,
-          ipAddress: "10.0.0.1",
+          consentMethod: 'digital_form' as const,
+          ipAddress: '10.0.0.1',
         },
       };
 
       const mockInitialPolicy: Policy = {
-        id: "policy-initial",
-        policyGroupId: "groupInitial",
+        id: 'policy-initial',
+        policyGroupId: 'groupInitial',
         version: 1,
-        status: "active",
+        status: 'active',
         effectiveDate: mockDate,
-        title: "Initial Grant Policy",
+        title: 'Initial Grant Policy',
         contentSections: [
-          { title: "s_init", content: "c_init", description: "d_init" },
+          { title: 's_init', content: 'c_init', description: 'd_init' },
         ],
         availableScopes: [
-          { key: "read", name: "Read", description: "Read access" },
-          { key: "write", name: "Write", description: "Write access" },
-          { key: "delete", name: "Delete", description: "Delete access" },
+          { key: 'read', name: 'Read', description: 'Read access' },
+          { key: 'write', name: 'Write', description: 'Write access' },
+          { key: 'delete', name: 'Delete', description: 'Delete access' },
         ],
         createdAt: mockDate,
         updatedAt: mockDate,
       };
 
       const mockCreatedConsent: ConsentRecord = {
-        id: "initialConsent789",
+        id: 'initialConsent789',
         version: 1,
         subjectId: mockConsentInput.subjectId,
         policyId: mockConsentInput.policyId,
-        status: "granted",
+        status: 'granted',
         consentedAt: mockDate,
         dateOfBirth: mockConsentInput.dateOfBirth,
         consenter: mockConsentInput.consenter,
@@ -903,7 +903,7 @@ describe("ConsentService", () => {
       };
 
       (mockDataAdapter.createConsent as any).mockResolvedValue(
-        mockCreatedConsent
+        mockCreatedConsent,
       );
       // Ensure findLatestConsentBySubjectAndPolicy is NOT called by createInitialGrant
       (mockDataAdapter.findLatestConsentBySubjectAndPolicy as any).mockClear();
@@ -916,12 +916,12 @@ describe("ConsentService", () => {
 
       // Assert
       expect(
-        mockDataAdapter.findLatestConsentBySubjectAndPolicy
+        mockDataAdapter.findLatestConsentBySubjectAndPolicy,
       ).not.toHaveBeenCalled();
       expect(mockDataAdapter.createConsent).toHaveBeenCalledWith({
         subjectId: mockConsentInput.subjectId,
         policyId: mockConsentInput.policyId,
-        status: "granted",
+        status: 'granted',
         version: 1,
         consentedAt: mockDate,
         dateOfBirth: mockConsentInput.dateOfBirth,
@@ -940,22 +940,22 @@ describe("ConsentService", () => {
     });
   });
 
-  describe("getLatestConsentForSubjectAndPolicy", () => {
-    const subjectId = "subj1";
-    const policyId = "pol1";
+  describe('getLatestConsentForSubjectAndPolicy', () => {
+    const subjectId = 'subj1';
+    const policyId = 'pol1';
 
-    it("should return the latest consent record if found", async () => {
+    it('should return the latest consent record if found', async () => {
       const mockConsent: ConsentRecord = {
-        id: "latestC1",
+        id: 'latestC1',
         subjectId,
         policyId,
         version: 2,
-        status: "granted",
+        status: 'granted',
         consentedAt: mockDate,
-        dateOfBirth: new Date("1990-01-01"),
-        consenter: { type: "self", userId: subjectId },
+        dateOfBirth: new Date('1990-01-01'),
+        consenter: { type: 'self', userId: subjectId },
         grantedScopes: { read: { grantedAt: mockDate } },
-        metadata: { consentMethod: "digital_form" },
+        metadata: { consentMethod: 'digital_form' },
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -965,59 +965,59 @@ describe("ConsentService", () => {
 
       const result = await consentService.getLatestConsentForSubjectAndPolicy(
         subjectId,
-        policyId
+        policyId,
       );
       expect(result).toEqual(mockConsent);
       expect(
-        mockDataAdapter.findLatestConsentBySubjectAndPolicy
+        mockDataAdapter.findLatestConsentBySubjectAndPolicy,
       ).toHaveBeenCalledWith(subjectId, policyId);
     });
 
-    it("should return null if no consent record is found", async () => {
+    it('should return null if no consent record is found', async () => {
       (
         mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
       ).mockResolvedValue(null);
 
       const result = await consentService.getLatestConsentForSubjectAndPolicy(
         subjectId,
-        policyId
+        policyId,
       );
       expect(result).toBeNull();
       expect(
-        mockDataAdapter.findLatestConsentBySubjectAndPolicy
+        mockDataAdapter.findLatestConsentBySubjectAndPolicy,
       ).toHaveBeenCalledWith(subjectId, policyId);
     });
   });
 
-  describe("getAllConsentVersionsForSubjectAndPolicy", () => {
-    const subjectId = "subj2";
-    const policyId = "pol2";
+  describe('getAllConsentVersionsForSubjectAndPolicy', () => {
+    const subjectId = 'subj2';
+    const policyId = 'pol2';
 
-    it("should return all consent versions for a subject and policy", async () => {
+    it('should return all consent versions for a subject and policy', async () => {
       const mockConsents: ConsentRecord[] = [
         {
-          id: "v1",
+          id: 'v1',
           subjectId,
           policyId,
           version: 1,
-          status: "superseded",
+          status: 'superseded',
           consentedAt: mockDate,
-          consenter: { type: "self", userId: subjectId },
+          consenter: { type: 'self', userId: subjectId },
           grantedScopes: {},
-          metadata: { consentMethod: "digital_form" },
+          metadata: { consentMethod: 'digital_form' },
           createdAt: mockDate,
           updatedAt: mockDate,
         },
         {
-          id: "v2",
+          id: 'v2',
           subjectId,
           policyId,
           version: 2,
-          status: "granted",
+          status: 'granted',
           consentedAt: mockDate,
-          consenter: { type: "self", userId: subjectId },
+          consenter: { type: 'self', userId: subjectId },
           grantedScopes: {},
-          metadata: { consentMethod: "digital_form" },
+          metadata: { consentMethod: 'digital_form' },
           createdAt: mockDate,
           updatedAt: mockDate,
         },
@@ -1028,112 +1028,112 @@ describe("ConsentService", () => {
       const result =
         await consentService.getAllConsentVersionsForSubjectAndPolicy(
           subjectId,
-          policyId
+          policyId,
         );
       expect(result).toEqual(mockConsents);
       expect(
-        mockDataAdapter.findAllConsentVersionsBySubjectAndPolicy
+        mockDataAdapter.findAllConsentVersionsBySubjectAndPolicy,
       ).toHaveBeenCalledWith(subjectId, policyId);
     });
 
-    it("should return an empty array if no versions are found", async () => {
+    it('should return an empty array if no versions are found', async () => {
       (
         mockDataAdapter.findAllConsentVersionsBySubjectAndPolicy as any
       ).mockResolvedValue([]);
       const result =
         await consentService.getAllConsentVersionsForSubjectAndPolicy(
           subjectId,
-          policyId
+          policyId,
         );
       expect(result).toEqual([]);
       expect(
-        mockDataAdapter.findAllConsentVersionsBySubjectAndPolicy
+        mockDataAdapter.findAllConsentVersionsBySubjectAndPolicy,
       ).toHaveBeenCalledWith(subjectId, policyId);
     });
   });
 
-  describe("getLatestConsentVersionsForSubject", () => {
-    const subjectId = "subj3";
-    const policyId1 = "policyA";
-    const policyId2 = "policyB";
+  describe('getLatestConsentVersionsForSubject', () => {
+    const subjectId = 'subj3';
+    const policyId1 = 'policyA';
+    const policyId2 = 'policyB';
 
     const consentP1V1: ConsentRecord = {
-      id: "p1v1",
+      id: 'p1v1',
       subjectId,
       policyId: policyId1,
       version: 1,
-      status: "superseded",
-      consentedAt: new Date("2023-01-01"),
-      consenter: { type: "self", userId: subjectId },
+      status: 'superseded',
+      consentedAt: new Date('2023-01-01'),
+      consenter: { type: 'self', userId: subjectId },
       grantedScopes: { d: { grantedAt: new Date() } },
-      metadata: { consentMethod: "digital_form" },
+      metadata: { consentMethod: 'digital_form' },
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     const consentP1V2: ConsentRecord = {
-      id: "p1v2",
+      id: 'p1v2',
       subjectId,
       policyId: policyId1,
       version: 2,
-      status: "granted",
-      consentedAt: new Date("2023-01-02"),
-      consenter: { type: "self", userId: subjectId },
+      status: 'granted',
+      consentedAt: new Date('2023-01-02'),
+      consenter: { type: 'self', userId: subjectId },
       grantedScopes: { d: { grantedAt: new Date() } },
-      metadata: { consentMethod: "digital_form" },
+      metadata: { consentMethod: 'digital_form' },
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     const consentP2V1: ConsentRecord = {
-      id: "p2v1",
+      id: 'p2v1',
       subjectId,
       policyId: policyId2,
       version: 1,
-      status: "granted",
-      consentedAt: new Date("2023-02-01"),
-      consenter: { type: "self", userId: subjectId },
+      status: 'granted',
+      consentedAt: new Date('2023-02-01'),
+      consenter: { type: 'self', userId: subjectId },
       grantedScopes: { d: { grantedAt: new Date() } },
-      metadata: { consentMethod: "digital_form" },
+      metadata: { consentMethod: 'digital_form' },
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    it("should return an empty array if no consents exist for the subject", async () => {
+    it('should return an empty array if no consents exist for the subject', async () => {
       (mockDataAdapter.findConsentsBySubject as any).mockResolvedValue([]);
       const result =
         await consentService.getLatestConsentVersionsForSubject(subjectId);
       expect(result).toEqual([]);
       expect(mockDataAdapter.findConsentsBySubject).toHaveBeenCalledWith(
-        subjectId
+        subjectId,
       );
     });
 
     it("should return the latest version of each policy's consent for the subject", async () => {
       const allConsents = [consentP1V1, consentP1V2, consentP2V1]; // P1V2 is latest for P1, P2V1 is latest for P2
       (mockDataAdapter.findConsentsBySubject as any).mockResolvedValue(
-        allConsents
+        allConsents,
       );
       const result =
         await consentService.getLatestConsentVersionsForSubject(subjectId);
       expect(result).toEqual(
-        expect.arrayContaining([consentP1V2, consentP2V1])
+        expect.arrayContaining([consentP1V2, consentP2V1]),
       );
       expect(result.length).toBe(2);
     });
 
-    it("should handle a single policy with multiple versions correctly", async () => {
+    it('should handle a single policy with multiple versions correctly', async () => {
       const allConsents = [consentP1V1, consentP1V2];
       (mockDataAdapter.findConsentsBySubject as any).mockResolvedValue(
-        allConsents
+        allConsents,
       );
       const result =
         await consentService.getLatestConsentVersionsForSubject(subjectId);
       expect(result).toEqual([consentP1V2]);
     });
 
-    it("should handle a single policy with a single version correctly", async () => {
+    it('should handle a single policy with a single version correctly', async () => {
       const allConsents = [consentP2V1];
       (mockDataAdapter.findConsentsBySubject as any).mockResolvedValue(
-        allConsents
+        allConsents,
       );
       const result =
         await consentService.getLatestConsentVersionsForSubject(subjectId);
@@ -1141,32 +1141,32 @@ describe("ConsentService", () => {
     });
   });
 
-  describe("getAllConsents", () => {
-    it("should return all consent records", async () => {
+  describe('getAllConsents', () => {
+    it('should return all consent records', async () => {
       const mockConsents: ConsentRecord[] = [
         {
-          id: "allC1",
-          subjectId: "s1",
-          policyId: "p1",
+          id: 'allC1',
+          subjectId: 's1',
+          policyId: 'p1',
           version: 1,
-          status: "granted",
+          status: 'granted',
           consentedAt: mockDate,
-          consenter: { type: "self", userId: "s1" },
+          consenter: { type: 'self', userId: 's1' },
           grantedScopes: {},
-          metadata: { consentMethod: "digital_form" },
+          metadata: { consentMethod: 'digital_form' },
           createdAt: mockDate,
           updatedAt: mockDate,
         },
         {
-          id: "allC2",
-          subjectId: "s2",
-          policyId: "p2",
+          id: 'allC2',
+          subjectId: 's2',
+          policyId: 'p2',
           version: 1,
-          status: "revoked",
+          status: 'revoked',
           consentedAt: mockDate,
-          consenter: { type: "self", userId: "s2" },
+          consenter: { type: 'self', userId: 's2' },
           grantedScopes: {},
-          metadata: { consentMethod: "digital_form" },
+          metadata: { consentMethod: 'digital_form' },
           createdAt: mockDate,
           updatedAt: mockDate,
         },
@@ -1177,7 +1177,7 @@ describe("ConsentService", () => {
       expect(mockDataAdapter.getAllConsents).toHaveBeenCalled();
     });
 
-    it("should return an empty array if no consents exist", async () => {
+    it('should return an empty array if no consents exist', async () => {
       (mockDataAdapter.getAllConsents as any).mockResolvedValue([]);
       const result = await consentService.getAllConsents();
       expect(result).toEqual([]);

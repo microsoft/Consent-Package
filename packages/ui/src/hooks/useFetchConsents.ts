@@ -1,13 +1,13 @@
-import { useCallback } from "react";
-import { deserializeConsentRecord } from "../utils/consentUtils.js";
-import type { ConsentRecord } from "@open-source-consent/types";
-import type { StatusState } from "./useStatus.js";
+import { useCallback } from 'react';
+import { deserializeConsentRecord } from '../utils/consentUtils.js';
+import type { ConsentRecord } from '@open-source-consent/types';
+import type { StatusState } from './useStatus.js';
 
 /**
  * Hook for fetching consents for a subject
  */
 export default function useFetchConsents(
-  updateStatus: (updates: Partial<StatusState>) => void
+  updateStatus: (updates: Partial<StatusState>) => void,
 ): {
   fetchConsentsForSubject(subjectId: string): Promise<ConsentRecord[] | null>;
 } {
@@ -21,18 +21,18 @@ export default function useFetchConsents(
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Failed to fetch consents: ${response.status} ${errorText}`
+            `Failed to fetch consents: ${response.status} ${errorText}`,
           );
         }
         const rawConsents = await response.json();
         return rawConsents.map(deserializeConsentRecord);
       } catch (err: any) {
-        console.error("Error fetching consents:", err.message);
+        console.error('Error fetching consents:', err.message);
         updateStatus({ consentsError: err.message });
         return null;
       }
     },
-    [updateStatus]
+    [updateStatus],
   );
 
   return {

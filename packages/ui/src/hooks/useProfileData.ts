@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import type { ProfileData, ManagedSubject } from "../Profile/Profile.type.js";
+import { useState, useCallback } from 'react';
+import type { ProfileData, ManagedSubject } from '../Profile/Profile.type.js';
 
 export const useProfileData = (initialData: ProfileData | null) => {
   const [profileData, setProfileData] = useState<ProfileData | null>(
@@ -13,7 +13,7 @@ export const useProfileData = (initialData: ProfileData | null) => {
               consents: ms.consents || [],
             })) || [],
         }
-      : null
+      : null,
   );
 
   const handleSave = useCallback((updates: Partial<ProfileData>): void => {
@@ -25,12 +25,12 @@ export const useProfileData = (initialData: ProfileData | null) => {
       if (!profileData?.managedSubjects) return;
 
       const updatedSubjects = profileData.managedSubjects.map((subject) =>
-        subject.id === subjectId ? { ...subject, ...subjectUpdates } : subject
+        subject.id === subjectId ? { ...subject, ...subjectUpdates } : subject,
       );
 
       handleSave({ managedSubjects: updatedSubjects });
     },
-    [profileData?.managedSubjects, handleSave]
+    [profileData?.managedSubjects, handleSave],
   );
 
   return {

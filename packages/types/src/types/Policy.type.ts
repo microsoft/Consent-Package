@@ -22,7 +22,7 @@ export interface Policy {
   readonly availableScopes: ReadonlyArray<PolicyScope>;
   readonly jurisdiction?: string;
   readonly requiresProxyForMinors?: boolean; // Flag indicating if proxy consent is needed for specific age groups
-  readonly status: "draft" | "active" | "archived"; // Lifecycle status of the policy version
+  readonly status: 'draft' | 'active' | 'archived'; // Lifecycle status of the policy version
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
@@ -33,5 +33,5 @@ export interface Policy {
 export interface PolicyDetails
   extends Pick<
     Policy,
-    "id" | "version" | "contentSections" | "availableScopes"
+    'id' | 'version' | 'contentSections' | 'availableScopes'
   > {}

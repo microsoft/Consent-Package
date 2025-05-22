@@ -3,16 +3,16 @@ import {
   type HttpRequest,
   type HttpResponseInit,
   type InvocationContext,
-} from "@azure/functions";
-import { getInitializedDataAdapter } from "../shared/dataAdapter.js";
+} from '@azure/functions';
+import { getInitializedDataAdapter } from '../shared/dataAdapter.js';
 import type {
   IConsentDataAdapter,
   ConsentRecord,
-} from "@open-source-consent/types";
+} from '@open-source-consent/types';
 
 export async function getConsentsByProxy(
   request: HttpRequest,
-  context: InvocationContext
+  context: InvocationContext,
 ): Promise<HttpResponseInit> {
   context.log(`Http function processed request for url "${request.url}"`);
 
@@ -22,7 +22,7 @@ export async function getConsentsByProxy(
     return {
       status: 400,
       jsonBody: {
-        error: "proxyId parameter is required.",
+        error: 'proxyId parameter is required.',
       },
     };
   }
@@ -47,21 +47,21 @@ export async function getConsentsByProxy(
   } catch (error: any) {
     context.error(
       `Error fetching consents for proxyId ${proxyId}:`,
-      error.message
+      error.message,
     );
     return {
       status: 500,
       jsonBody: {
-        error: "Failed to retrieve consents for proxy.",
+        error: 'Failed to retrieve consents for proxy.',
         details: error.message,
       },
     };
   }
 }
 
-app.http("getConsentsByProxy", {
-  methods: ["GET"],
-  authLevel: "anonymous",
-  route: "proxies/{proxyId}/consents",
+app.http('getConsentsByProxy', {
+  methods: ['GET'],
+  authLevel: 'anonymous',
+  route: 'proxies/{proxyId}/consents',
   handler: getConsentsByProxy,
 });

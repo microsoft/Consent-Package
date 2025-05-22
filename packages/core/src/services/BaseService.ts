@@ -25,7 +25,7 @@ export abstract class BaseService<TAdapter> {
     TAdapterType,
   >(
     this: new (adapter: TAdapterType) => TService,
-    adapter: TAdapterType
+    adapter: TAdapterType,
   ): TService {
     if (
       !BaseService.instances.has(this) ||

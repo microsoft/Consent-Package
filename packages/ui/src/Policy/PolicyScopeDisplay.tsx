@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   makeStyles,
   shorthands,
@@ -6,8 +6,8 @@ import {
   Card,
   Text,
   Tag,
-} from "@fluentui/react-components";
-import type { PolicyScope } from "@open-source-consent/types";
+} from '@fluentui/react-components';
+import type { PolicyScope } from '@open-source-consent/types';
 
 const useStyles = makeStyles({
   scopesContainer: {
@@ -21,7 +21,7 @@ const useStyles = makeStyles({
     fontWeight: tokens.fontWeightSemibold,
   },
   scopeCard: {
-    ...shorthands.padding("20px"),
+    ...shorthands.padding('20px'),
     marginBottom: tokens.spacingVerticalL,
     backgroundColor: tokens.colorNeutralBackground2,
     borderRadius: tokens.borderRadiusMedium,

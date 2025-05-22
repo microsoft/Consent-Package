@@ -1,12 +1,12 @@
-import { ConsentService } from "@open-source-consent/core";
-import { getInitializedDataAdapter } from "../shared/dataAdapter.js";
+import { ConsentService } from '@open-source-consent/core';
+import { getInitializedDataAdapter } from '../shared/dataAdapter.js';
 import type {
   CreateConsentInput,
   ConsentRecord,
   IConsentDataAdapter,
-} from "@open-source-consent/types";
-import { defaultMockUser } from "./data/defaultUser.js";
-import { getLatestActivePolicyByGroupId } from "./policy.js";
+} from '@open-source-consent/types';
+import { defaultMockUser } from './data/defaultUser.js';
+import { getLatestActivePolicyByGroupId } from './policy.js';
 
 let consentServiceInstance: ConsentService | null = null;
 
@@ -14,7 +14,7 @@ async function getConsentService(): Promise<ConsentService> {
   if (!consentServiceInstance) {
     const dataAdapter = await getInitializedDataAdapter();
     consentServiceInstance = ConsentService.getInstance(
-      dataAdapter as IConsentDataAdapter
+      dataAdapter as IConsentDataAdapter,
     );
   }
   return consentServiceInstance;
@@ -30,7 +30,7 @@ async function ensureDefaultConsentsSeeded(): Promise<void> {
     const consentService = await getConsentService();
     const existingConsents =
       await consentService.getLatestConsentVersionsForSubject(
-        defaultMockUser.id
+        defaultMockUser.id,
       );
 
     if (existingConsents.length === 0 && defaultMockUser.consents) {
@@ -42,7 +42,7 @@ async function ensureDefaultConsentsSeeded(): Promise<void> {
         if (!activePolicy) {
           console.error(
             `[Mock API] Error seeding consent for subject ${consentTemplate.subjectId}: 
-            Policy not found for group ${policyGroupId}. Skipping this consent.`
+            Policy not found for group ${policyGroupId}. Skipping this consent.`,
           );
           continue;
         }
@@ -52,11 +52,11 @@ async function ensureDefaultConsentsSeeded(): Promise<void> {
           subjectId: consentTemplate.subjectId,
           grantedScopes: Object.keys(consentTemplate.grantedScopes),
           consenter: consentTemplate.consenter || {
-            type: "self",
+            type: 'self',
             userId: defaultMockUser.id,
           },
           metadata: {
-            consentMethod: "digital_form",
+            consentMethod: 'digital_form',
             ...(consentTemplate.metadata?.ipAddress && {
               ipAddress: consentTemplate.metadata.ipAddress,
             }),
@@ -69,50 +69,50 @@ async function ensureDefaultConsentsSeeded(): Promise<void> {
       }
     }
   } catch (error) {
-    console.error("[Mock API] Error seeding default user consents:", error);
+    console.error('[Mock API] Error seeding default user consents:', error);
   }
 }
 
 export async function createConsent(
-  consentData: CreateConsentInput
+  consentData: CreateConsentInput,
 ): Promise<ConsentRecord> {
   await ensureDefaultConsentsSeeded();
   const consentService = await getConsentService();
   if (!consentData || !consentData.policyId || !consentData.subjectId) {
-    throw new Error("Missing required fields for consent creation.");
+    throw new Error('Missing required fields for consent creation.');
   }
   return consentService.grantConsent(consentData);
 }
 
 export async function getConsentById(
-  consentId: string
+  consentId: string,
 ): Promise<ConsentRecord | null> {
   await ensureDefaultConsentsSeeded();
   const consentService = await getConsentService();
   if (!consentId) {
-    throw new Error("Consent ID is required.");
+    throw new Error('Consent ID is required.');
   }
   return consentService.getConsentDetails(consentId);
 }
 
 export async function findActiveConsentsBySubject(
-  subjectId: string
+  subjectId: string,
 ): Promise<ConsentRecord[]> {
   await ensureDefaultConsentsSeeded();
   const consentService = await getConsentService();
   if (!subjectId) {
-    throw new Error("Subject ID is required.");
+    throw new Error('Subject ID is required.');
   }
   return consentService.getLatestConsentVersionsForSubject(subjectId);
 }
 
 export async function getConsentsByProxyId(
-  proxyId: string
+  proxyId: string,
 ): Promise<ConsentRecord[]> {
   await ensureDefaultConsentsSeeded();
   const consentService = await getConsentService();
   if (!proxyId) {
-    throw new Error("Proxy ID is required.");
+    throw new Error('Proxy ID is required.');
   }
   return consentService.getConsentsByProxyId(proxyId);
 }

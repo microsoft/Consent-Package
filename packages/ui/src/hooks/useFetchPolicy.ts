@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import type { Policy } from "@open-source-consent/types";
+import { useCallback } from 'react';
+import type { Policy } from '@open-source-consent/types';
 
 interface FetchPolicyResult {
   fetchPolicy(policyId: string): Promise<Policy>;
@@ -14,7 +14,7 @@ export default function useFetchPolicy(): FetchPolicyResult {
    */
   const fetchPolicy = useCallback(async (policyId: string): Promise<Policy> => {
     if (!policyId) {
-      throw new Error("No Policy ID provided.");
+      throw new Error('No Policy ID provided.');
     }
 
     try {
@@ -24,7 +24,7 @@ export default function useFetchPolicy(): FetchPolicyResult {
           throw new Error(`Policy with ID "${policyId}" not found.`);
         }
         throw new Error(
-          `Failed to fetch policy: ${response.status} ${response.statusText}`
+          `Failed to fetch policy: ${response.status} ${response.statusText}`,
         );
       }
 

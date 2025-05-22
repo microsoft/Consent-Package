@@ -1,36 +1,36 @@
-import { makeStyles, Text, Title2, tokens } from "@fluentui/react-components";
-import Signature from "../Signature/index.js";
-import type { ConsentFlowFormData } from "./ConsentFlow.type.js";
-import type { Policy, PolicyScope } from "@open-source-consent/types";
+import { makeStyles, Text, Title2, tokens } from '@fluentui/react-components';
+import Signature from '../Signature/index.js';
+import type { ConsentFlowFormData } from './ConsentFlow.type.js';
+import type { Policy, PolicyScope } from '@open-source-consent/types';
 
 const useStyles = makeStyles({
   root: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "24px",
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '24px',
   },
   section: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-    padding: "16px",
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    padding: '16px',
     border: `1px solid ${tokens.colorNeutralStroke1}`,
-    borderRadius: "4px",
+    borderRadius: '4px',
   },
   sectionTitle: {
     fontWeight: tokens.fontWeightSemibold,
   },
   signatureSection: {
-    marginTop: "24px",
-    "& > :last-child": {
-      marginTop: "16px",
+    marginTop: '24px',
+    '& > :last-child': {
+      marginTop: '16px',
     },
   },
   list: {
-    paddingLeft: "16px",
-    margin: "8px 0",
-    "& > li": {
-      marginBottom: "4px",
+    paddingLeft: '16px',
+    margin: '8px 0',
+    '& > li': {
+      marginBottom: '4px',
     },
   },
 });
@@ -42,9 +42,9 @@ interface ConsentReviewProps {
 }
 
 const formatAge = (age: number | undefined): string => {
-  if (age === undefined) return "N/A";
+  if (age === undefined) return 'N/A';
 
-  if (age < 1) return "less than 1 year old";
+  if (age < 1) return 'less than 1 year old';
   else return age === 1 ? `${age} year old` : `${age} years old`;
 };
 
@@ -65,8 +65,8 @@ const ConsentReview = ({
         <Text>Date of Birth: {formData.dob?.toLocaleDateString()}</Text>
         <Text>Age: {formatAge(formData.age)}</Text>
         <Text>
-          Role:{" "}
-          {formData.isProxy ? "Proxy (Consenting on behalf of others)" : "Self"}
+          Role:{' '}
+          {formData.isProxy ? 'Proxy (Consenting on behalf of others)' : 'Self'}
         </Text>
       </div>
 
@@ -76,7 +76,7 @@ const ConsentReview = ({
           <ul className={styles.list}>
             {formData.grantedScopes?.map((scopeId) => {
               const scope = policy.availableScopes.find(
-                (s: PolicyScope) => s.key === scopeId
+                (s: PolicyScope) => s.key === scopeId,
               );
               return (
                 <li key={scopeId}>
@@ -103,7 +103,7 @@ const ConsentReview = ({
                 <ul className={styles.list}>
                   {subject.grantedScopes?.map((scopeId) => {
                     const scope = policy.availableScopes.find(
-                      (s: PolicyScope) => s.key === scopeId
+                      (s: PolicyScope) => s.key === scopeId,
                     );
                     return (
                       <li key={scopeId}>

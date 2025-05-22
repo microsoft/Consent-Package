@@ -3,12 +3,12 @@ import type {
   Policy,
   CreatePolicyInput,
   IDataAdapter,
-} from "@open-source-consent/types";
-import { v4 as uuidv4 } from "uuid";
+} from '@open-source-consent/types';
+import { v4 as uuidv4 } from 'uuid';
 
-const DB_NAME = "OpenSourceConsentDB";
-const CONSENT_STORE_NAME = "consents";
-const POLICY_STORE_NAME = "policies";
+const DB_NAME = 'OpenSourceConsentDB';
+const CONSENT_STORE_NAME = 'consents';
+const POLICY_STORE_NAME = 'policies';
 const DB_VERSION = 1;
 
 export class IndexedDBDataAdapter implements IDataAdapter {
@@ -28,7 +28,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
         let consentStore: IDBObjectStore;
         if (!db.objectStoreNames.contains(CONSENT_STORE_NAME)) {
           consentStore = db.createObjectStore(CONSENT_STORE_NAME, {
-            keyPath: "id",
+            keyPath: 'id',
           });
         } else {
           consentStore = (
@@ -36,28 +36,28 @@ export class IndexedDBDataAdapter implements IDataAdapter {
           ).transaction!.objectStore(CONSENT_STORE_NAME);
         }
 
-        if (!consentStore.indexNames.contains("subjectId_idx")) {
-          consentStore.createIndex("subjectId_idx", "subjectId", {
+        if (!consentStore.indexNames.contains('subjectId_idx')) {
+          consentStore.createIndex('subjectId_idx', 'subjectId', {
             unique: false,
           });
         }
 
-        if (!consentStore.indexNames.contains("policyId_idx")) {
-          consentStore.createIndex("policyId_idx", "policyId", {
+        if (!consentStore.indexNames.contains('policyId_idx')) {
+          consentStore.createIndex('policyId_idx', 'policyId', {
             unique: false,
           });
         }
 
-        if (!consentStore.indexNames.contains("subjectId_policyId_idx")) {
+        if (!consentStore.indexNames.contains('subjectId_policyId_idx')) {
           consentStore.createIndex(
-            "subjectId_policyId_idx",
-            ["subjectId", "policyId"],
-            { unique: false }
+            'subjectId_policyId_idx',
+            ['subjectId', 'policyId'],
+            { unique: false },
           );
         }
 
-        if (!consentStore.indexNames.contains("consenterUserId_idx")) {
-          consentStore.createIndex("consenterUserId_idx", "consenter.userId", {
+        if (!consentStore.indexNames.contains('consenterUserId_idx')) {
+          consentStore.createIndex('consenterUserId_idx', 'consenter.userId', {
             unique: false,
           });
         }
@@ -65,7 +65,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
         let policyStore: IDBObjectStore;
         if (!db.objectStoreNames.contains(POLICY_STORE_NAME)) {
           policyStore = db.createObjectStore(POLICY_STORE_NAME, {
-            keyPath: "id",
+            keyPath: 'id',
           });
         } else {
           policyStore = (
@@ -73,22 +73,22 @@ export class IndexedDBDataAdapter implements IDataAdapter {
           ).transaction!.objectStore(POLICY_STORE_NAME);
         }
 
-        if (!policyStore.indexNames.contains("policyGroupId_idx")) {
-          policyStore.createIndex("policyGroupId_idx", "policyGroupId", {
+        if (!policyStore.indexNames.contains('policyGroupId_idx')) {
+          policyStore.createIndex('policyGroupId_idx', 'policyGroupId', {
             unique: false,
           });
         }
-        if (!policyStore.indexNames.contains("policyGroupId_status_idx")) {
+        if (!policyStore.indexNames.contains('policyGroupId_status_idx')) {
           policyStore.createIndex(
-            "policyGroupId_status_idx",
-            ["policyGroupId", "status"],
+            'policyGroupId_status_idx',
+            ['policyGroupId', 'status'],
             {
               unique: false,
-            }
+            },
           );
         }
-        if (!policyStore.indexNames.contains("status_idx")) {
-          policyStore.createIndex("status_idx", "status", {
+        if (!policyStore.indexNames.contains('status_idx')) {
+          policyStore.createIndex('status_idx', 'status', {
             unique: false,
           });
         }
@@ -101,8 +101,8 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
       request.onerror = (event) => {
         console.error(
-          "Database error: ",
-          (event.target as IDBOpenDBRequest).error
+          'Database error: ',
+          (event.target as IDBOpenDBRequest).error,
         );
         reject((event.target as IDBOpenDBRequest).error);
       };
@@ -124,12 +124,12 @@ export class IndexedDBDataAdapter implements IDataAdapter {
   async clearStore(storeName: string): Promise<void> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized. Cannot clear store.");
+      throw new Error('Database not initialized. Cannot clear store.');
     }
 
     return new Promise((resolve, reject) => {
       try {
-        const transaction = this.db!.transaction(storeName, "readwrite");
+        const transaction = this.db!.transaction(storeName, 'readwrite');
         const store = transaction.objectStore(storeName);
         const request = store.clear();
 
@@ -145,7 +145,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
           const error = (event.target as IDBTransaction).error;
           console.error(
             `Transaction aborted while clearing store '${storeName}':`,
-            error
+            error,
           );
           reject(error);
         };
@@ -157,11 +157,11 @@ export class IndexedDBDataAdapter implements IDataAdapter {
   }
 
   async createConsent(
-    data: Omit<ConsentRecord, "id" | "createdAt" | "updatedAt">
+    data: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<ConsentRecord> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     const now = new Date();
@@ -173,7 +173,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
     };
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(CONSENT_STORE_NAME, "readwrite");
+      const transaction = this.db!.transaction(CONSENT_STORE_NAME, 'readwrite');
       const store = transaction.objectStore(CONSENT_STORE_NAME);
       const request = store.add(newConsent);
 
@@ -183,16 +183,16 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
       request.onerror = (event) => {
         console.error(
-          "Error creating consent:",
-          (event.target as IDBRequest).error
+          'Error creating consent:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
 
       transaction.onabort = (event) => {
         console.error(
-          "Create consent transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Create consent transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -201,23 +201,23 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
   async updateConsentStatus(
     id: string,
-    status: ConsentRecord["status"],
-    expectedVersion: number
+    status: ConsentRecord['status'],
+    expectedVersion: number,
   ): Promise<ConsentRecord> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(CONSENT_STORE_NAME, "readwrite");
+      const transaction = this.db!.transaction(CONSENT_STORE_NAME, 'readwrite');
       const store = transaction.objectStore(CONSENT_STORE_NAME);
       const getRequest = store.get(id);
 
       getRequest.onerror = (event) => {
         console.error(
-          "Error getting consent for status update:",
-          (event.target as IDBRequest).error
+          'Error getting consent for status update:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
@@ -233,7 +233,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
         if (existingConsent.version !== expectedVersion) {
           const error = new Error(
-            `Optimistic concurrency check failed for consent record ${id}. Expected version ${expectedVersion}, found ${existingConsent.version}.`
+            `Optimistic concurrency check failed for consent record ${id}. Expected version ${expectedVersion}, found ${existingConsent.version}.`,
           );
           console.error(error);
           reject(error);
@@ -253,8 +253,8 @@ export class IndexedDBDataAdapter implements IDataAdapter {
         };
         putRequest.onerror = (event) => {
           console.error(
-            "Error updating consent status:",
-            (event.target as IDBRequest).error
+            'Error updating consent status:',
+            (event.target as IDBRequest).error,
           );
           reject((event.target as IDBRequest).error);
         };
@@ -262,8 +262,8 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
       transaction.onabort = (event) => {
         console.error(
-          "Update consent status transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Update consent status transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -273,11 +273,11 @@ export class IndexedDBDataAdapter implements IDataAdapter {
   async findConsentById(id: string): Promise<ConsentRecord | null> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(CONSENT_STORE_NAME, "readonly");
+      const transaction = this.db!.transaction(CONSENT_STORE_NAME, 'readonly');
       const store = transaction.objectStore(CONSENT_STORE_NAME);
       const request = store.get(id);
 
@@ -287,16 +287,16 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
       request.onerror = (event) => {
         console.error(
-          "Error finding consent by ID:",
-          (event.target as IDBRequest).error
+          'Error finding consent by ID:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
 
       transaction.onabort = (event) => {
         console.error(
-          "Find consent by ID transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Find consent by ID transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -306,13 +306,13 @@ export class IndexedDBDataAdapter implements IDataAdapter {
   async findConsentsBySubject(subjectId: string): Promise<ConsentRecord[]> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(CONSENT_STORE_NAME, "readonly");
+      const transaction = this.db!.transaction(CONSENT_STORE_NAME, 'readonly');
       const store = transaction.objectStore(CONSENT_STORE_NAME);
-      const index = store.index("subjectId_idx");
+      const index = store.index('subjectId_idx');
       const request = index.getAll(subjectId);
 
       request.onsuccess = () => {
@@ -323,15 +323,15 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
       request.onerror = (event) => {
         console.error(
-          "Error finding consents by subject:",
-          (event.target as IDBRequest).error
+          'Error finding consents by subject:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
       transaction.onabort = (event) => {
         console.error(
-          "Find consents by subject transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Find consents by subject transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -340,17 +340,17 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
   async findLatestConsentBySubjectAndPolicy(
     subjectId: string,
-    policyId: string
+    policyId: string,
   ): Promise<ConsentRecord | null> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(CONSENT_STORE_NAME, "readonly");
+      const transaction = this.db!.transaction(CONSENT_STORE_NAME, 'readonly');
       const store = transaction.objectStore(CONSENT_STORE_NAME);
-      const index = store.index("subjectId_policyId_idx");
+      const index = store.index('subjectId_policyId_idx');
       const request = index.getAll([subjectId, policyId]);
 
       request.onsuccess = () => {
@@ -365,15 +365,15 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
       request.onerror = (event) => {
         console.error(
-          "Error finding latest consent by subject and policy:",
-          (event.target as IDBRequest).error
+          'Error finding latest consent by subject and policy:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
       transaction.onabort = (event) => {
         console.error(
-          "Find latest consent transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Find latest consent transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -382,17 +382,17 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
   async findAllConsentVersionsBySubjectAndPolicy(
     subjectId: string,
-    policyId: string
+    policyId: string,
   ): Promise<ConsentRecord[]> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(CONSENT_STORE_NAME, "readonly");
+      const transaction = this.db!.transaction(CONSENT_STORE_NAME, 'readonly');
       const store = transaction.objectStore(CONSENT_STORE_NAME);
-      const index = store.index("subjectId_policyId_idx");
+      const index = store.index('subjectId_policyId_idx');
       const request = index.getAll([subjectId, policyId]);
 
       request.onsuccess = () => {
@@ -403,15 +403,15 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
       request.onerror = (event) => {
         console.error(
-          "Error finding all consent versions by subject and policy:",
-          (event.target as IDBRequest).error
+          'Error finding all consent versions by subject and policy:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
       transaction.onabort = (event) => {
         console.error(
-          "Find all consent versions transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Find all consent versions transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -421,11 +421,11 @@ export class IndexedDBDataAdapter implements IDataAdapter {
   async getAllConsents(): Promise<ConsentRecord[]> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(CONSENT_STORE_NAME, "readonly");
+      const transaction = this.db!.transaction(CONSENT_STORE_NAME, 'readonly');
       const store = transaction.objectStore(CONSENT_STORE_NAME);
       const request = store.getAll();
 
@@ -435,16 +435,16 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
       request.onerror = (event) => {
         console.error(
-          "Error getting all consents:",
-          (event.target as IDBRequest).error
+          'Error getting all consents:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
 
       transaction.onabort = (event) => {
         console.error(
-          "Get all consents transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Get all consents transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -454,13 +454,13 @@ export class IndexedDBDataAdapter implements IDataAdapter {
   async getConsentsByProxyId(proxyId: string): Promise<ConsentRecord[]> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(CONSENT_STORE_NAME, "readonly");
+      const transaction = this.db!.transaction(CONSENT_STORE_NAME, 'readonly');
       const store = transaction.objectStore(CONSENT_STORE_NAME);
-      const index = store.index("consenterUserId_idx");
+      const index = store.index('consenterUserId_idx');
       const request = index.getAll(proxyId);
 
       request.onsuccess = (event) => {
@@ -468,7 +468,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
           .result;
         if (allRecordsForUser) {
           const proxyRecords = allRecordsForUser.filter(
-            (record) => record.consenter && record.consenter.type === "proxy"
+            (record) => record.consenter && record.consenter.type === 'proxy',
           );
           resolve(proxyRecords);
         } else {
@@ -479,7 +479,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
       request.onerror = (event) => {
         console.error(
           `Error fetching consents by proxyId ${proxyId} using index:`,
-          (event.target as IDBRequest).error
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
@@ -487,7 +487,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
       transaction.onabort = (event) => {
         console.error(
           `Transaction aborted while fetching consents for proxyId ${proxyId}:`,
-          (event.target as IDBTransaction).error
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -497,7 +497,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
   async createPolicy(data: CreatePolicyInput): Promise<Policy> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     const now = new Date();
@@ -510,7 +510,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
     };
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(POLICY_STORE_NAME, "readwrite");
+      const transaction = this.db!.transaction(POLICY_STORE_NAME, 'readwrite');
       const store = transaction.objectStore(POLICY_STORE_NAME);
       const request = store.add(newPolicy);
 
@@ -519,15 +519,15 @@ export class IndexedDBDataAdapter implements IDataAdapter {
       };
       request.onerror = (event) => {
         console.error(
-          "Error creating policy:",
-          (event.target as IDBRequest).error
+          'Error creating policy:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
       transaction.onabort = (event) => {
         console.error(
-          "Create policy transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Create policy transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -536,23 +536,23 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
   async updatePolicyStatus(
     policyId: string,
-    status: Policy["status"],
-    expectedVersion: number
+    status: Policy['status'],
+    expectedVersion: number,
   ): Promise<Policy> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(POLICY_STORE_NAME, "readwrite");
+      const transaction = this.db!.transaction(POLICY_STORE_NAME, 'readwrite');
       const store = transaction.objectStore(POLICY_STORE_NAME);
       const getRequest = store.get(policyId);
 
       getRequest.onerror = (event) => {
         console.error(
-          "Error getting policy for status update:",
-          (event.target as IDBRequest).error
+          'Error getting policy for status update:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
@@ -568,7 +568,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
         if (existingPolicy.version !== expectedVersion) {
           const error = new Error(
-            `Optimistic concurrency check failed for policy ${policyId}. Expected version ${expectedVersion}, found ${existingPolicy.version}.`
+            `Optimistic concurrency check failed for policy ${policyId}. Expected version ${expectedVersion}, found ${existingPolicy.version}.`,
           );
           console.error(error);
           reject(error);
@@ -588,16 +588,16 @@ export class IndexedDBDataAdapter implements IDataAdapter {
         };
         putRequest.onerror = (event) => {
           console.error(
-            "Error updating policy status:",
-            (event.target as IDBRequest).error
+            'Error updating policy status:',
+            (event.target as IDBRequest).error,
           );
           reject((event.target as IDBRequest).error);
         };
       };
       transaction.onabort = (event) => {
         console.error(
-          "Update policy status transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Update policy status transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -607,11 +607,11 @@ export class IndexedDBDataAdapter implements IDataAdapter {
   async findPolicyById(policyId: string): Promise<Policy | null> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(POLICY_STORE_NAME, "readonly");
+      const transaction = this.db!.transaction(POLICY_STORE_NAME, 'readonly');
       const store = transaction.objectStore(POLICY_STORE_NAME);
       const request = store.get(policyId);
 
@@ -620,15 +620,15 @@ export class IndexedDBDataAdapter implements IDataAdapter {
       };
       request.onerror = (event) => {
         console.error(
-          "Error finding policy by ID:",
-          (event.target as IDBRequest).error
+          'Error finding policy by ID:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
       transaction.onabort = (event) => {
         console.error(
-          "Find policy by ID transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Find policy by ID transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -636,18 +636,18 @@ export class IndexedDBDataAdapter implements IDataAdapter {
   }
 
   async findLatestActivePolicyByGroupId(
-    policyGroupId: string
+    policyGroupId: string,
   ): Promise<Policy | null> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(POLICY_STORE_NAME, "readonly");
+      const transaction = this.db!.transaction(POLICY_STORE_NAME, 'readonly');
       const store = transaction.objectStore(POLICY_STORE_NAME);
-      const index = store.index("policyGroupId_status_idx");
-      const request = index.getAll([policyGroupId, "active"]);
+      const index = store.index('policyGroupId_status_idx');
+      const request = index.getAll([policyGroupId, 'active']);
 
       request.onsuccess = () => {
         const activePolicies = (request.result as Policy[]) || [];
@@ -660,15 +660,15 @@ export class IndexedDBDataAdapter implements IDataAdapter {
       };
       request.onerror = (event) => {
         console.error(
-          "Error finding latest active policy by group ID:",
-          (event.target as IDBRequest).error
+          'Error finding latest active policy by group ID:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
       transaction.onabort = (event) => {
         console.error(
-          "Find latest active policy transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Find latest active policy transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -676,17 +676,17 @@ export class IndexedDBDataAdapter implements IDataAdapter {
   }
 
   async findAllPolicyVersionsByGroupId(
-    policyGroupId: string
+    policyGroupId: string,
   ): Promise<Policy[]> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(POLICY_STORE_NAME, "readonly");
+      const transaction = this.db!.transaction(POLICY_STORE_NAME, 'readonly');
       const store = transaction.objectStore(POLICY_STORE_NAME);
-      const index = store.index("policyGroupId_idx");
+      const index = store.index('policyGroupId_idx');
       const request = index.getAll(policyGroupId);
 
       request.onsuccess = () => {
@@ -696,15 +696,15 @@ export class IndexedDBDataAdapter implements IDataAdapter {
       };
       request.onerror = (event) => {
         console.error(
-          "Error finding all policy versions by group ID:",
-          (event.target as IDBRequest).error
+          'Error finding all policy versions by group ID:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
       transaction.onabort = (event) => {
         console.error(
-          "Find all policy versions transaction aborted:",
-          (event.target as IDBTransaction).error
+          'Find all policy versions transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };
@@ -714,11 +714,11 @@ export class IndexedDBDataAdapter implements IDataAdapter {
   async listPolicies(): Promise<Policy[]> {
     await this.initialize();
     if (!this.db) {
-      throw new Error("Database not initialized.");
+      throw new Error('Database not initialized.');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(POLICY_STORE_NAME, "readonly");
+      const transaction = this.db!.transaction(POLICY_STORE_NAME, 'readonly');
       const store = transaction.objectStore(POLICY_STORE_NAME);
       const request = store.getAll();
 
@@ -733,15 +733,15 @@ export class IndexedDBDataAdapter implements IDataAdapter {
       };
       request.onerror = (event) => {
         console.error(
-          "Error listing policies:",
-          (event.target as IDBRequest).error
+          'Error listing policies:',
+          (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
       };
       transaction.onabort = (event) => {
         console.error(
-          "List policies transaction aborted:",
-          (event.target as IDBTransaction).error
+          'List policies transaction aborted:',
+          (event.target as IDBTransaction).error,
         );
         reject((event.target as IDBTransaction).error);
       };

@@ -1,19 +1,19 @@
-import type { Container, Database } from "@azure/cosmos";
+import type { Container, Database } from '@azure/cosmos';
 import {
   CosmosClient,
   PartitionKeyKind,
   type SqlQuerySpec,
-} from "@azure/cosmos";
+} from '@azure/cosmos';
 import type {
   ConsentRecord,
   Policy,
   CreatePolicyInput,
   IDataAdapter,
-} from "@open-source-consent/types";
-import { v4 as uuidv4 } from "uuid";
+} from '@open-source-consent/types';
+import { v4 as uuidv4 } from 'uuid';
 
 // Constant for the partition key value for policy documents
-const POLICY_PARTITION_KEY_VALUE = "_POLICY_";
+const POLICY_PARTITION_KEY_VALUE = '_POLICY_';
 
 export interface CosmosDBConfig {
   endpoint: string;
@@ -52,7 +52,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     });
     this.database = database;
 
-    const partitionKeyPath = this.config.partitionKeyPath || "/subjectId";
+    const partitionKeyPath = this.config.partitionKeyPath || '/subjectId';
 
     const { container } = await this.database.containers.createIfNotExists({
       id: this.config.containerName,
@@ -62,13 +62,13 @@ export class CosmosDBDataAdapter implements IDataAdapter {
       },
       indexingPolicy: {
         automatic: true,
-        indexingMode: "consistent",
-        includedPaths: [{ path: "/*" }],
+        indexingMode: 'consistent',
+        includedPaths: [{ path: '/*' }],
         excludedPaths: [{ path: '/"_etag"/?' }],
         compositeIndexes: [
           [
-            { path: "/policyGroupId", order: "ascending" },
-            { path: "/version", order: "descending" },
+            { path: '/policyGroupId', order: 'ascending' },
+            { path: '/version', order: 'descending' },
           ],
         ],
       },
@@ -76,21 +76,21 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     this.dataContainer = container;
     // eslint-disable-next-line no-console
     console.log(
-      `CosmosDB Adapter initialized: DB='${this.config.databaseName}', Container='${this.config.containerName}', PartitionKey='${partitionKeyPath}'`
+      `CosmosDB Adapter initialized: DB='${this.config.databaseName}', Container='${this.config.containerName}', PartitionKey='${partitionKeyPath}'`,
     );
   }
 
   private getInitializedContainer(): Container {
     if (!this.dataContainer) {
       throw new Error(
-        "CosmosDBDataAdapter not initialized. Call initialize() first."
+        'CosmosDBDataAdapter not initialized. Call initialize() first.',
       );
     }
     return this.dataContainer;
   }
 
   async createConsent(
-    data: Omit<ConsentRecord, "id" | "createdAt" | "updatedAt">
+    data: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<ConsentRecord> {
     const container = this.getInitializedContainer();
     const now = new Date();
@@ -100,30 +100,30 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     const consentDoc: ConsentRecord & { docType: string } = {
       ...data,
       id: newId,
-      docType: "consent",
+      docType: 'consent',
       createdAt: now,
       updatedAt: now,
     };
 
     const { resource } = await container.items.create(consentDoc);
     if (!resource) {
-      throw new Error("Failed to create consent record");
+      throw new Error('Failed to create consent record');
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { docType, ...rest } = resource as any;
     return rest as ConsentRecord;
   }
 
   async updateConsentStatus(
     id: string,
-    status: ConsentRecord["status"],
-    expectedVersion: number
+    status: ConsentRecord['status'],
+    expectedVersion: number,
   ): Promise<ConsentRecord> {
     const container = this.getInitializedContainer();
 
     const querySpec = {
       query: "SELECT * FROM c WHERE c.id = @id AND c.docType = 'consent'",
-      parameters: [{ name: "@id", value: id }],
+      parameters: [{ name: '@id', value: id }],
     };
 
     // Expect SDK to deserialize dates based on this type
@@ -139,7 +139,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
 
     if (existingConsent.version !== expectedVersion) {
       throw new Error(
-        `Optimistic concurrency check failed for consent record ${id}. Expected version ${expectedVersion}, found ${existingConsent.version}.`
+        `Optimistic concurrency check failed for consent record ${id}. Expected version ${expectedVersion}, found ${existingConsent.version}.`,
       );
     }
 
@@ -158,7 +158,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
       metadata: existingConsent.metadata,
       createdAt: existingConsent.createdAt,
       updatedAt: new Date(),
-      docType: "consent",
+      docType: 'consent',
     };
 
     const { resource: replacedResource } = await container
@@ -184,7 +184,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     // Cross-partition query is needed if subjectId (partition key) is unknown.
     const querySpec = {
       query: "SELECT * FROM c WHERE c.id = @id AND c.docType = 'consent'",
-      parameters: [{ name: "@id", value: id }],
+      parameters: [{ name: '@id', value: id }],
     };
 
     const { resources } = await container.items
@@ -194,7 +194,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     if (resources.length === 0) {
       return null;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { docType, ...rest } = resources[0];
     return rest as ConsentRecord;
   }
@@ -206,7 +206,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
         "SELECT * FROM c WHERE c.docType = 'consent' AND c.subjectId = @subjectId",
       parameters: [
         {
-          name: "@subjectId",
+          name: '@subjectId',
           value: subjectId,
         },
       ],
@@ -235,7 +235,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     const now = new Date();
     const newId = uuidv4();
 
-    const policyRecord: Omit<Policy, "id" | "createdAt" | "updatedAt"> & {
+    const policyRecord: Omit<Policy, 'id' | 'createdAt' | 'updatedAt'> & {
       id: string;
       docType: string;
       createdAt: Date;
@@ -244,7 +244,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     } = {
       ...data,
       id: newId,
-      docType: "policy",
+      docType: 'policy',
       version: data.version || 1,
       createdAt: now,
       updatedAt: now,
@@ -253,21 +253,21 @@ export class CosmosDBDataAdapter implements IDataAdapter {
 
     const { resource } = await container.items.create(policyRecord);
     if (!resource) {
-      throw new Error("Failed to create policy record");
+      throw new Error('Failed to create policy record');
     }
     const createdPolicy = resource as Policy & {
       docType: string;
       subjectId: string;
     };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { docType, subjectId, ...rest } = createdPolicy;
     return rest as Policy;
   }
 
   async updatePolicyStatus(
     policyId: string,
-    status: Policy["status"],
-    expectedVersion: number
+    status: Policy['status'],
+    expectedVersion: number,
   ): Promise<Policy> {
     const container = this.getInitializedContainer();
 
@@ -276,8 +276,8 @@ export class CosmosDBDataAdapter implements IDataAdapter {
       query:
         "SELECT * FROM c WHERE c.id = @id AND c.docType = 'policy' AND c.subjectId = @pk",
       parameters: [
-        { name: "@id", value: policyId },
-        { name: "@pk", value: POLICY_PARTITION_KEY_VALUE },
+        { name: '@id', value: policyId },
+        { name: '@pk', value: POLICY_PARTITION_KEY_VALUE },
       ],
     };
     const { resources } = await container.items
@@ -291,15 +291,15 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     }
     const existingPolicy = resources[0];
 
-    if (existingPolicy.docType !== "policy") {
+    if (existingPolicy.docType !== 'policy') {
       throw new Error(
-        `Policy with id ${policyId} not found or not a policy document.`
+        `Policy with id ${policyId} not found or not a policy document.`,
       );
     }
 
     if (existingPolicy.version !== expectedVersion) {
       throw new Error(
-        `Optimistic concurrency check failed for policy ${policyId}. Expected version ${expectedVersion}, found ${existingPolicy.version}.`
+        `Optimistic concurrency check failed for policy ${policyId}. Expected version ${expectedVersion}, found ${existingPolicy.version}.`,
       );
     }
 
@@ -326,7 +326,6 @@ export class CosmosDBDataAdapter implements IDataAdapter {
       throw new Error(`Failed to update status for policy ${policyId}`);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { docType, subjectId, ...rest } = replacedResource;
     return rest as Policy;
   }
@@ -338,8 +337,8 @@ export class CosmosDBDataAdapter implements IDataAdapter {
         query:
           "SELECT * FROM c WHERE c.id = @id AND c.docType = 'policy' AND c.subjectId = @pk",
         parameters: [
-          { name: "@id", value: policyId },
-          { name: "@pk", value: POLICY_PARTITION_KEY_VALUE },
+          { name: '@id', value: policyId },
+          { name: '@pk', value: POLICY_PARTITION_KEY_VALUE },
         ],
       };
 
@@ -350,7 +349,6 @@ export class CosmosDBDataAdapter implements IDataAdapter {
         .fetchAll();
 
       if (resources.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { docType, subjectId, ...rest } = resources[0];
         return rest as Policy;
       }
@@ -358,14 +356,14 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     } catch (error: unknown) {
       console.error(
         `Error finding policy by ID ${policyId} using query:`,
-        error
+        error,
       );
       throw error;
     }
   }
 
   async findLatestActivePolicyByGroupId(
-    policyGroupId: string
+    policyGroupId: string,
   ): Promise<Policy | null> {
     const container = this.getInitializedContainer();
     const querySpec = {
@@ -375,8 +373,8 @@ export class CosmosDBDataAdapter implements IDataAdapter {
               AND c.policyGroupId = @policyGroupId
               AND c.status = 'active'`,
       parameters: [
-        { name: "@policyPartitionKey", value: POLICY_PARTITION_KEY_VALUE },
-        { name: "@policyGroupId", value: policyGroupId },
+        { name: '@policyPartitionKey', value: POLICY_PARTITION_KEY_VALUE },
+        { name: '@policyGroupId', value: policyGroupId },
       ],
     };
 
@@ -391,7 +389,6 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     // Sort by version descending in code
     resources.sort((a, b) => b.version - a.version);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { docType, subjectId, ...rest } = resources[0] as Policy & {
       docType?: string;
       subjectId?: string;
@@ -400,7 +397,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
   }
 
   async findAllPolicyVersionsByGroupId(
-    policyGroupId: string
+    policyGroupId: string,
   ): Promise<Policy[]> {
     const container = this.getInitializedContainer();
     const querySpec = {
@@ -410,8 +407,8 @@ export class CosmosDBDataAdapter implements IDataAdapter {
               AND c.policyGroupId = @policyGroupId
               ORDER BY c.version ASC`,
       parameters: [
-        { name: "@policyPartitionKey", value: POLICY_PARTITION_KEY_VALUE },
-        { name: "@policyGroupId", value: policyGroupId },
+        { name: '@policyPartitionKey', value: POLICY_PARTITION_KEY_VALUE },
+        { name: '@policyGroupId', value: policyGroupId },
       ],
     };
     const { resources } = await container.items
@@ -428,7 +425,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
               AND c.subjectId = @policyPartitionKey
               ORDER BY c.policyGroupId ASC, c.version DESC`,
       parameters: [
-        { name: "@policyPartitionKey", value: POLICY_PARTITION_KEY_VALUE },
+        { name: '@policyPartitionKey', value: POLICY_PARTITION_KEY_VALUE },
       ],
     };
     const { resources } = await container.items
@@ -439,18 +436,18 @@ export class CosmosDBDataAdapter implements IDataAdapter {
 
   async findLatestConsentBySubjectAndPolicy(
     subjectId: string,
-    policyId: string
+    policyId: string,
   ): Promise<ConsentRecord | null> {
     const container = this.getInitializedContainer();
     const querySpec = {
       query:
-        "SELECT * FROM c " +
+        'SELECT * FROM c ' +
         "WHERE c.docType = 'consent' " +
-        "AND c.subjectId = @subjectId " +
-        "AND c.policyId = @policyId",
+        'AND c.subjectId = @subjectId ' +
+        'AND c.policyId = @policyId',
       parameters: [
-        { name: "@subjectId", value: subjectId },
-        { name: "@policyId", value: policyId },
+        { name: '@subjectId', value: subjectId },
+        { name: '@policyId', value: policyId },
       ],
     };
 
@@ -472,7 +469,7 @@ export class CosmosDBDataAdapter implements IDataAdapter {
 
   async findAllConsentVersionsBySubjectAndPolicy(
     subjectId: string,
-    policyId: string
+    policyId: string,
   ): Promise<ConsentRecord[]> {
     const container = this.getInitializedContainer();
     const querySpec = {
@@ -482,8 +479,8 @@ export class CosmosDBDataAdapter implements IDataAdapter {
               AND c.policyId = @policyId 
               ORDER BY c.version ASC`,
       parameters: [
-        { name: "@subjectId", value: subjectId },
-        { name: "@policyId", value: policyId },
+        { name: '@subjectId', value: subjectId },
+        { name: '@policyId', value: policyId },
       ],
     };
     const { resources } = await container.items
@@ -496,11 +493,11 @@ export class CosmosDBDataAdapter implements IDataAdapter {
     const container = this.getInitializedContainer();
     const querySpec: SqlQuerySpec = {
       query:
-        "SELECT * FROM c " +
+        'SELECT * FROM c ' +
         "WHERE c.docType = 'consent' " +
-        "AND c.consenter.userId = @proxyId " +
+        'AND c.consenter.userId = @proxyId ' +
         "AND c.consenter.type = 'proxy'",
-      parameters: [{ name: "@proxyId", value: proxyId }],
+      parameters: [{ name: '@proxyId', value: proxyId }],
     };
 
     const { resources } = await container.items

@@ -1,8 +1,8 @@
-import { useEffect, useCallback } from "react";
-import { deserializeConsentRecord } from "../utils/consentUtils.js";
-import type { ProfileData } from "../Profile/Profile.type.js";
-import type { StatusState } from "./useStatus.js";
-import type { ConsentRecord } from "@open-source-consent/types";
+import { useEffect, useCallback } from 'react';
+import { deserializeConsentRecord } from '../utils/consentUtils.js';
+import type { ProfileData } from '../Profile/Profile.type.js';
+import type { StatusState } from './useStatus.js';
+import type { ConsentRecord } from '@open-source-consent/types';
 
 interface ProxySubject {
   id: string;
@@ -27,9 +27,9 @@ export default function useFetchManagedSubjects(
   profileId: string | undefined,
   updateStatus: (updates: Partial<StatusState>) => void,
   setProfileData: (
-    updater: (prev: ProfileData | null) => ProfileData | null
+    updater: (prev: ProfileData | null) => ProfileData | null,
   ) => void,
-  subjectIdToDisplayName: (subjectId: string) => string
+  subjectIdToDisplayName: (subjectId: string) => string,
 ): FetchManagedSubjectsResult {
   // Fetch consents for a specific subject
   const fetchConsentsForSubject = useCallback(
@@ -46,7 +46,7 @@ export default function useFetchManagedSubjects(
         return [];
       }
     },
-    []
+    [],
   );
 
   // Fetch proxy subjects
@@ -62,7 +62,7 @@ export default function useFetchManagedSubjects(
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Failed to fetch proxy consents: ${response.status} ${errorText}`
+          `Failed to fetch proxy consents: ${response.status} ${errorText}`,
         );
       }
 
@@ -75,7 +75,7 @@ export default function useFetchManagedSubjects(
 
       for (const consent of consentsByProxy) {
         if (
-          consent.consenter.type === "proxy" &&
+          consent.consenter.type === 'proxy' &&
           consent.consenter.proxyDetails &&
           !subjectsFromProxyConsents.has(consent.subjectId)
         ) {
@@ -83,7 +83,7 @@ export default function useFetchManagedSubjects(
             id: consent.subjectId,
             name: subjectIdToDisplayName(consent.subjectId),
             relationship:
-              consent.consenter.proxyDetails.relationship || "Managed",
+              consent.consenter.proxyDetails.relationship || 'Managed',
             ageGroup: {
               id: consent.consenter.proxyDetails.subjectAgeGroup,
               label: consent.consenter.proxyDetails.subjectAgeGroup,
@@ -95,9 +95,9 @@ export default function useFetchManagedSubjects(
 
       return Array.from(subjectsFromProxyConsents.values());
     } catch (err: any) {
-      console.error("Error fetching proxy subjects:", err);
+      console.error('Error fetching proxy subjects:', err);
       updateStatus({
-        proxySubjectsError: err.message || "Failed to load managed subjects",
+        proxySubjectsError: err.message || 'Failed to load managed subjects',
       });
       return null;
     } finally {
@@ -125,11 +125,11 @@ export default function useFetchManagedSubjects(
             } catch (err) {
               console.error(
                 `Error fetching consents for proxy subject ${subject.id}:`,
-                err
+                err,
               );
               return subject;
             }
-          })
+          }),
         );
 
         setProfileData((prev) => {
@@ -137,11 +137,11 @@ export default function useFetchManagedSubjects(
 
           const existingManagedSubjects = prev.managedSubjects || [];
           const existingManagedSubjectIds = new Set(
-            existingManagedSubjects.map((ms) => ms.id)
+            existingManagedSubjects.map((ms) => ms.id),
           );
 
           const newSubjectsToAdd = subjectsWithConsents.filter(
-            (ps) => !existingManagedSubjectIds.has(ps.id)
+            (ps) => !existingManagedSubjectIds.has(ps.id),
           );
 
           if (newSubjectsToAdd.length === 0) return prev;

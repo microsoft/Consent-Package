@@ -7,13 +7,13 @@ const defaultRoles: Role[] = [
   {
     id: 'self',
     label: 'Self',
-    description: 'I am providing consent for myself'
+    description: 'I am providing consent for myself',
   },
   {
     id: 'proxy',
     label: 'Parent / Guardian / Representative',
-    description: 'I am providing consent on behalf of someone else'
-  }
+    description: 'I am providing consent on behalf of someone else',
+  },
 ];
 
 const RoleSelect: React.FC<RoleSelectProps> = ({
@@ -24,7 +24,9 @@ const RoleSelect: React.FC<RoleSelectProps> = ({
   submitLabel = 'Continue',
   showTitle = false,
 }) => {
-  const [selected, setSelected] = useState<string | undefined>(initialRoleIdValue ?? roles[0]?.id);
+  const [selected, setSelected] = useState<string | undefined>(
+    initialRoleIdValue ?? roles[0]?.id,
+  );
 
   const handleRoleSelect = (roleId: string): void => {
     setSelected(roleId);
@@ -37,9 +39,11 @@ const RoleSelect: React.FC<RoleSelectProps> = ({
 
   return (
     <div className="role-select-container">
-      {showTitle && <Text size={500} weight="semibold">
-        Select Role
-      </Text>}
+      {showTitle && (
+        <Text size={500} weight="semibold">
+          Select Role
+        </Text>
+      )}
       <div className="role-select-container">
         {roles.map((role) => (
           <Button
@@ -61,14 +65,16 @@ const RoleSelect: React.FC<RoleSelectProps> = ({
           </Button>
         ))}
       </div>
-      {onSubmit && <Button
-        appearance="primary"
-        onClick={handleSubmit}
-        disabled={!selected}
-        className="submit-button"
-      >
-        {submitLabel}
-      </Button>}
+      {onSubmit && (
+        <Button
+          appearance="primary"
+          onClick={handleSubmit}
+          disabled={!selected}
+          className="submit-button"
+        >
+          {submitLabel}
+        </Button>
+      )}
     </div>
   );
 };

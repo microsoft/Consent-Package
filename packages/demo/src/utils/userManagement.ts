@@ -1,5 +1,5 @@
-import type { ProfileData } from "@open-source-consent/ui";
-import { defaultMockUser } from "../../../api/src/mock/data/defaultUser.js";
+import type { ProfileData } from '@open-source-consent/ui';
+import { defaultMockUser } from '../../../api/src/mock/data/defaultUser.js';
 
 /**
  * This module handles mock user management.
@@ -7,7 +7,7 @@ import { defaultMockUser } from "../../../api/src/mock/data/defaultUser.js";
  * This framework does not provide auth or user management.
  */
 
-const USER_ID_STORAGE_KEY = "currentUserId";
+const USER_ID_STORAGE_KEY = 'currentUserId';
 let hasDefaultUserInitializationAttempted = false;
 
 export function getCurrentUserId(): string | null {
@@ -35,7 +35,7 @@ export async function initializeDefaultUser(): Promise<void> {
 void initializeDefaultUser();
 
 export async function fetchUserProfile(
-  userId: string
+  userId: string,
 ): Promise<ProfileData | null> {
   if (userId === defaultMockUser.id) {
     return defaultMockUser;
@@ -43,8 +43,8 @@ export async function fetchUserProfile(
   return {
     id: userId,
     name: `${userId}`,
-    email: `${userId.replace(/[^a-zA-Z0-9]/g, "-")}@example.com`,
-    role: { id: "self", label: "Myself" },
+    email: `${userId.replace(/[^a-zA-Z0-9]/g, '-')}@example.com`,
+    role: { id: 'self', label: 'Myself' },
     consents: [], // These are fetched from the API
     managedSubjects: [], // These are fetched from the API
   };

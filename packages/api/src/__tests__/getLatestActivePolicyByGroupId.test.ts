@@ -1,15 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   createMockContext,
   type MockRequest,
   initializeTestEnvironment,
-} from "./utils";
+} from './utils';
 
-vi.mock("@azure/functions");
-vi.mock("../shared/dataAdapter.js");
-vi.mock("@open-source-consent/core");
+vi.mock('@azure/functions');
+vi.mock('../shared/dataAdapter.js');
+vi.mock('@open-source-consent/core');
 
-describe("getLatestActivePolicyByGroupId function", () => {
+describe('getLatestActivePolicyByGroupId function', () => {
   let registeredHandlers: Record<string, Function>;
   let policyServiceMocks: any;
 
@@ -18,46 +18,46 @@ describe("getLatestActivePolicyByGroupId function", () => {
     vi.resetModules();
 
     const env: any = await initializeTestEnvironment([
-      "../functions/getLatestActivePolicyByGroupId.js",
+      '../functions/getLatestActivePolicyByGroupId.js',
     ]);
     registeredHandlers = env.registeredHandlers;
     policyServiceMocks = env.policyServiceMocks;
   });
 
-  it("should return the latest active policy when valid policyGroupId is provided", async () => {
-    const mockPolicy = { id: "policy1", version: "2", status: "active" };
+  it('should return the latest active policy when valid policyGroupId is provided', async () => {
+    const mockPolicy = { id: 'policy1', version: '2', status: 'active' };
     policyServiceMocks.getLatestActivePolicyByGroupId.mockResolvedValue(
-      mockPolicy
+      mockPolicy,
     );
 
     const request: MockRequest = {
-      params: { policyGroupId: "test-group-id" },
+      params: { policyGroupId: 'test-group-id' },
     };
     const context = createMockContext();
 
     const result = await registeredHandlers.getLatestActivePolicyByGroupId(
       request,
-      context
+      context,
     );
 
     expect(result.status).toBe(200);
     expect(result.jsonBody).toEqual(mockPolicy);
     expect(
-      policyServiceMocks.getLatestActivePolicyByGroupId
-    ).toHaveBeenCalledWith("test-group-id");
+      policyServiceMocks.getLatestActivePolicyByGroupId,
+    ).toHaveBeenCalledWith('test-group-id');
   });
 
-  it("should return 404 if no active policy is found", async () => {
+  it('should return 404 if no active policy is found', async () => {
     policyServiceMocks.getLatestActivePolicyByGroupId.mockResolvedValue(null);
 
     const request: MockRequest = {
-      params: { policyGroupId: "test-group-id" },
+      params: { policyGroupId: 'test-group-id' },
     };
     const context = createMockContext();
 
     const result = await registeredHandlers.getLatestActivePolicyByGroupId(
       request,
-      context
+      context,
     );
 
     expect(result.status).toBe(404);
@@ -66,7 +66,7 @@ describe("getLatestActivePolicyByGroupId function", () => {
     });
   });
 
-  it("should return 400 if policyGroupId is not provided", async () => {
+  it('should return 400 if policyGroupId is not provided', async () => {
     const request: MockRequest = {
       params: {}, // policyGroupId is missing
     };
@@ -74,72 +74,72 @@ describe("getLatestActivePolicyByGroupId function", () => {
 
     const result = await registeredHandlers.getLatestActivePolicyByGroupId(
       request,
-      context
+      context,
     );
 
     expect(result.status).toBe(400);
-    expect(result.jsonBody).toEqual({ error: "Policy Group ID is required" });
+    expect(result.jsonBody).toEqual({ error: 'Policy Group ID is required' });
   });
 
-  it("should handle database initialization failure", async () => {
-    const dataAdapterModule = await import("../shared/dataAdapter.js");
+  it('should handle database initialization failure', async () => {
+    const dataAdapterModule = await import('../shared/dataAdapter.js');
     (dataAdapterModule.getInitializedDataAdapter as any).mockRejectedValueOnce(
-      new Error("Database connection failed.")
+      new Error('Database connection failed.'),
     );
 
     const request: MockRequest = {
-      params: { policyGroupId: "test-group-id" },
+      params: { policyGroupId: 'test-group-id' },
     };
     const context = createMockContext();
 
     const result = await registeredHandlers.getLatestActivePolicyByGroupId(
       request,
-      context
+      context,
     );
 
     expect(result.status).toBe(500);
-    expect(result.jsonBody).toEqual({ error: "Database connection failed." });
+    expect(result.jsonBody).toEqual({ error: 'Database connection failed.' });
     expect(context.error).toHaveBeenCalled();
   });
 
-  it("should handle service error when getting latest active policy", async () => {
+  it('should handle service error when getting latest active policy', async () => {
     policyServiceMocks.getLatestActivePolicyByGroupId.mockRejectedValueOnce(
-      new Error("Service unavailable")
+      new Error('Service unavailable'),
     );
 
     const request: MockRequest = {
-      params: { policyGroupId: "test-group-id" },
+      params: { policyGroupId: 'test-group-id' },
     };
     const context = createMockContext();
 
     const result = await registeredHandlers.getLatestActivePolicyByGroupId(
       request,
-      context
+      context,
     );
 
     expect(result.status).toBe(500);
-    expect(result.jsonBody).toEqual({ error: "Service unavailable" });
+    expect(result.jsonBody).toEqual({ error: 'Service unavailable' });
     expect(context.error).toHaveBeenCalled();
   });
 
-  it("should handle non-Error object in service error", async () => {
+  it('should handle non-Error object in service error', async () => {
     policyServiceMocks.getLatestActivePolicyByGroupId.mockRejectedValueOnce(
-      "String error"
+      'String error',
     );
 
     const request: MockRequest = {
-      params: { policyGroupId: "test-group-id" },
+      params: { policyGroupId: 'test-group-id' },
     };
     const context = createMockContext();
 
     const result = await registeredHandlers.getLatestActivePolicyByGroupId(
       request,
-      context
+      context,
     );
 
     expect(result.status).toBe(500);
     expect(result.jsonBody).toEqual({
-      error: "An internal server error occurred.",
+      error: 'An internal server error occurred.',
     });
     expect(context.error).toHaveBeenCalled();
   });

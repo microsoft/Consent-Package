@@ -1,6 +1,6 @@
-import React from "react";
-import { Text, Badge, Button } from "@fluentui/react-components";
-import type { ConsentRecord } from "@open-source-consent/types";
+import React from 'react';
+import { Text, Badge, Button } from '@fluentui/react-components';
+import type { ConsentRecord } from '@open-source-consent/types';
 
 interface ScopeDisplayInfo {
   id: string;
@@ -16,13 +16,13 @@ interface ConsentsTabProps {
     consentId: string,
     policyId: string,
     scopeId: string,
-    currentGrantedScopes: string[]
+    currentGrantedScopes: string[],
   ): void;
   onGrantScope(
     consentId: string,
     policyId: string,
     scopeId: string,
-    currentGrantedScopes: string[]
+    currentGrantedScopes: string[],
   ): void;
 }
 
@@ -41,7 +41,7 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
 
   const getGrantedScopesForPolicy = (policyId: string): string[] => {
     const activeConsentForPolicy = consents.find(
-      (c) => c.policyId === policyId && c.status === "granted"
+      (c) => c.policyId === policyId && c.status === 'granted',
     );
     return activeConsentForPolicy
       ? Object.keys(activeConsentForPolicy.grantedScopes || {})
@@ -52,33 +52,33 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
     <div className="profile-consent-list-container">
       {consents.map((consent) => {
         const currentGrantedScopesForThisPolicy = getGrantedScopesForPolicy(
-          consent.policyId
+          consent.policyId,
         );
         const grantedDisplayScopes: Array<ScopeDisplayInfo> = [];
         const revokedDisplayScopes: Array<ScopeDisplayInfo> = [];
 
-        if (consent.status === "granted") {
+        if (consent.status === 'granted') {
           Object.entries(consent.grantedScopes || {}).forEach(
             ([scopeId, _scopeGrantDetails]) => {
               grantedDisplayScopes.push({
                 id: scopeId,
                 label: scopeId,
-                className: "scope-granted",
+                className: 'scope-granted',
                 canBeRevoked: true,
               });
-            }
+            },
           );
           Object.entries(consent.revokedScopes || {}).forEach(
             ([scopeId, scopeRevocation]) => {
               revokedDisplayScopes.push({
                 id: scopeId,
                 label: `${scopeId}`,
-                className: "scope-revoked-within-grant",
+                className: 'scope-revoked-within-grant',
                 canBeGranted: true,
               });
-            }
+            },
           );
-        } else if (consent.status === "revoked") {
+        } else if (consent.status === 'revoked') {
           const allOriginallyAssociatedScopeIds = new Set([
             ...Object.keys(consent.grantedScopes || {}),
             ...Object.keys(consent.revokedScopes || {}),
@@ -86,15 +86,15 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
 
           allOriginallyAssociatedScopeIds.forEach((scopeId) => {
             const explicitRevocation = consent.revokedScopes?.[scopeId];
-            let label = "";
-            let className = "";
+            let label = '';
+            let className = '';
 
             if (explicitRevocation) {
               label = `${scopeId} (revoked ${explicitRevocation.revokedAt.toLocaleDateString()})`;
-              className = "scope-explicitly-revoked";
+              className = 'scope-explicitly-revoked';
             } else {
               label = `${scopeId} (revoked as overall consent is revoked)`;
-              className = "scope-implicitly-revoked";
+              className = 'scope-implicitly-revoked';
             }
             revokedDisplayScopes.push({
               id: scopeId,
@@ -115,11 +115,11 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
             <Badge
               className="profile-consent-badge"
               color={
-                consent.status === "granted"
-                  ? "success"
-                  : consent.status === "revoked"
-                    ? "danger"
-                    : "warning"
+                consent.status === 'granted'
+                  ? 'success'
+                  : consent.status === 'revoked'
+                    ? 'danger'
+                    : 'warning'
               }
             >
               {consent.status}
@@ -132,7 +132,7 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
                   {grantedDisplayScopes.map((scope) => (
                     <li
                       key={scope.id}
-                      className={`profile-consent-scope-item ${scope.className || ""}`}
+                      className={`profile-consent-scope-item ${scope.className || ''}`}
                     >
                       <Text>{scope.label}</Text>
                       {scope.canBeRevoked && (
@@ -144,7 +144,7 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
                               consent.id,
                               consent.policyId,
                               scope.id,
-                              currentGrantedScopesForThisPolicy
+                              currentGrantedScopesForThisPolicy,
                             )
                           }
                         >
@@ -164,7 +164,7 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
                   {revokedDisplayScopes.map((scope) => (
                     <li
                       key={scope.id}
-                      className={`profile-consent-scope-item ${scope.className || ""}`}
+                      className={`profile-consent-scope-item ${scope.className || ''}`}
                     >
                       <Text>{scope.label}</Text>
                       {scope.canBeGranted && (
@@ -176,7 +176,7 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
                               consent.id,
                               consent.policyId,
                               scope.id,
-                              currentGrantedScopesForThisPolicy
+                              currentGrantedScopesForThisPolicy,
                             )
                           }
                         >
@@ -191,9 +191,9 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
 
             {grantedDisplayScopes.length === 0 &&
               revokedDisplayScopes.length === 0 &&
-              (consent.status === "granted" ||
-                consent.status === "revoked") && (
-                <Text as="div" style={{ marginLeft: "16px", marginTop: "8px" }}>
+              (consent.status === 'granted' ||
+                consent.status === 'revoked') && (
+                <Text as="div" style={{ marginLeft: '16px', marginTop: '8px' }}>
                   No specific scopes detailed for this consent event.
                 </Text>
               )}

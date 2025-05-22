@@ -5,15 +5,15 @@ import type {
   CreateNextConsentVersionInput,
   CreateConsentInput,
   PolicyScope,
-} from "@open-source-consent/types";
-import { BaseService } from "./BaseService.js";
+} from '@open-source-consent/types';
+import { BaseService } from './BaseService.js';
 
 export class ConsentService extends BaseService<IConsentDataAdapter> {
   private async getRevokedScopesMap(
     grantedScopes: string[],
     revokedScopesInput: string[] | undefined,
     policyId: string,
-    timestamp: Date
+    timestamp: Date,
   ): Promise<Record<string, { revokedAt: Date }>> {
     let finalRevokedScopeKeys: string[];
 
@@ -24,14 +24,14 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
       const policy = await policyAdapter.findPolicyById(policyId);
       if (!policy || !policy.availableScopes) {
         throw new Error(
-          `Cannot determine revoked scopes: Policy ${policyId} not found or has no available scopes.`
+          `Cannot determine revoked scopes: Policy ${policyId} not found or has no available scopes.`,
         );
       }
       const policyAvailableScopes = policy.availableScopes.map(
-        (scope: PolicyScope) => scope.key
+        (scope: PolicyScope) => scope.key,
       );
       finalRevokedScopeKeys = policyAvailableScopes.filter(
-        (key: string) => key !== undefined && !grantedScopes.includes(key)
+        (key: string) => key !== undefined && !grantedScopes.includes(key),
       );
     }
 
@@ -58,18 +58,18 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
     const latestConsentRecord =
       await this.adapter.findLatestConsentBySubjectAndPolicy(
         input.subjectId,
-        input.policyId
+        input.policyId,
       );
 
-    if (latestConsentRecord?.status === "revoked") {
+    if (latestConsentRecord?.status === 'revoked') {
       throw new Error(
-        `Consent record ${latestConsentRecord.id} for subject ${input.subjectId} and policy ${input.policyId} is revoked and cannot be granted again.`
+        `Consent record ${latestConsentRecord.id} for subject ${input.subjectId} and policy ${input.policyId} is revoked and cannot be granted again.`,
       );
     }
 
-    if (latestConsentRecord?.status === "superseded") {
+    if (latestConsentRecord?.status === 'superseded') {
       throw new Error(
-        `Consent record ${latestConsentRecord.id} for subject ${input.subjectId} and policy ${input.policyId} is superseded. The latest active should never be superseded, investigate issues with the DB.`
+        `Consent record ${latestConsentRecord.id} for subject ${input.subjectId} and policy ${input.policyId} is superseded. The latest active should never be superseded, investigate issues with the DB.`,
       );
     }
 
@@ -77,20 +77,20 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
       const currentEffectiveGrantedScopes = inputGrantedScopesMap;
       const newStatus =
         Object.keys(currentEffectiveGrantedScopes).length > 0
-          ? "granted"
-          : "revoked";
+          ? 'granted'
+          : 'revoked';
 
       const revokedScopesMapForNewVersion = await this.getRevokedScopesMap(
         input.grantedScopes,
         input.revokedScopes,
         input.policyId,
-        operationTimestamp
+        operationTimestamp,
       );
 
       const nextVersionData: CreateNextConsentVersionInput = {
         status: newStatus,
         consentedAt: latestConsentRecord.consentedAt,
-        revokedAt: newStatus === "revoked" ? operationTimestamp : undefined,
+        revokedAt: newStatus === 'revoked' ? operationTimestamp : undefined,
         consenter: input.consenter,
         grantedScopes: currentEffectiveGrantedScopes,
         revokedScopes: revokedScopesMapForNewVersion,
@@ -102,24 +102,24 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
       return this.supersedeConsent(
         latestConsentRecord.id,
         nextVersionData,
-        latestConsentRecord.version
+        latestConsentRecord.version,
       );
     } else {
       const initialRevokedScopesMap = await this.getRevokedScopesMap(
         input.grantedScopes,
         input.revokedScopes,
         input.policyId,
-        operationTimestamp
+        operationTimestamp,
       );
 
       const isGranted = input.grantedScopes.length > 0;
       const initialConsentData: Omit<
         ConsentRecord,
-        "id" | "createdAt" | "updatedAt"
+        'id' | 'createdAt' | 'updatedAt'
       > = {
         subjectId: input.subjectId,
         policyId: input.policyId,
-        status: isGranted ? "granted" : "revoked",
+        status: isGranted ? 'granted' : 'revoked',
         version: 1,
         consentedAt: operationTimestamp,
         revokedAt: isGranted ? undefined : operationTimestamp,
@@ -148,17 +148,17 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
       input.grantedScopes,
       input.revokedScopes,
       input.policyId,
-      now
+      now,
     );
 
     const isGranted = input.grantedScopes.length > 0;
     const initialConsentData: Omit<
       ConsentRecord,
-      "id" | "createdAt" | "updatedAt"
+      'id' | 'createdAt' | 'updatedAt'
     > = {
       subjectId: input.subjectId,
       policyId: input.policyId,
-      status: isGranted ? "granted" : "revoked",
+      status: isGranted ? 'granted' : 'revoked',
       version: 1,
       consentedAt: now,
       revokedAt: isGranted ? undefined : now,
@@ -178,7 +178,7 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
   private async supersedeConsent(
     oldConsentRecordId: string,
     newConsentVersionInput: CreateNextConsentVersionInput,
-    expectedOldVersion: number
+    expectedOldVersion: number,
   ): Promise<ConsentRecord> {
     const oldConsentRecord = await (
       this.adapter as IDataAdapter
@@ -186,27 +186,27 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
 
     if (!oldConsentRecord) {
       throw new Error(
-        `Consent record with ID ${oldConsentRecordId} not found to supersede.`
+        `Consent record with ID ${oldConsentRecordId} not found to supersede.`,
       );
     }
 
     if (oldConsentRecord.version !== expectedOldVersion) {
       throw new Error(
-        `Optimistic concurrency check failed for consent ${oldConsentRecordId}. Expected version ${expectedOldVersion}, found ${oldConsentRecord.version}.`
+        `Optimistic concurrency check failed for consent ${oldConsentRecordId}. Expected version ${expectedOldVersion}, found ${oldConsentRecord.version}.`,
       );
     }
 
-    if (oldConsentRecord.status === "superseded") {
+    if (oldConsentRecord.status === 'superseded') {
       throw new Error(
-        `Consent record ${oldConsentRecordId} has already been superseded.`
+        `Consent record ${oldConsentRecordId} has already been superseded.`,
       );
     }
     if (
-      oldConsentRecord.status === "revoked" &&
-      newConsentVersionInput.status !== "revoked"
+      oldConsentRecord.status === 'revoked' &&
+      newConsentVersionInput.status !== 'revoked'
     ) {
       throw new Error(
-        `Cannot supersede a 'revoked' consent record (${oldConsentRecordId}) with a non-revoked status. Revoked consents are terminal.`
+        `Cannot supersede a 'revoked' consent record (${oldConsentRecordId}) with a non-revoked status. Revoked consents are terminal.`,
       );
     }
 
@@ -215,7 +215,7 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
     // Prepare data for the new consent version record
     const newConsentRecordData: Omit<
       ConsentRecord,
-      "id" | "createdAt" | "updatedAt"
+      'id' | 'createdAt' | 'updatedAt'
     > = {
       subjectId: oldConsentRecord.subjectId,
       policyId: oldConsentRecord.policyId,
@@ -232,14 +232,14 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
 
     // Create the new consent version using the generic createConsent
     const newConsentRecord = await (this.adapter as IDataAdapter).createConsent(
-      newConsentRecordData
+      newConsentRecordData,
     );
 
     // Mark the old consent record as "superseded"
     await (this.adapter as IDataAdapter).updateConsentStatus(
       oldConsentRecord.id,
-      "superseded",
-      oldConsentRecord.version
+      'superseded',
+      oldConsentRecord.version,
     );
 
     return newConsentRecord;
@@ -252,7 +252,7 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
   async getSubjectConsentStatus(
     subjectId: string,
     scopes: string[],
-    policyId?: string
+    policyId?: string,
   ): Promise<Record<string, boolean>> {
     const status: Record<string, boolean> = {};
     scopes.forEach((s) => (status[s] = false));
@@ -261,9 +261,9 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
       const latestConsent =
         await this.adapter.findLatestConsentBySubjectAndPolicy(
           subjectId,
-          policyId
+          policyId,
         );
-      if (latestConsent && latestConsent.status === "granted") {
+      if (latestConsent && latestConsent.status === 'granted') {
         for (const scope of scopes) {
           if (
             latestConsent.grantedScopes[scope] &&
@@ -277,7 +277,7 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
       const subjectConsents =
         await this.adapter.findConsentsBySubject(subjectId);
       for (const consent of subjectConsents) {
-        if (consent.status === "granted") {
+        if (consent.status === 'granted') {
           for (const scope of scopes) {
             if (status[scope]) continue;
             if (
@@ -295,26 +295,26 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
 
   async getLatestConsentForSubjectAndPolicy(
     subjectId: string,
-    policyId: string
+    policyId: string,
   ): Promise<ConsentRecord | null> {
     return this.adapter.findLatestConsentBySubjectAndPolicy(
       subjectId,
-      policyId
+      policyId,
     );
   }
 
   async getAllConsentVersionsForSubjectAndPolicy(
     subjectId: string,
-    policyId: string
+    policyId: string,
   ): Promise<ConsentRecord[]> {
     return this.adapter.findAllConsentVersionsBySubjectAndPolicy(
       subjectId,
-      policyId
+      policyId,
     );
   }
 
   async getLatestConsentVersionsForSubject(
-    subjectId: string
+    subjectId: string,
   ): Promise<ConsentRecord[]> {
     const allConsentsForSubject =
       await this.adapter.findConsentsBySubject(subjectId);

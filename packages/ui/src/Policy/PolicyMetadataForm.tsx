@@ -1,29 +1,29 @@
-import React from "react";
+import React from 'react';
 import {
   Input,
   Checkbox,
   makeStyles,
   tokens,
   Label,
-} from "@fluentui/react-components";
-import type { CheckboxProps } from "@fluentui/react-components";
-import type { PolicyEditorFormData } from "../hooks/usePolicyEditor.js"; // Adjust path as needed
+} from '@fluentui/react-components';
+import type { CheckboxProps } from '@fluentui/react-components';
+import type { PolicyEditorFormData } from '../hooks/usePolicyEditor.js'; // Adjust path as needed
 
 const useStyles = makeStyles({
   fieldSet: {
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
     gap: tokens.spacingVerticalS,
   },
   statusSelect: {
-    height: "32px",
-    width: "100%",
+    height: '32px',
+    width: '100%',
     border: `1px solid ${tokens.colorNeutralStroke1}`,
     borderRadius: tokens.borderRadiusMedium,
     paddingLeft: tokens.spacingHorizontalS,
     backgroundColor: tokens.colorNeutralBackground1,
     color: tokens.colorNeutralForeground1,
-    ":focus": {
+    ':focus': {
       outline: `2px solid ${tokens.colorCompoundBrandStroke}`,
       borderColor: tokens.colorCompoundBrandStroke,
     },
@@ -33,20 +33,20 @@ const useStyles = makeStyles({
 interface PolicyMetadataFormProps {
   formData: Pick<
     PolicyEditorFormData,
-    | "title"
-    | "policyGroupId"
-    | "version"
-    | "effectiveDate"
-    | "jurisdiction"
-    | "requiresProxyForMinors"
-    | "status"
+    | 'title'
+    | 'policyGroupId'
+    | 'version'
+    | 'effectiveDate'
+    | 'jurisdiction'
+    | 'requiresProxyForMinors'
+    | 'status'
   >;
   onInputChange(
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ): void;
   onDateChange(event: React.ChangeEvent<HTMLInputElement>): void;
   onCheckboxChange(name: keyof PolicyEditorFormData, checked: boolean): void;
-  onStatusChange(status: PolicyEditorFormData["status"]): void;
+  onStatusChange(status: PolicyEditorFormData['status']): void;
   isNewPolicy: boolean;
 }
 
@@ -69,7 +69,7 @@ const PolicyMetadataForm: React.FC<PolicyMetadataFormProps> = ({
         <Input
           id="title"
           name="title"
-          value={formData.title || ""}
+          value={formData.title || ''}
           onChange={onInputChange}
           required
         />
@@ -83,7 +83,7 @@ const PolicyMetadataForm: React.FC<PolicyMetadataFormProps> = ({
           <Input
             id="policyGroupId"
             name="policyGroupId"
-            value={formData.policyGroupId || ""}
+            value={formData.policyGroupId || ''}
             onChange={onInputChange}
           />
         </div>
@@ -108,7 +108,7 @@ const PolicyMetadataForm: React.FC<PolicyMetadataFormProps> = ({
         <Input
           id="jurisdiction"
           name="jurisdiction"
-          value={formData.jurisdiction || ""}
+          value={formData.jurisdiction || ''}
           onChange={onInputChange}
         />
       </div>
@@ -121,8 +121,8 @@ const PolicyMetadataForm: React.FC<PolicyMetadataFormProps> = ({
           checked={formData.requiresProxyForMinors || false}
           onChange={(
             _ev: React.FormEvent<HTMLInputElement>,
-            data: CheckboxProps
-          ) => onCheckboxChange("requiresProxyForMinors", !!data.checked)}
+            data: CheckboxProps,
+          ) => onCheckboxChange('requiresProxyForMinors', !!data.checked)}
         />
       </div>
 
@@ -133,7 +133,7 @@ const PolicyMetadataForm: React.FC<PolicyMetadataFormProps> = ({
           name="status"
           value={formData.status}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            onStatusChange(e.target.value as PolicyEditorFormData["status"])
+            onStatusChange(e.target.value as PolicyEditorFormData['status'])
           }
           className={styles.statusSelect}
         >

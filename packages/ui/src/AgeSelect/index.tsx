@@ -10,22 +10,22 @@ const defaultAgeRanges: AgeRange[] = [
     label: 'Child',
     description: 'Ages 13 and under',
     minAge: 0,
-    maxAge: 12
+    maxAge: 12,
   },
   {
     id: '13-17',
     label: 'Teen',
     description: 'Ages 13 to 17',
     minAge: 13,
-    maxAge: 17
+    maxAge: 17,
   },
   {
     id: '18+',
     label: 'Adult',
     description: 'Ages 18 and over',
     minAge: 18,
-    maxAge: undefined
-  }
+    maxAge: undefined,
+  },
 ];
 
 // DatePicker or DateSelect applicable
@@ -39,7 +39,9 @@ const AgeSelect: React.FC<AgeSelectProps> = ({
   useDatePicker = false,
   showTitle = false,
 }) => {
-  const [selectedAgeRangeId, setSelectedAgeRangeId] = useState<string | undefined>(initialAgeRangeIdValue ?? ageRanges[0]?.id);
+  const [selectedAgeRangeId, setSelectedAgeRangeId] = useState<
+    string | undefined
+  >(initialAgeRangeIdValue ?? ageRanges[0]?.id);
   const [dob, setDob] = useState<Date | undefined>(undefined);
   const [age, setAge] = useState<number | undefined>(undefined);
 
@@ -52,12 +54,15 @@ const AgeSelect: React.FC<AgeSelectProps> = ({
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     // Adjust age if birthday hasn't occurred this year
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
-    
+
     return age;
   };
 
@@ -75,7 +80,7 @@ const AgeSelect: React.FC<AgeSelectProps> = ({
     const birthDate = new Date(date);
     const age = calculateAge(birthDate);
     const ageRangeId = findAgeRange(age);
-    
+
     if (ageRangeId) {
       setSelectedAgeRangeId(ageRangeId);
       setDob(birthDate);
@@ -90,48 +95,53 @@ const AgeSelect: React.FC<AgeSelectProps> = ({
 
   return (
     <div className="age-select-container">
-      {showTitle && <Text size={500} weight="semibold">
-        Select Age Range
-      </Text>}
-      {
-        useDatePicker ? <DatePicker
-            placeholder="Select date of birth..."
-            value={initialDateValue === undefined ? null : initialDateValue}
-            onSelectDate={handleDateSelect}
-            showGoToToday={false}
-            maxDate={new Date()}
-            allowTextInput
-          /> :
-          <div className="age-select-container">
-            {ageRanges.map((ageRange: AgeRange) => (
-              <Button
-                key={ageRange.id}
-                appearance="secondary"
-                onClick={() => handleAgeRangeSelect(ageRange.id)}
-                className={`age-range-button ${selectedAgeRangeId === ageRange.id ? 'selected' : ''}`}
-              >
-                <div className="age-range-content">
-                  <Text size={400} weight="semibold">
-                    {ageRange.label}
+      {showTitle && (
+        <Text size={500} weight="semibold">
+          Select Age Range
+        </Text>
+      )}
+      {useDatePicker ? (
+        <DatePicker
+          placeholder="Select date of birth..."
+          value={initialDateValue === undefined ? null : initialDateValue}
+          onSelectDate={handleDateSelect}
+          showGoToToday={false}
+          maxDate={new Date()}
+          allowTextInput
+        />
+      ) : (
+        <div className="age-select-container">
+          {ageRanges.map((ageRange: AgeRange) => (
+            <Button
+              key={ageRange.id}
+              appearance="secondary"
+              onClick={() => handleAgeRangeSelect(ageRange.id)}
+              className={`age-range-button ${selectedAgeRangeId === ageRange.id ? 'selected' : ''}`}
+            >
+              <div className="age-range-content">
+                <Text size={400} weight="semibold">
+                  {ageRange.label}
+                </Text>
+                {ageRange.description && (
+                  <Text size={300} className="age-range-description">
+                    {ageRange.description}
                   </Text>
-                  {ageRange.description && (
-                    <Text size={300} className="age-range-description">
-                      {ageRange.description}
-                    </Text>
-                  )}
-                </div>
-              </Button>
-            ))}
-          </div>
-      }
-      {onSubmit && <Button
-        appearance="primary"
-        onClick={handleSubmit}
-        disabled={!selectedAgeRangeId}
-        className="submit-button"
-      >
-        {submitLabel}
-      </Button>}
+                )}
+              </div>
+            </Button>
+          ))}
+        </div>
+      )}
+      {onSubmit && (
+        <Button
+          appearance="primary"
+          onClick={handleSubmit}
+          disabled={!selectedAgeRangeId}
+          className="submit-button"
+        >
+          {submitLabel}
+        </Button>
+      )}
     </div>
   );
 };

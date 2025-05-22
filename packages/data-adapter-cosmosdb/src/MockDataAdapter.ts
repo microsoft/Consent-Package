@@ -1,7 +1,7 @@
 import type {
   ConsentRecord,
   IConsentDataAdapter,
-} from "@open-source-consent/types";
+} from '@open-source-consent/types';
 
 export class MockDataAdapter implements IConsentDataAdapter {
   private consents: Map<string, ConsentRecord> = new Map();
@@ -13,7 +13,7 @@ export class MockDataAdapter implements IConsentDataAdapter {
   }
 
   async createConsent(
-    data: Omit<ConsentRecord, "id" | "createdAt" | "updatedAt">
+    data: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<ConsentRecord> {
     const now = new Date();
     const id = this.generateId();
@@ -30,8 +30,8 @@ export class MockDataAdapter implements IConsentDataAdapter {
 
   async updateConsent(
     id: string,
-    updates: Partial<Omit<ConsentRecord, "id" | "createdAt">>,
-    currentVersion: number
+    updates: Partial<Omit<ConsentRecord, 'id' | 'createdAt'>>,
+    currentVersion: number,
   ): Promise<ConsentRecord> {
     const existingConsent = this.consents.get(id);
     if (!existingConsent) {
@@ -39,7 +39,7 @@ export class MockDataAdapter implements IConsentDataAdapter {
     }
     if (existingConsent.version !== currentVersion) {
       throw new Error(
-        `Optimistic concurrency check failed for consent record ${id}. Expected version ${currentVersion}, found ${existingConsent.version}.`
+        `Optimistic concurrency check failed for consent record ${id}. Expected version ${currentVersion}, found ${existingConsent.version}.`,
       );
     }
     const updatedConsent = {
@@ -54,8 +54,8 @@ export class MockDataAdapter implements IConsentDataAdapter {
 
   async updateConsentStatus(
     id: string,
-    status: ConsentRecord["status"],
-    expectedVersion: number
+    status: ConsentRecord['status'],
+    expectedVersion: number,
   ): Promise<ConsentRecord> {
     const existingConsent = this.consents.get(id);
     if (!existingConsent) {
@@ -63,7 +63,7 @@ export class MockDataAdapter implements IConsentDataAdapter {
     }
     if (existingConsent.version !== expectedVersion) {
       throw new Error(
-        `Optimistic concurrency check failed for consent record ${id}. Expected version ${expectedVersion}, found ${existingConsent.version}.`
+        `Optimistic concurrency check failed for consent record ${id}. Expected version ${expectedVersion}, found ${existingConsent.version}.`,
       );
     }
     const updatedConsent: ConsentRecord = {
@@ -82,16 +82,16 @@ export class MockDataAdapter implements IConsentDataAdapter {
 
   async findConsentsBySubject(subjectId: string): Promise<ConsentRecord[]> {
     return Array.from(this.consents.values()).filter(
-      (consent) => consent.subjectId === subjectId
+      (consent) => consent.subjectId === subjectId,
     );
   }
 
   async findLatestConsentBySubjectAndPolicy(
     subjectId: string,
-    policyId: string
+    policyId: string,
   ): Promise<ConsentRecord | null> {
     const relevantConsents = Array.from(this.consents.values()).filter(
-      (c) => c.subjectId === subjectId && c.policyId === policyId
+      (c) => c.subjectId === subjectId && c.policyId === policyId,
     );
     if (relevantConsents.length === 0) return null;
     relevantConsents.sort((a, b) => b.version - a.version); // Sort descending by version
@@ -100,10 +100,10 @@ export class MockDataAdapter implements IConsentDataAdapter {
 
   async findAllConsentVersionsBySubjectAndPolicy(
     subjectId: string,
-    policyId: string
+    policyId: string,
   ): Promise<ConsentRecord[]> {
     const relevantConsents = Array.from(this.consents.values()).filter(
-      (c) => c.subjectId === subjectId && c.policyId === policyId
+      (c) => c.subjectId === subjectId && c.policyId === policyId,
     );
     relevantConsents.sort((a, b) => a.version - b.version); // Sort ascending by version
     return relevantConsents;
@@ -118,8 +118,8 @@ export class MockDataAdapter implements IConsentDataAdapter {
     return Array.from(this.consents.values()).filter(
       (consent) =>
         consent.consenter &&
-        consent.consenter.type === "proxy" &&
-        consent.consenter.userId === proxyId
+        consent.consenter.type === 'proxy' &&
+        consent.consenter.userId === proxyId,
     );
   }
 }

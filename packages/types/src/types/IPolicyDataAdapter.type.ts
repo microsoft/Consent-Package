@@ -1,5 +1,5 @@
-import type { Policy } from "./Policy.type.ts";
-import type { CreatePolicyInput } from "./PolicyInputs.type.ts";
+import type { Policy } from './Policy.type.ts';
+import type { CreatePolicyInput } from './PolicyInputs.type.ts';
 
 export interface IPolicyDataAdapter {
   /**
@@ -13,8 +13,8 @@ export interface IPolicyDataAdapter {
    */
   updatePolicyStatus(
     policyId: string,
-    status: Policy["status"],
-    expectedVersion: number
+    status: Policy['status'],
+    expectedVersion: number,
   ): Promise<Policy>;
 
   /**
@@ -26,7 +26,7 @@ export interface IPolicyDataAdapter {
    * Retrieves the latest active policy version for a given policy group ID.
    */
   findLatestActivePolicyByGroupId(
-    policyGroupId: string
+    policyGroupId: string,
   ): Promise<Policy | null>;
 
   /**

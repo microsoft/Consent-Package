@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Input,
   Textarea,
@@ -10,11 +10,11 @@ import {
   TabList,
   Tab,
   Subtitle2,
-} from "@fluentui/react-components";
-import type { TabValue, TabListProps } from "@fluentui/react-components";
-import type { PolicyContentSection } from "@open-source-consent/types";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+} from '@fluentui/react-components';
+import type { TabValue, TabListProps } from '@fluentui/react-components';
+import type { PolicyContentSection } from '@open-source-consent/types';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const useStyles = makeStyles({
   sectionCard: {
@@ -22,16 +22,16 @@ const useStyles = makeStyles({
     border: `1px solid ${tokens.colorNeutralStroke2}`,
     borderRadius: tokens.borderRadiusMedium,
     marginBottom: tokens.spacingVerticalM,
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
     gap: tokens.spacingVerticalM,
   },
   removeButton: {
     marginTop: tokens.spacingVerticalM,
-    alignSelf: "flex-end",
+    alignSelf: 'flex-end',
   },
   quillEditor: {
-    height: "200px",
+    height: '200px',
     marginBottom: tokens.spacingVerticalL,
   },
   previewContainer: {
@@ -39,7 +39,7 @@ const useStyles = makeStyles({
     padding: tokens.spacingHorizontalM,
     border: `1px solid ${tokens.colorNeutralStroke2}`,
     borderRadius: tokens.borderRadiusMedium,
-    minHeight: "100px",
+    minHeight: '100px',
     backgroundColor: tokens.colorSubtleBackground,
   },
   previewTitle: {
@@ -56,7 +56,7 @@ interface PolicyContentSectionEditorProps {
   onUpdateSection(
     index: number,
     field: keyof PolicyContentSection,
-    value: string
+    value: string,
   ): void;
   onRemoveSection(index: number): void;
   quillModules?: Record<string, unknown>;
@@ -72,21 +72,21 @@ const PolicyContentSectionEditor: React.FC<PolicyContentSectionEditorProps> = ({
   quillFormats,
 }) => {
   const styles = useStyles();
-  const [selectedTab, setSelectedTab] = useState<TabValue>("edit");
+  const [selectedTab, setSelectedTab] = useState<TabValue>('edit');
 
   const defaultQuillModules = {
     toolbar: [
-      [{ header: "1" }, { header: "2" }, { font: [] }],
+      [{ header: '1' }, { header: '2' }, { font: [] }],
       [{ size: [] }],
-      ["bold", "italic", "underline", "strike", "blockquote"],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
       [
-        { list: "ordered" },
-        { list: "bullet" },
-        { indent: "-1" },
-        { indent: "+1" },
+        { list: 'ordered' },
+        { list: 'bullet' },
+        { indent: '-1' },
+        { indent: '+1' },
       ],
-      ["link", "image", "video"],
-      ["clean"],
+      ['link', 'image', 'video'],
+      ['clean'],
     ],
     clipboard: {
       matchVisual: false,
@@ -94,25 +94,25 @@ const PolicyContentSectionEditor: React.FC<PolicyContentSectionEditorProps> = ({
   };
 
   const defaultQuillFormats = [
-    "header",
-    "font",
-    "size",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "blockquote",
-    "list",
-    "bullet",
-    "indent",
-    "link",
-    "image",
-    "video",
+    'header',
+    'font',
+    'size',
+    'bold',
+    'italic',
+    'underline',
+    'strike',
+    'blockquote',
+    'list',
+    'bullet',
+    'indent',
+    'link',
+    'image',
+    'video',
   ];
 
-  const handleTabSelect: TabListProps["onTabSelect"] = (
+  const handleTabSelect: TabListProps['onTabSelect'] = (
     _event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
-    data: { value: TabValue }
+    data: { value: TabValue },
   ) => {
     setSelectedTab(data.value);
   };
@@ -123,7 +123,7 @@ const PolicyContentSectionEditor: React.FC<PolicyContentSectionEditorProps> = ({
         placeholder="Section Title"
         value={section.title}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          onUpdateSection(index, "title", e.target.value)
+          onUpdateSection(index, 'title', e.target.value)
         }
         required
       />
@@ -131,7 +131,7 @@ const PolicyContentSectionEditor: React.FC<PolicyContentSectionEditorProps> = ({
         placeholder="Section Description"
         value={section.description}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-          onUpdateSection(index, "description", e.target.value)
+          onUpdateSection(index, 'description', e.target.value)
         }
         required
       />
@@ -159,7 +159,7 @@ const PolicyContentSectionEditor: React.FC<PolicyContentSectionEditorProps> = ({
         </Tab>
       </TabList>
 
-      {selectedTab === "edit" && (
+      {selectedTab === 'edit' && (
         <div
           id={`section-${index}-edit-panel`}
           role="tabpanel"
@@ -172,7 +172,7 @@ const PolicyContentSectionEditor: React.FC<PolicyContentSectionEditorProps> = ({
             theme="snow"
             value={section.content}
             onChange={(contentValue: string) => {
-              onUpdateSection(index, "content", contentValue);
+              onUpdateSection(index, 'content', contentValue);
             }}
             modules={quillModules || defaultQuillModules}
             formats={quillFormats || defaultQuillFormats}
@@ -181,7 +181,7 @@ const PolicyContentSectionEditor: React.FC<PolicyContentSectionEditorProps> = ({
         </div>
       )}
 
-      {selectedTab === "preview" && (
+      {selectedTab === 'preview' && (
         <div
           id={`section-${index}-preview-panel`}
           role="tabpanel"

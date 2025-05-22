@@ -1,17 +1,17 @@
-import { useCallback } from "react";
-import type { AgeGroup, CreateConsentInput } from "@open-source-consent/types";
+import { useCallback } from 'react';
+import type { AgeGroup, CreateConsentInput } from '@open-source-consent/types';
 import type {
   ProfileData,
   ManagedSubject,
   SubjectForConsentUpdate,
-} from "../Profile/Profile.type.js";
-import { getAgeGroup } from "../utils/ageUtils.js";
-import type { StatusState } from "./useStatus.js";
-import useFetchConsents from "./useFetchConsents.js";
+} from '../Profile/Profile.type.js';
+import { getAgeGroup } from '../utils/ageUtils.js';
+import type { StatusState } from './useStatus.js';
+import useFetchConsents from './useFetchConsents.js';
 
 export const useConsents = (
   profileData: ProfileData | null,
-  updateStatus: (updates: Partial<StatusState>) => void
+  updateStatus: (updates: Partial<StatusState>) => void,
 ) => {
   const { fetchConsentsForSubject } = useFetchConsents(updateStatus);
 
@@ -19,12 +19,12 @@ export const useConsents = (
     async (
       subjectId: string,
       setProfileData: (
-        updater: (prev: ProfileData | null) => ProfileData | null
+        updater: (prev: ProfileData | null) => ProfileData | null,
       ) => void,
       selectedSubject: ManagedSubject | null,
       setSelectedSubject: (
-        updater: (prev: ManagedSubject | null) => ManagedSubject | null
-      ) => void
+        updater: (prev: ManagedSubject | null) => ManagedSubject | null,
+      ) => void,
     ) => {
       updateStatus({ isLoadingConsents: true });
       const fetchedConsents = await fetchConsentsForSubject(subjectId);
@@ -40,7 +40,7 @@ export const useConsents = (
             return {
               ...prev,
               managedSubjects: prev.managedSubjects.map((ms) =>
-                ms.id === subjectId ? { ...ms, consents: fetchedConsents } : ms
+                ms.id === subjectId ? { ...ms, consents: fetchedConsents } : ms,
               ),
             };
           }
@@ -49,12 +49,12 @@ export const useConsents = (
 
         if (selectedSubject?.id === subjectId) {
           setSelectedSubject((prev) =>
-            prev ? { ...prev, consents: fetchedConsents } : null
+            prev ? { ...prev, consents: fetchedConsents } : null,
           );
         }
       }
     },
-    [fetchConsentsForSubject, updateStatus]
+    [fetchConsentsForSubject, updateStatus],
   );
 
   const updateConsents = useCallback(
@@ -78,7 +78,7 @@ export const useConsents = (
             managedSubjects.map(async (ms) => {
               const consents = await fetchConsentsForSubject(ms.id);
               return { subjectId: ms.id, consents };
-            })
+            }),
           );
 
           const updatedManagedSubjects = managedSubjects.map((ms) => {
@@ -93,16 +93,16 @@ export const useConsents = (
 
         return updatedProfile;
       } catch (err: any) {
-        console.error("Error fetching consents:", err);
+        console.error('Error fetching consents:', err);
         updateStatus({
-          consentsError: err.message || "Failed to load consents",
+          consentsError: err.message || 'Failed to load consents',
         });
         return null;
       } finally {
         updateStatus({ isLoadingConsents: false });
       }
     },
-    [fetchConsentsForSubject, updateStatus]
+    [fetchConsentsForSubject, updateStatus],
   );
 
   const handleScopeChange = useCallback(
@@ -113,26 +113,26 @@ export const useConsents = (
       policyId: string,
       scopeId: string,
       currentActiveScopes: string[],
-      action: "grant" | "revoke",
-      refreshConsents: (subjectId: string) => Promise<void>
+      action: 'grant' | 'revoke',
+      refreshConsents: (subjectId: string) => Promise<void>,
     ) => {
       updateStatus({ isSavingConsent: true, saveConsentError: null });
 
       try {
         const finalGrantedScopes =
-          action === "grant"
+          action === 'grant'
             ? [...currentActiveScopes, scopeId].filter(
-                (s, i, a) => a.indexOf(s) === i
+                (s, i, a) => a.indexOf(s) === i,
               ) // Add and deduplicate
             : currentActiveScopes.filter((s) => s !== scopeId); // Remove
 
-        let determinedAgeGroup: AgeGroup = "18+";
+        let determinedAgeGroup: AgeGroup = '18+';
         if (isProxyConsenter) {
           determinedAgeGroup =
             subjectForConsent.directAgeGroup ||
             (subjectForConsent.ageForGroupDetermination !== undefined
               ? getAgeGroup(subjectForConsent.ageForGroupDetermination)
-              : "18+");
+              : '18+');
         }
 
         const consentInput: CreateConsentInput = {
@@ -140,48 +140,48 @@ export const useConsents = (
           policyId: policyId,
           consenter: isProxyConsenter
             ? {
-                type: "proxy",
+                type: 'proxy',
                 userId: proxyConsenterId,
                 proxyDetails: {
                   relationship:
-                    subjectForConsent.roleForRelationship || "unknown",
+                    subjectForConsent.roleForRelationship || 'unknown',
                   subjectAgeGroup: determinedAgeGroup,
                 },
               }
             : {
-                type: "self",
+                type: 'self',
                 userId: subjectForConsent.id,
               },
           grantedScopes: finalGrantedScopes,
           metadata: {
-            consentMethod: "digital_form",
+            consentMethod: 'digital_form',
           },
         };
 
-        const response = await fetch("/api/consents", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch('/api/consents', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(consentInput),
         });
 
         if (!response.ok) {
           const errorBody = await response.text();
           throw new Error(
-            `Failed to save consent: ${response.status} ${errorBody || response.statusText}`
+            `Failed to save consent: ${response.status} ${errorBody || response.statusText}`,
           );
         }
 
         await refreshConsents(subjectForConsent.id);
       } catch (err: any) {
-        console.error("Error saving consent:", err);
+        console.error('Error saving consent:', err);
         updateStatus({
-          saveConsentError: err.message || "Failed to save consent",
+          saveConsentError: err.message || 'Failed to save consent',
         });
       } finally {
         updateStatus({ isSavingConsent: false });
       }
     },
-    [updateStatus]
+    [updateStatus],
   );
 
   return {

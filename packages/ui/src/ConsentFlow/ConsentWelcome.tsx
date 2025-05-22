@@ -1,5 +1,5 @@
-import AgeSelect from "../AgeSelect/index.js";
-import RoleSelect from "../RoleSelect/index.js";
+import AgeSelect from '../AgeSelect/index.js';
+import RoleSelect from '../RoleSelect/index.js';
 import {
   makeStyles,
   Text,
@@ -7,13 +7,13 @@ import {
   Input,
   Button,
   tokens,
-} from "@fluentui/react-components";
-import type { ChangeEvent, FocusEvent } from "react";
-import type { Policy } from "@open-source-consent/types";
+} from '@fluentui/react-components';
+import type { ChangeEvent, FocusEvent } from 'react';
+import type { Policy } from '@open-source-consent/types';
 import type {
   ConsentFlowFormData,
   ConsentFlowManagedSubject,
-} from "./ConsentFlow.type.js";
+} from './ConsentFlow.type.js';
 
 interface ConsentWelcomeProps {
   policy: Policy;
@@ -33,38 +33,38 @@ interface ConsentWelcomeProps {
 
 const useStyles = makeStyles({
   root: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "24px",
-    marginBottom: "32px",
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '24px',
+    marginBottom: '32px',
   },
   form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "16px",
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
   },
   managedSubjectsForm: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "16px",
-    marginTop: "16px",
-    padding: "16px",
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    marginTop: '16px',
+    padding: '16px',
     border: `1px solid ${tokens.colorNeutralStroke1}`,
     borderRadius: tokens.borderRadiusMedium,
   },
   managedSubject: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "16px",
-    padding: "16px",
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    padding: '16px',
     border: `1px solid ${tokens.colorNeutralStroke1}`,
     borderRadius: tokens.borderRadiusMedium,
   },
   managedSubjectHeader: {
-    display: "flex",
-    flexDirection: "row-reverse",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
+    display: 'flex',
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
   },
 });
 
@@ -78,7 +78,7 @@ const ConsentWelcome = ({
   const styles = useStyles();
 
   const handleFormDataChange = (
-    updates: Partial<ConsentFlowFormData>
+    updates: Partial<ConsentFlowFormData>,
   ): void => {
     const newFormData = { ...formData, ...updates };
     onFormDataChange(newFormData);
@@ -90,9 +90,9 @@ const ConsentWelcome = ({
       managedSubjects: [
         ...formData.managedSubjects,
         {
-          id: "",
-          name: "",
-          ageRangeId: "",
+          id: '',
+          name: '',
+          ageRangeId: '',
         },
       ],
     };
@@ -109,7 +109,7 @@ const ConsentWelcome = ({
 
   const handleManagedSubjectChange = (
     index: number,
-    updates: Partial<ConsentFlowManagedSubject>
+    updates: Partial<ConsentFlowManagedSubject>,
   ): void => {
     const newFormData = {
       ...formData,
@@ -125,10 +125,10 @@ const ConsentWelcome = ({
 
   const handleManagedSubjectBlur = (
     index: number,
-    e: FocusEvent<HTMLInputElement>
+    e: FocusEvent<HTMLInputElement>,
   ): void => {
     const name = e.target.value.trim();
-    if (name === "") return;
+    if (name === '') return;
 
     const subject = formData.managedSubjects[index];
     const newId = getSubjectId(name);
@@ -187,7 +187,7 @@ const ConsentWelcome = ({
             <RoleSelect
               initialRoleIdValue={formData.roleId}
               onChange={(roleId: string) =>
-                handleFormDataChange({ roleId, isProxy: roleId === "proxy" })
+                handleFormDataChange({ roleId, isProxy: roleId === 'proxy' })
               }
             />
           </>

@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, useNavigate } from "react-router";
+import React from 'react';
+import { Link, useNavigate } from 'react-router';
 import {
   Button,
   Card,
@@ -8,34 +8,34 @@ import {
   tokens,
   Spinner,
   Text,
-} from "@fluentui/react-components";
-import { usePolicyList, PolicyTable } from "@open-source-consent/ui";
+} from '@fluentui/react-components';
+import { usePolicyList, PolicyTable } from '@open-source-consent/ui';
 
 const useStyles = makeStyles({
   root: {
-    padding: "24px 64px",
-    margin: "0 auto",
-    maxWidth: "1200px",
-    "@media (max-width: 768px)": {
-      padding: "24px",
+    padding: '24px 64px',
+    margin: '0 auto',
+    maxWidth: '1200px',
+    '@media (max-width: 768px)': {
+      padding: '24px',
     },
   },
   card: {
-    ...shorthands.padding("20px"),
+    ...shorthands.padding('20px'),
     boxShadow: tokens.shadow8,
     borderRadius: tokens.borderRadiusMedium,
   },
   headerContainer: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: tokens.spacingVerticalL,
   },
   loading: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "400px",
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '400px',
   },
 });
 

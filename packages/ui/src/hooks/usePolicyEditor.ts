@@ -1,17 +1,17 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 import type {
   Policy,
   PolicyContentSection,
   PolicyScope,
   CreatePolicyInput,
   NewPolicyVersionDataInput,
-} from "@open-source-consent/types";
-import useFetchPolicy from "./useFetchPolicy.js";
-import useSavePolicy from "./useSavePolicy.js";
+} from '@open-source-consent/types';
+import useFetchPolicy from './useFetchPolicy.js';
+import useSavePolicy from './useSavePolicy.js';
 
 export type PolicyEditorFormData = Omit<
   CreatePolicyInput,
-  "effectiveDate" | "contentSections" | "availableScopes"
+  'effectiveDate' | 'contentSections' | 'availableScopes'
 > & {
   effectiveDate: string;
   contentSections: Array<PolicyContentSection>;
@@ -29,28 +29,28 @@ interface UsePolicyEditorResult {
   updateContentSection(
     index: number,
     field: keyof PolicyContentSection,
-    value: string
+    value: string,
   ): void;
   removeContentSection(index: number): void;
   addScope(): void;
   updateScope(
     index: number,
     field: keyof PolicyScope,
-    value: string | boolean
+    value: string | boolean,
   ): void;
   removeScope(index: number): void;
 }
 
 const getDefaultFormData = (): PolicyEditorFormData => ({
-  title: "",
-  policyGroupId: "",
+  title: '',
+  policyGroupId: '',
   version: 1,
-  effectiveDate: "",
-  contentSections: [{ title: "", description: "", content: "" }],
-  availableScopes: [{ key: "", name: "", description: "", required: false }],
-  jurisdiction: "",
+  effectiveDate: '',
+  contentSections: [{ title: '', description: '', content: '' }],
+  availableScopes: [{ key: '', name: '', description: '', required: false }],
+  jurisdiction: '',
   requiresProxyForMinors: false,
-  status: "draft",
+  status: 'draft',
 });
 
 const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
@@ -72,11 +72,11 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
           setPolicy(data);
           setFormData({
             policyGroupId: data.policyGroupId,
-            title: data.title || "",
+            title: data.title || '',
             version: data.version,
             effectiveDate: new Date(data.effectiveDate)
               .toISOString()
-              .split("T")[0],
+              .split('T')[0],
             contentSections: data.contentSections.map((section) => ({
               title: section.title,
               description: section.description,
@@ -88,14 +88,14 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
               description: scope.description,
               required: scope.required || false,
             })),
-            jurisdiction: data.jurisdiction || "",
+            jurisdiction: data.jurisdiction || '',
             requiresProxyForMinors: data.requiresProxyForMinors || false,
             status: data.status,
           });
         })
         .catch((err) => {
-          console.error("Error fetching policy for editing:", err);
-          setError(err.message || "An unknown error occurred");
+          console.error('Error fetching policy for editing:', err);
+          setError(err.message || 'An unknown error occurred');
           setPolicy(null);
         })
         .finally(() => {
@@ -112,7 +112,7 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
       ...prev,
       contentSections: [
         ...prev.contentSections,
-        { title: "", description: "", content: "" },
+        { title: '', description: '', content: '' },
       ],
     }));
   }, [setFormData]);
@@ -126,7 +126,7 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
         return { ...prev, contentSections: newSections };
       });
     },
-    [setFormData]
+    [setFormData],
   );
 
   const removeContentSection = useCallback(
@@ -136,7 +136,7 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
         contentSections: prev.contentSections.filter((_, i) => i !== index),
       }));
     },
-    [setFormData]
+    [setFormData],
   );
 
   const addScope = useCallback(() => {
@@ -144,7 +144,7 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
       ...prev,
       availableScopes: [
         ...prev.availableScopes,
-        { key: "", name: "", description: "", required: false },
+        { key: '', name: '', description: '', required: false },
       ],
     }));
   }, [setFormData]);
@@ -158,7 +158,7 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
         return { ...prev, availableScopes: newScopes };
       });
     },
-    [setFormData]
+    [setFormData],
   );
 
   const removeScope = useCallback(
@@ -168,7 +168,7 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
         availableScopes: prev.availableScopes.filter((_, i) => i !== index),
       }));
     },
-    [setFormData]
+    [setFormData],
   );
 
   const savePolicy = useCallback(async () => {
@@ -197,12 +197,12 @@ const usePolicyEditor = (policyIdToEdit?: string): UsePolicyEditorResult => {
         }));
       } else {
         setPolicy((prevPolicy) =>
-          prevPolicy ? { ...prevPolicy, ...saved } : saved
+          prevPolicy ? { ...prevPolicy, ...saved } : saved,
         );
       }
     } catch (err: any) {
-      console.error("Error saving policy:", err);
-      setError(err.message || "An unknown error occurred while saving.");
+      console.error('Error saving policy:', err);
+      setError(err.message || 'An unknown error occurred while saving.');
     } finally {
       setIsLoading(false);
     }

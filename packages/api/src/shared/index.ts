@@ -1,1 +1,1 @@
-export { setDataAdapter, getInitializedDataAdapter } from "./dataAdapter.js";
+export { setDataAdapter, getInitializedDataAdapter } from './dataAdapter.js';

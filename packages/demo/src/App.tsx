@@ -1,19 +1,19 @@
-import { Outlet, ScrollRestoration } from "react-router";
-import { Header } from "./components/Header.js";
-import { Footer } from "./components/Footer.js";
-import { makeStyles, shorthands } from "@fluentui/react-components";
-import { useAuth } from "./utils/useAuth.js";
+import { Outlet, ScrollRestoration } from 'react-router';
+import { Header } from './components/Header.js';
+import { Footer } from './components/Footer.js';
+import { makeStyles, shorthands } from '@fluentui/react-components';
+import { useAuth } from './utils/useAuth.js';
 
 const useStyles = makeStyles({
   root: {
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "100vh",
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh',
   },
   main: {
     flex: 1,
-    ...shorthands.padding("16px"),
-    paddingTop: "88px",
+    ...shorthands.padding('16px'),
+    paddingTop: '88px',
   },
 });
 

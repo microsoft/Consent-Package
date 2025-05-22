@@ -6,24 +6,24 @@ import {
   beforeEach,
   beforeAll,
   afterAll,
-} from "vitest";
-import { CosmosClient } from "@azure/cosmos";
-import { type CosmosDBConfig, CosmosDBDataAdapter } from "../index.js";
-import type { Policy, CreatePolicyInput } from "@open-source-consent/types";
+} from 'vitest';
+import { CosmosClient } from '@azure/cosmos';
+import { type CosmosDBConfig, CosmosDBDataAdapter } from '../index.js';
+import type { Policy, CreatePolicyInput } from '@open-source-consent/types';
 
-describe("CosmosDBDataAdapter", () => {
+describe('CosmosDBDataAdapter', () => {
   let dataAdapter: CosmosDBDataAdapter;
   /**
    * This is a default cosmosdb emulator config.
    */
   const testConfig = {
-    endpoint: process.env.COSMOSDB_ENDPOINT || "https://localhost:8081",
+    endpoint: process.env.COSMOSDB_ENDPOINT || 'https://localhost:8081',
     key:
       process.env.COSMOSDB_KEY ||
-      "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
+      'C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==',
     databaseName: `test-db-${Date.now()}`,
-    containerName: "test-container",
-    partitionKeyPath: "/subjectId",
+    containerName: 'test-container',
+    partitionKeyPath: '/subjectId',
   } as CosmosDBConfig;
 
   beforeAll(async () => {
@@ -42,7 +42,7 @@ describe("CosmosDBDataAdapter", () => {
       } catch (error) {
         console.error(
           `Failed to delete test database ${testConfig.databaseName}:`,
-          error
+          error,
         );
       }
     }
@@ -52,8 +52,8 @@ describe("CosmosDBDataAdapter", () => {
     vi.clearAllMocks();
   });
 
-  describe("initialize", () => {
-    it("should initialize client, database and container with default /subjectId partition key", async () => {
+  describe('initialize', () => {
+    it('should initialize client, database and container with default /subjectId partition key', async () => {
       // Arrange
       const localAdapterConfig = {
         ...testConfig,
@@ -73,9 +73,9 @@ describe("CosmosDBDataAdapter", () => {
       await client.database(localAdapterConfig.databaseName).delete(); // Use the specific db name for this test
     });
 
-    it("should initialize with a custom partition key path if provided", async () => {
+    it('should initialize with a custom partition key path if provided', async () => {
       // Arrange
-      const customPartitionKey = "/customKey";
+      const customPartitionKey = '/customKey';
       const dbNameForCustomKeyTest = `init-test-db2-${Date.now()}`;
       const adapterWithCustomKeyConfig = {
         ...testConfig,
@@ -83,7 +83,7 @@ describe("CosmosDBDataAdapter", () => {
         partitionKeyPath: customPartitionKey,
       };
       const adapterWithCustomKey = new CosmosDBDataAdapter(
-        adapterWithCustomKeyConfig
+        adapterWithCustomKeyConfig,
       );
 
       // Act
@@ -100,14 +100,14 @@ describe("CosmosDBDataAdapter", () => {
       await client.database(adapterWithCustomKeyConfig.databaseName).delete();
     });
 
-    it("should reuse existing initialization promise", async () => {
+    it('should reuse existing initialization promise', async () => {
       // Arrange
       const localTestAdapterConfig = {
         ...testConfig,
         databaseName: `reuse-promise-db-${Date.now()}`,
       };
       const localTestAdapter = new CosmosDBDataAdapter(localTestAdapterConfig);
-      const spy = vi.spyOn(localTestAdapter as any, "_initialize");
+      const spy = vi.spyOn(localTestAdapter as any, '_initialize');
 
       // Act
       const promise1 = localTestAdapter.initialize();
@@ -130,24 +130,24 @@ describe("CosmosDBDataAdapter", () => {
       } catch (error) {
         console.error(
           `Failed to delete DB for reuse promise test: ${localTestAdapterConfig.databaseName}`,
-          error
+          error,
         );
       }
     });
   });
 
-  describe("createConsent", () => {
-    it("should create a consent record with auto-generated fields set to mocked system time", async () => {
+  describe('createConsent', () => {
+    it('should create a consent record with auto-generated fields set to mocked system time', async () => {
       // dataAdapter is initialized in beforeAll
       const inputData = {
-        subjectId: "s1",
-        policyId: "p1",
-        status: "granted" as const,
+        subjectId: 's1',
+        policyId: 'p1',
+        status: 'granted' as const,
         version: 1,
-        consentedAt: new Date("2023-01-01"),
-        consenter: { type: "self" as const, userId: "u1" },
-        grantedScopes: { testScope: { grantedAt: new Date("2023-01-01") } },
-        metadata: { consentMethod: "digital_form" as const },
+        consentedAt: new Date('2023-01-01'),
+        consenter: { type: 'self' as const, userId: 'u1' },
+        grantedScopes: { testScope: { grantedAt: new Date('2023-01-01') } },
+        metadata: { consentMethod: 'digital_form' as const },
       };
 
       // Act
@@ -160,27 +160,27 @@ describe("CosmosDBDataAdapter", () => {
       expect(createdConsent.status).toBe(inputData.status);
       expect(createdConsent.version).toBe(inputData.version);
       expect(createdConsent.consentedAt).toEqual(
-        inputData.consentedAt.toISOString()
+        inputData.consentedAt.toISOString(),
       );
       expect(createdConsent.consenter).toEqual(inputData.consenter);
       expect(createdConsent.grantedScopes.testScope.grantedAt).toEqual(
-        inputData.grantedScopes.testScope.grantedAt.toISOString()
+        inputData.grantedScopes.testScope.grantedAt.toISOString(),
       );
       expect(createdConsent.metadata).toEqual(inputData.metadata);
       // Check createdAt and updatedAt are valid, recent date strings
       expect(new Date(createdConsent.createdAt).getTime()).toBeGreaterThan(0);
       expect(
-        Date.now() - new Date(createdConsent.createdAt).getTime()
+        Date.now() - new Date(createdConsent.createdAt).getTime(),
       ).toBeLessThan(6000);
       expect(new Date(createdConsent.updatedAt).getTime()).toBeGreaterThan(0);
       expect(
-        Date.now() - new Date(createdConsent.updatedAt).getTime()
+        Date.now() - new Date(createdConsent.updatedAt).getTime(),
       ).toBeLessThan(6000);
       expect(createdConsent.updatedAt).toEqual(createdConsent.createdAt);
 
       // Verify by fetching from DB
       const fetchedConsent = await dataAdapter.findConsentById(
-        createdConsent.id
+        createdConsent.id,
       );
       expect(fetchedConsent).not.toBeNull();
       // Explicit checks for the fetched object
@@ -193,69 +193,69 @@ describe("CosmosDBDataAdapter", () => {
       expect(fetchedConsent?.createdAt).toEqual(createdConsent.createdAt);
       expect(fetchedConsent?.updatedAt).toEqual(createdConsent.updatedAt);
       expect(fetchedConsent?.grantedScopes).toEqual(
-        createdConsent.grantedScopes
+        createdConsent.grantedScopes,
       );
       expect(fetchedConsent?.consenter).toEqual(createdConsent.consenter);
       expect(fetchedConsent?.metadata).toEqual(createdConsent.metadata);
     });
 
-    it("should throw error when not initialized", async () => {
+    it('should throw error when not initialized', async () => {
       // Arrange
       // Create a new, uninitialized adapter instance for this test
       const uninitializedAdapter = new CosmosDBDataAdapter({
         ...testConfig,
-        databaseName: "temp-uninit-db", // doesn't really matter as it won't connect
+        databaseName: 'temp-uninit-db', // doesn't really matter as it won't connect
       });
       // Ensure its internal _initializationPromise is null / not set
       (uninitializedAdapter as any)._initializationPromise = null;
       (uninitializedAdapter as any).dataContainer = undefined;
 
       const inputData = {
-        subjectId: "s1",
-        policyId: "p1",
-        status: "granted" as const,
+        subjectId: 's1',
+        policyId: 'p1',
+        status: 'granted' as const,
         version: 1,
         consentedAt: new Date(),
-        consenter: { type: "self" as const, userId: "u1" },
+        consenter: { type: 'self' as const, userId: 'u1' },
         grantedScopes: {},
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
 
       // Act & Assert
       await expect(
-        uninitializedAdapter.createConsent(inputData)
+        uninitializedAdapter.createConsent(inputData),
       ).rejects.toThrow(
-        "CosmosDBDataAdapter not initialized. Call initialize() first."
+        'CosmosDBDataAdapter not initialized. Call initialize() first.',
       );
     });
   });
 
-  describe("updateConsentStatus", () => {
+  describe('updateConsentStatus', () => {
     it("should query by id, then update a consent record's status using subjectId as partition key", async () => {
       // Arrange
       const initialData = {
-        subjectId: "subjectForUpdateTest",
-        policyId: "pUpd1",
-        status: "granted" as const,
+        subjectId: 'subjectForUpdateTest',
+        policyId: 'pUpd1',
+        status: 'granted' as const,
         version: 1,
-        consentedAt: new Date("2023-02-01"),
-        consenter: { type: "self" as const, userId: "uUpd1" },
-        grantedScopes: { scopeA: { grantedAt: new Date("2023-02-01") } },
-        metadata: { consentMethod: "digital_form" as const },
+        consentedAt: new Date('2023-02-01'),
+        consenter: { type: 'self' as const, userId: 'uUpd1' },
+        grantedScopes: { scopeA: { grantedAt: new Date('2023-02-01') } },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       const createdConsent = await dataAdapter.createConsent(initialData);
       expect(createdConsent.createdAt).toEqual(expect.any(String));
       expect(createdConsent.updatedAt).toEqual(expect.any(String));
       expect(new Date(createdConsent.createdAt).getTime()).toBeLessThanOrEqual(
-        Date.now()
+        Date.now(),
       );
       expect(new Date(createdConsent.updatedAt).getTime()).toBeLessThanOrEqual(
-        Date.now()
+        Date.now(),
       );
 
       const consentId = createdConsent.id;
       const currentVersion = createdConsent.version;
-      const newStatus = "revoked" as const;
+      const newStatus = 'revoked' as const;
 
       // Reset timer to a new time for the update operation to check updatedAt
       await new Promise((resolve) => setTimeout(resolve, 50));
@@ -264,7 +264,7 @@ describe("CosmosDBDataAdapter", () => {
       const updatedConsent = await dataAdapter.updateConsentStatus(
         consentId,
         newStatus,
-        currentVersion
+        currentVersion,
       );
 
       // Assert
@@ -273,7 +273,7 @@ describe("CosmosDBDataAdapter", () => {
       expect(updatedConsent.version).toBe(currentVersion); // Version doesn't change in this implementation with explicit version check
       expect(new Date(updatedConsent.updatedAt).getTime()).toBeGreaterThan(0);
       expect(
-        Date.now() - new Date(updatedConsent.updatedAt).getTime()
+        Date.now() - new Date(updatedConsent.updatedAt).getTime(),
       ).toBeLessThan(5000);
       expect(updatedConsent.updatedAt).not.toEqual(createdConsent.createdAt);
       expect(updatedConsent.createdAt).toEqual(createdConsent.createdAt);
@@ -294,65 +294,65 @@ describe("CosmosDBDataAdapter", () => {
       expect(fetchedConsent?.consenter).toEqual(updatedConsent.consenter);
       expect(fetchedConsent?.metadata).toEqual(updatedConsent.metadata);
       expect(fetchedConsent?.grantedScopes).toEqual(
-        updatedConsent.grantedScopes
+        updatedConsent.grantedScopes,
       );
     });
 
-    it("should throw error when consent is not found by query during status update", async () => {
+    it('should throw error when consent is not found by query during status update', async () => {
       // Arrange
-      const consentId = "nonexistent-consent-id-for-update";
-      const newStatus = "revoked" as const;
+      const consentId = 'nonexistent-consent-id-for-update';
+      const newStatus = 'revoked' as const;
 
       // Act & Assert
       await expect(
-        dataAdapter.updateConsentStatus(consentId, newStatus, 1)
+        dataAdapter.updateConsentStatus(consentId, newStatus, 1),
       ).rejects.toThrow(`Consent record with id ${consentId} not found`);
     });
 
-    it("should throw error when version mismatch after query during status update", async () => {
+    it('should throw error when version mismatch after query during status update', async () => {
       // Arrange
       const initialData = {
-        subjectId: "subjectForVersionMismatch",
-        policyId: "pVm1",
-        status: "granted" as const,
+        subjectId: 'subjectForVersionMismatch',
+        policyId: 'pVm1',
+        status: 'granted' as const,
         version: 2, // Initial version in DB will be this
-        consentedAt: new Date("2023-03-01"),
-        consenter: { type: "self" as const, userId: "uVm1" },
+        consentedAt: new Date('2023-03-01'),
+        consenter: { type: 'self' as const, userId: 'uVm1' },
         grantedScopes: {},
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       const createdConsent = await dataAdapter.createConsent(initialData);
 
       const consentId = createdConsent.id;
       const actualVersionInDB = createdConsent.version;
       const incorrectVersionInput = 1;
-      const newStatus = "revoked" as const;
+      const newStatus = 'revoked' as const;
 
       // Act & Assert
       await expect(
         dataAdapter.updateConsentStatus(
           consentId,
           newStatus,
-          incorrectVersionInput
-        )
+          incorrectVersionInput,
+        ),
       ).rejects.toThrow(
-        `Optimistic concurrency check failed for consent record ${consentId}. Expected version ${incorrectVersionInput}, found ${actualVersionInDB}.`
+        `Optimistic concurrency check failed for consent record ${consentId}. Expected version ${incorrectVersionInput}, found ${actualVersionInDB}.`,
       );
     });
   });
 
-  describe("findConsentById", () => {
-    it("should return consent record when found by cross-partition query", async () => {
+  describe('findConsentById', () => {
+    it('should return consent record when found by cross-partition query', async () => {
       // Arrange
       const initialData = {
-        subjectId: "subjectForFindTest",
-        policyId: "pFind1",
-        status: "granted" as const,
+        subjectId: 'subjectForFindTest',
+        policyId: 'pFind1',
+        status: 'granted' as const,
         version: 1,
-        consentedAt: new Date("2023-04-01"),
-        consenter: { type: "self" as const, userId: "uFind1" },
-        grantedScopes: { findScope: { grantedAt: new Date("2023-04-01") } },
-        metadata: { consentMethod: "digital_form" as const },
+        consentedAt: new Date('2023-04-01'),
+        consenter: { type: 'self' as const, userId: 'uFind1' },
+        grantedScopes: { findScope: { grantedAt: new Date('2023-04-01') } },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       const createdConsent = await dataAdapter.createConsent(initialData);
       const consentId = createdConsent.id;
@@ -376,9 +376,9 @@ describe("CosmosDBDataAdapter", () => {
       expect(result?.metadata).toEqual(createdConsent.metadata);
     });
 
-    it("should return null when consent is not found by query", async () => {
+    it('should return null when consent is not found by query', async () => {
       // Arrange
-      const consentId = "nonexistent-id-for-find";
+      const consentId = 'nonexistent-id-for-find';
 
       // Act
       const result = await dataAdapter.findConsentById(consentId);
@@ -388,41 +388,41 @@ describe("CosmosDBDataAdapter", () => {
     });
   });
 
-  describe("findConsentsBySubject", () => {
-    it("should return consents for a subject, querying with partitionKey", async () => {
+  describe('findConsentsBySubject', () => {
+    it('should return consents for a subject, querying with partitionKey', async () => {
       // Arrange
-      const targetSubjectId = "subjectWithMultipleConsents";
-      const otherSubjectId = "subjectWithOtherConsents";
+      const targetSubjectId = 'subjectWithMultipleConsents';
+      const otherSubjectId = 'subjectWithOtherConsents';
 
       const consent1Data = {
         subjectId: targetSubjectId,
-        policyId: "pSub1",
-        status: "granted" as const,
+        policyId: 'pSub1',
+        status: 'granted' as const,
         version: 1,
-        consentedAt: new Date("2025-05-01"),
-        consenter: { type: "self" as const, userId: targetSubjectId },
+        consentedAt: new Date('2025-05-01'),
+        consenter: { type: 'self' as const, userId: targetSubjectId },
         grantedScopes: { s1: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       const consent2Data = {
         subjectId: targetSubjectId,
-        policyId: "pSub2",
-        status: "revoked" as const,
+        policyId: 'pSub2',
+        status: 'revoked' as const,
         version: 2,
-        consentedAt: new Date("2025-05-02"),
-        consenter: { type: "self" as const, userId: targetSubjectId },
+        consentedAt: new Date('2025-05-02'),
+        consenter: { type: 'self' as const, userId: targetSubjectId },
         grantedScopes: { s2: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       const otherConsentData = {
         subjectId: otherSubjectId,
-        policyId: "pOther1",
-        status: "granted" as const,
+        policyId: 'pOther1',
+        status: 'granted' as const,
         version: 1,
-        consentedAt: new Date("2025-05-03"),
-        consenter: { type: "self" as const, userId: otherSubjectId },
+        consentedAt: new Date('2025-05-03'),
+        consenter: { type: 'self' as const, userId: otherSubjectId },
         grantedScopes: { s3: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
 
       const consent1 = await dataAdapter.createConsent(consent1Data);
@@ -438,13 +438,13 @@ describe("CosmosDBDataAdapter", () => {
 
       expect(
         results.some(
-          (r) => r.id === consent1.id && r.status === consent1.status
-        )
+          (r) => r.id === consent1.id && r.status === consent1.status,
+        ),
       ).toBe(true);
       expect(
         results.some(
-          (r) => r.id === consent2.id && r.status === consent2.status
-        )
+          (r) => r.id === consent2.id && r.status === consent2.status,
+        ),
       ).toBe(true);
       results.forEach((consent) => {
         expect(consent.subjectId).toBe(targetSubjectId);
@@ -461,31 +461,31 @@ describe("CosmosDBDataAdapter", () => {
     });
   });
 
-  describe("getAllConsents", () => {
-    it("should return all consents via a cross-partition query", async () => {
+  describe('getAllConsents', () => {
+    it('should return all consents via a cross-partition query', async () => {
       const consentAll1Data = {
         subjectId: `getAllSubject1-${Date.now()}`,
-        policyId: "pAll1",
-        status: "granted" as const,
+        policyId: 'pAll1',
+        status: 'granted' as const,
         version: 1,
-        consentedAt: new Date("2023-06-01"),
-        consenter: { type: "self" as const, userId: "uAll1" },
+        consentedAt: new Date('2023-06-01'),
+        consenter: { type: 'self' as const, userId: 'uAll1' },
         grantedScopes: { all1: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
       const consentAll2Data = {
         subjectId: `getAllSubject2-${Date.now()}`,
-        policyId: "pAll2",
-        status: "revoked" as const,
+        policyId: 'pAll2',
+        status: 'revoked' as const,
         version: 1,
-        consentedAt: new Date("2023-06-02"),
+        consentedAt: new Date('2023-06-02'),
         consenter: {
-          type: "proxy" as const,
-          userId: "gAll2",
-          relation: "parent",
+          type: 'proxy' as const,
+          userId: 'gAll2',
+          relation: 'parent',
         },
         grantedScopes: { all2: { grantedAt: new Date() } },
-        metadata: { consentMethod: "digital_form" as const },
+        metadata: { consentMethod: 'digital_form' as const },
       };
 
       const createdConsent1 = await dataAdapter.createConsent(consentAll1Data);
@@ -517,30 +517,30 @@ describe("CosmosDBDataAdapter", () => {
     });
   });
 
-  describe("Policy Management", () => {
-    const POLICY_GROUP_ID_1 = "testPolicyGroup1";
-    const POLICY_GROUP_ID_2 = "testPolicyGroup2";
+  describe('Policy Management', () => {
+    const POLICY_GROUP_ID_1 = 'testPolicyGroup1';
+    const POLICY_GROUP_ID_2 = 'testPolicyGroup2';
 
-    describe("createPolicy", () => {
-      it("should create a policy record with auto-generated fields and specified version", async () => {
+    describe('createPolicy', () => {
+      it('should create a policy record with auto-generated fields and specified version', async () => {
         const policyInput: CreatePolicyInput = {
-          title: "Policy 1",
+          title: 'Policy 1',
           policyGroupId: POLICY_GROUP_ID_1,
           version: 1,
-          status: "draft",
-          effectiveDate: new Date("2025-01-01"),
+          status: 'draft',
+          effectiveDate: new Date('2025-01-01'),
           contentSections: [
             {
-              title: "Intro",
-              description: "Welcome to the policy.",
-              content: "Welcome to the policy.",
+              title: 'Intro',
+              description: 'Welcome to the policy.',
+              content: 'Welcome to the policy.',
             },
           ],
           availableScopes: [
             {
-              key: "read_data",
-              name: "Read Data",
-              description: "Allows reading user data.",
+              key: 'read_data',
+              name: 'Read Data',
+              description: 'Allows reading user data.',
             },
           ],
         };
@@ -552,19 +552,19 @@ describe("CosmosDBDataAdapter", () => {
         expect(createdPolicy.version).toBe(policyInput.version);
         expect(createdPolicy.status).toBe(policyInput.status);
         expect(new Date(createdPolicy.effectiveDate).toISOString()).toBe(
-          policyInput.effectiveDate.toISOString()
+          policyInput.effectiveDate.toISOString(),
         );
         expect(createdPolicy.contentSections).toEqual(
-          policyInput.contentSections
+          policyInput.contentSections,
         );
         expect(createdPolicy.availableScopes).toEqual(
-          policyInput.availableScopes
+          policyInput.availableScopes,
         );
         expect(createdPolicy.createdAt).toEqual(expect.any(String));
         expect(createdPolicy.updatedAt).toEqual(expect.any(String));
 
         const fetchedPolicy = await dataAdapter.findPolicyById(
-          createdPolicy.id
+          createdPolicy.id,
         );
         expect(fetchedPolicy).not.toBeNull();
         if (fetchedPolicy) {
@@ -574,35 +574,35 @@ describe("CosmosDBDataAdapter", () => {
           expect(fetchedPolicy.status).toBe(createdPolicy.status);
           expect(fetchedPolicy.effectiveDate).toBe(createdPolicy.effectiveDate); // Adapter returns ISO string
           expect(fetchedPolicy.contentSections).toEqual(
-            createdPolicy.contentSections
+            createdPolicy.contentSections,
           );
           expect(fetchedPolicy.availableScopes).toEqual(
-            createdPolicy.availableScopes
+            createdPolicy.availableScopes,
           );
           expect(fetchedPolicy.createdAt).toBe(createdPolicy.createdAt);
           expect(fetchedPolicy.updatedAt).toBe(createdPolicy.updatedAt);
         }
       });
 
-      it("should create a policy record with default version 1 if adapter sets it (type expects version)", async () => {
+      it('should create a policy record with default version 1 if adapter sets it (type expects version)', async () => {
         const policyInput: CreatePolicyInput = {
-          title: "Policy 1",
+          title: 'Policy 1',
           policyGroupId: POLICY_GROUP_ID_1,
-          status: "active",
+          status: 'active',
           version: 1, // CreatePolicyInput expects version
-          effectiveDate: new Date("2025-01-02"),
+          effectiveDate: new Date('2025-01-02'),
           contentSections: [
             {
-              title: "Permissions",
-              description: "User permissions section.",
-              content: "User permissions section.",
+              title: 'Permissions',
+              description: 'User permissions section.',
+              content: 'User permissions section.',
             },
           ],
           availableScopes: [
             {
-              key: "email_read",
-              name: "Read Email",
-              description: "Access to read emails.",
+              key: 'email_read',
+              name: 'Read Email',
+              description: 'Access to read emails.',
             },
           ],
         };
@@ -613,13 +613,13 @@ describe("CosmosDBDataAdapter", () => {
         expect(createdPolicy.policyGroupId).toBe(policyInput.policyGroupId);
         expect(createdPolicy.status).toBe(policyInput.status);
         expect(new Date(createdPolicy.effectiveDate).toISOString()).toBe(
-          policyInput.effectiveDate.toISOString()
+          policyInput.effectiveDate.toISOString(),
         );
         expect(createdPolicy.contentSections).toEqual(
-          policyInput.contentSections
+          policyInput.contentSections,
         );
         expect(createdPolicy.availableScopes).toEqual(
-          policyInput.availableScopes
+          policyInput.availableScopes,
         );
         expect(createdPolicy.createdAt).toEqual(expect.any(String));
         expect(createdPolicy.updatedAt).toEqual(expect.any(String));
@@ -633,10 +633,10 @@ describe("CosmosDBDataAdapter", () => {
           expect(foundPolicy.status).toBe(createdPolicy.status);
           expect(foundPolicy.effectiveDate).toBe(createdPolicy.effectiveDate);
           expect(foundPolicy.contentSections).toEqual(
-            createdPolicy.contentSections
+            createdPolicy.contentSections,
           );
           expect(foundPolicy.availableScopes).toEqual(
-            createdPolicy.availableScopes
+            createdPolicy.availableScopes,
           );
           expect(foundPolicy.createdAt).toBe(createdPolicy.createdAt);
           expect(foundPolicy.updatedAt).toBe(createdPolicy.updatedAt);
@@ -645,51 +645,51 @@ describe("CosmosDBDataAdapter", () => {
         }
       });
 
-      it("should throw error when trying to create policy if adapter not initialized", async () => {
+      it('should throw error when trying to create policy if adapter not initialized', async () => {
         const uninitializedAdapter = new CosmosDBDataAdapter({
           ...testConfig,
-          databaseName: "temp-policy-uninit-db",
+          databaseName: 'temp-policy-uninit-db',
         });
         (uninitializedAdapter as any)._initializationPromise = null;
         (uninitializedAdapter as any).dataContainer = undefined;
 
         const policyInput: CreatePolicyInput = {
-          title: "Policy 1",
-          policyGroupId: "pGroupUninit",
-          status: "draft",
+          title: 'Policy 1',
+          policyGroupId: 'pGroupUninit',
+          status: 'draft',
           version: 1,
           effectiveDate: new Date(),
           contentSections: [],
           availableScopes: [],
         };
         await expect(
-          uninitializedAdapter.createPolicy(policyInput)
+          uninitializedAdapter.createPolicy(policyInput),
         ).rejects.toThrow(
-          "CosmosDBDataAdapter not initialized. Call initialize() first."
+          'CosmosDBDataAdapter not initialized. Call initialize() first.',
         );
       });
     });
 
-    describe("updatePolicyStatus", () => {
+    describe('updatePolicyStatus', () => {
       let policyToUpdate: Policy;
       const initialPolicyData: CreatePolicyInput = {
-        title: "Policy 1",
+        title: 'Policy 1',
         policyGroupId: POLICY_GROUP_ID_1,
         version: 1,
-        status: "draft",
-        effectiveDate: new Date("2025-03-01"),
+        status: 'draft',
+        effectiveDate: new Date('2025-03-01'),
         contentSections: [
           {
-            title: "Initial",
-            description: "Initial content for update tests.",
-            content: "Initial content for update tests.",
+            title: 'Initial',
+            description: 'Initial content for update tests.',
+            content: 'Initial content for update tests.',
           },
         ],
         availableScopes: [
           {
-            key: "initial_scope",
-            name: "Initial Scope",
-            description: "Scope for update.",
+            key: 'initial_scope',
+            name: 'Initial Scope',
+            description: 'Scope for update.',
           },
         ],
       };
@@ -699,7 +699,7 @@ describe("CosmosDBDataAdapter", () => {
       });
 
       it("should update a policy's status, increment version, and update 'updatedAt'", async () => {
-        const newStatus = "active";
+        const newStatus = 'active';
         const expectedVersionBeforeUpdate = policyToUpdate.version;
 
         // Ensure a small delay so updatedAt is different if the operation is very fast
@@ -708,7 +708,7 @@ describe("CosmosDBDataAdapter", () => {
         const updatedPolicy = await dataAdapter.updatePolicyStatus(
           policyToUpdate.id,
           newStatus,
-          expectedVersionBeforeUpdate
+          expectedVersionBeforeUpdate,
         );
 
         expect(updatedPolicy.id).toBe(policyToUpdate.id);
@@ -717,17 +717,17 @@ describe("CosmosDBDataAdapter", () => {
         expect(updatedPolicy.version).toBe(expectedVersionBeforeUpdate);
         expect(new Date(updatedPolicy.updatedAt).getTime()).toBeGreaterThan(0);
         expect(
-          Date.now() - new Date(updatedPolicy.updatedAt).getTime()
+          Date.now() - new Date(updatedPolicy.updatedAt).getTime(),
         ).toBeLessThan(5000);
         expect(updatedPolicy.updatedAt).not.toEqual(policyToUpdate.createdAt); // Should be different
         expect(updatedPolicy.createdAt).toEqual(policyToUpdate.createdAt);
         expect(updatedPolicy.policyGroupId).toBe(policyToUpdate.policyGroupId);
         expect(updatedPolicy.availableScopes).toEqual(
-          initialPolicyData.availableScopes
+          initialPolicyData.availableScopes,
         );
 
         const fetchedPolicy = await dataAdapter.findPolicyById(
-          policyToUpdate.id
+          policyToUpdate.id,
         );
         expect(fetchedPolicy).not.toBeNull();
         if (fetchedPolicy) {
@@ -737,57 +737,57 @@ describe("CosmosDBDataAdapter", () => {
           expect(fetchedPolicy.status).toBe(updatedPolicy.status);
           expect(fetchedPolicy.effectiveDate).toBe(updatedPolicy.effectiveDate);
           expect(fetchedPolicy.contentSections).toEqual(
-            updatedPolicy.contentSections
+            updatedPolicy.contentSections,
           );
           expect(fetchedPolicy.availableScopes).toEqual(
-            updatedPolicy.availableScopes
+            updatedPolicy.availableScopes,
           );
           expect(fetchedPolicy.createdAt).toBe(updatedPolicy.createdAt);
           expect(fetchedPolicy.updatedAt).toBe(updatedPolicy.updatedAt);
         }
       });
 
-      it("should throw error if policy for status update is not found", async () => {
-        const nonExistentPolicyId = "non-existent-policy-id-for-update";
+      it('should throw error if policy for status update is not found', async () => {
+        const nonExistentPolicyId = 'non-existent-policy-id-for-update';
         await expect(
-          dataAdapter.updatePolicyStatus(nonExistentPolicyId, "active", 1)
+          dataAdapter.updatePolicyStatus(nonExistentPolicyId, 'active', 1),
         ).rejects.toThrow(/^Policy with id .* not found/);
       });
 
-      it("should throw error on version mismatch during status update (optimistic concurrency)", async () => {
+      it('should throw error on version mismatch during status update (optimistic concurrency)', async () => {
         const incorrectVersion = policyToUpdate.version + 5;
         await expect(
           dataAdapter.updatePolicyStatus(
             policyToUpdate.id,
-            "archived",
-            incorrectVersion
-          )
+            'archived',
+            incorrectVersion,
+          ),
         ).rejects.toThrow(
-          `Optimistic concurrency check failed for policy ${policyToUpdate.id}. Expected version ${incorrectVersion}, found ${policyToUpdate.version}.`
+          `Optimistic concurrency check failed for policy ${policyToUpdate.id}. Expected version ${incorrectVersion}, found ${policyToUpdate.version}.`,
         );
       });
     });
 
-    describe("findPolicyById", () => {
-      it("should return a policy record when found", async () => {
+    describe('findPolicyById', () => {
+      it('should return a policy record when found', async () => {
         const policyInput: CreatePolicyInput = {
-          title: "Policy 1",
+          title: 'Policy 1',
           policyGroupId: POLICY_GROUP_ID_1,
-          status: "active",
+          status: 'active',
           version: 1,
-          effectiveDate: new Date("2025-02-15"),
+          effectiveDate: new Date('2025-02-15'),
           contentSections: [
             {
-              title: "Find Me Section",
-              description: "Details for finding by ID.",
-              content: "Details for finding by ID.",
+              title: 'Find Me Section',
+              description: 'Details for finding by ID.',
+              content: 'Details for finding by ID.',
             },
           ],
           availableScopes: [
             {
-              key: "find_scope",
-              name: "Find Scope",
-              description: "A scope to find.",
+              key: 'find_scope',
+              name: 'Find Scope',
+              description: 'A scope to find.',
             },
           ],
         };
@@ -802,126 +802,126 @@ describe("CosmosDBDataAdapter", () => {
           expect(foundPolicy.status).toBe(createdPolicy.status);
           expect(foundPolicy.effectiveDate).toBe(createdPolicy.effectiveDate);
           expect(foundPolicy.contentSections).toEqual(
-            createdPolicy.contentSections
+            createdPolicy.contentSections,
           );
           expect(foundPolicy.availableScopes).toEqual(
-            createdPolicy.availableScopes
+            createdPolicy.availableScopes,
           );
           expect(foundPolicy.createdAt).toBe(createdPolicy.createdAt);
           expect(foundPolicy.updatedAt).toBe(createdPolicy.updatedAt);
         }
       });
 
-      it("should return null if policy is not found", async () => {
+      it('should return null if policy is not found', async () => {
         const foundPolicy = await dataAdapter.findPolicyById(
-          "non-existent-id-for-find"
+          'non-existent-id-for-find',
         );
         expect(foundPolicy).toBeNull();
       });
     });
 
-    describe("findLatestActivePolicyByGroupId", () => {
+    describe('findLatestActivePolicyByGroupId', () => {
       const commonPolicyDetails = {
-        effectiveDate: new Date("2025-04-01"),
+        effectiveDate: new Date('2025-04-01'),
         contentSections: [
           {
-            title: "Latest Active",
-            description: "Policy for latest active tests.",
-            content: "Policy for latest active tests.",
+            title: 'Latest Active',
+            description: 'Policy for latest active tests.',
+            content: 'Policy for latest active tests.',
           },
         ],
         availableScopes: [
           {
-            key: "latest_active_scope",
-            name: "Latest Scope",
-            description: "For these tests.",
+            key: 'latest_active_scope',
+            name: 'Latest Scope',
+            description: 'For these tests.',
           },
         ],
       };
       beforeEach(async () => {
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
-          title: "Policy 1",
+          title: 'Policy 1',
           policyGroupId: POLICY_GROUP_ID_1,
           version: 1,
-          status: "draft",
+          status: 'draft',
         });
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
-          title: "Policy 1",
+          title: 'Policy 1',
           policyGroupId: POLICY_GROUP_ID_1,
           version: 2,
-          status: "active",
+          status: 'active',
         });
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
-          title: "Policy 1",
+          title: 'Policy 1',
           policyGroupId: POLICY_GROUP_ID_1,
           version: 3,
-          status: "archived",
+          status: 'archived',
         });
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
-          title: "Policy 1",
+          title: 'Policy 1',
           policyGroupId: POLICY_GROUP_ID_2,
           version: 1,
-          status: "active",
+          status: 'active',
         });
       });
 
-      it("should return the latest active policy for a given group ID", async () => {
+      it('should return the latest active policy for a given group ID', async () => {
         const latestActive =
           await dataAdapter.findLatestActivePolicyByGroupId(POLICY_GROUP_ID_1);
         expect(latestActive).not.toBeNull();
         expect(latestActive?.policyGroupId).toBe(POLICY_GROUP_ID_1);
         expect(latestActive?.version).toBe(2);
-        expect(latestActive?.status).toBe("active");
+        expect(latestActive?.status).toBe('active');
       });
 
-      it("should return null if no active policy exists for the group ID", async () => {
+      it('should return null if no active policy exists for the group ID', async () => {
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
-          title: "Policy 1",
-          policyGroupId: "noActiveGroup",
+          title: 'Policy 1',
+          policyGroupId: 'noActiveGroup',
           version: 1,
-          status: "draft",
+          status: 'draft',
         });
         await dataAdapter.createPolicy({
           ...commonPolicyDetails,
-          title: "Policy 1",
-          policyGroupId: "noActiveGroup",
+          title: 'Policy 1',
+          policyGroupId: 'noActiveGroup',
           version: 2,
-          status: "archived",
+          status: 'archived',
         });
         const latestActive =
-          await dataAdapter.findLatestActivePolicyByGroupId("noActiveGroup");
+          await dataAdapter.findLatestActivePolicyByGroupId('noActiveGroup');
         expect(latestActive).toBeNull();
       });
 
-      it("should return null if the policy group ID does not exist", async () => {
+      it('should return null if the policy group ID does not exist', async () => {
         const latestActive = await dataAdapter.findLatestActivePolicyByGroupId(
-          "nonExistentGroupLatest"
+          'nonExistentGroupLatest',
         );
         expect(latestActive).toBeNull();
       });
     });
 
-    describe("findAllPolicyVersionsByGroupId", () => {
+    describe('findAllPolicyVersionsByGroupId', () => {
       let p1v1: Policy, p1v2: Policy;
       const commonVersionData = {
-        effectiveDate: new Date("2025-05-01"),
+        effectiveDate: new Date('2025-05-01'),
         contentSections: [
           {
-            title: "All Versions",
-            description: "Content for all versions test.",
-            content: "Content for all versions test.",
+            title: 'All Versions',
+            description: 'Content for all versions test.',
+            content: 'Content for all versions test.',
           },
         ],
         availableScopes: [
           {
-            key: "version_scope_all",
-            name: "Version Scope",
-            description: "Details...",
+            key: 'version_scope_all',
+            name: 'Version Scope',
+            description: 'Details...',
           },
         ],
       };
@@ -929,30 +929,30 @@ describe("CosmosDBDataAdapter", () => {
       beforeEach(async () => {
         p1v1 = await dataAdapter.createPolicy({
           ...commonVersionData,
-          policyGroupId: "groupForAllVersions",
+          policyGroupId: 'groupForAllVersions',
           version: 1,
-          status: "draft",
-          title: "Policy 1",
+          status: 'draft',
+          title: 'Policy 1',
         });
         p1v2 = await dataAdapter.createPolicy({
           ...commonVersionData,
-          policyGroupId: "groupForAllVersions",
+          policyGroupId: 'groupForAllVersions',
           version: 2,
-          status: "active",
-          title: "Policy 1",
+          status: 'active',
+          title: 'Policy 1',
         });
         await dataAdapter.createPolicy({
           ...commonVersionData,
-          policyGroupId: "anotherGroupForVersions",
+          policyGroupId: 'anotherGroupForVersions',
           version: 1,
-          status: "active",
-          title: "Policy 1",
+          status: 'active',
+          title: 'Policy 1',
         });
       });
 
-      it("should return all versions of policies for a given group ID, ordered by version ASC", async () => {
+      it('should return all versions of policies for a given group ID, ordered by version ASC', async () => {
         const versions = await dataAdapter.findAllPolicyVersionsByGroupId(
-          "groupForAllVersions"
+          'groupForAllVersions',
         );
         expect(versions.length).toBe(2);
         expect(versions[0].id).toBe(p1v1.id);
@@ -961,108 +961,108 @@ describe("CosmosDBDataAdapter", () => {
         expect(versions[1].version).toBe(2);
       });
 
-      it("should return an empty array if the policy group ID does not exist", async () => {
+      it('should return an empty array if the policy group ID does not exist', async () => {
         const versions = await dataAdapter.findAllPolicyVersionsByGroupId(
-          "nonExistentGroupForFindAll"
+          'nonExistentGroupForFindAll',
         );
         expect(versions).toEqual([]);
       });
 
-      it("should return an empty array if the group ID exists but has no policies", async () => {
+      it('should return an empty array if the group ID exists but has no policies', async () => {
         const versions = await dataAdapter.findAllPolicyVersionsByGroupId(
-          "emptyGroupYetPopulated"
+          'emptyGroupYetPopulated',
         );
         expect(versions).toEqual([]);
       });
     });
 
-    describe("listPolicies", () => {
+    describe('listPolicies', () => {
       // These variables will be assigned in beforeAll and used to verify their presence in the list.
       let policy_A_v1_listed: Policy,
         policy_A_v2_listed: Policy,
         policy_B_v1_listed: Policy,
         policy_C_v1_listed: Policy;
       const commonListData = {
-        effectiveDate: new Date("2025-06-01"),
+        effectiveDate: new Date('2025-06-01'),
         contentSections: [
           {
-            title: "List Policies",
-            description: "For listing.",
-            content: "For listing.",
+            title: 'List Policies',
+            description: 'For listing.',
+            content: 'For listing.',
           },
         ],
         availableScopes: [
           {
-            key: "list_scope_key",
-            name: "List Scope",
-            description: "Scope for listing tests.",
+            key: 'list_scope_key',
+            name: 'List Scope',
+            description: 'Scope for listing tests.',
           },
         ],
       };
-      const P_GROUP_LIST_A = "listPGroupA"; // Lexicographically first
-      const P_GROUP_LIST_B = "listPGroupB";
-      const P_GROUP_LIST_C = "listPGroupC";
+      const P_GROUP_LIST_A = 'listPGroupA'; // Lexicographically first
+      const P_GROUP_LIST_B = 'listPGroupB';
+      const P_GROUP_LIST_C = 'listPGroupC';
 
       beforeAll(async () => {
         policy_A_v2_listed = await dataAdapter.createPolicy({
           ...commonListData,
           policyGroupId: P_GROUP_LIST_A,
           version: 2,
-          status: "active",
-          title: "Policy A",
+          status: 'active',
+          title: 'Policy A',
         });
         policy_A_v1_listed = await dataAdapter.createPolicy({
           ...commonListData,
           policyGroupId: P_GROUP_LIST_A,
           version: 1,
-          status: "draft",
-          title: "Policy A",
+          status: 'draft',
+          title: 'Policy A',
         });
         policy_B_v1_listed = await dataAdapter.createPolicy({
           ...commonListData,
           policyGroupId: P_GROUP_LIST_B,
           version: 1,
-          status: "active",
-          title: "Policy B",
+          status: 'active',
+          title: 'Policy B',
         });
         policy_C_v1_listed = await dataAdapter.createPolicy({
           ...commonListData,
           policyGroupId: P_GROUP_LIST_C,
           version: 1,
-          status: "draft",
-          title: "Policy C",
+          status: 'draft',
+          title: 'Policy C',
         });
       });
 
-      it("should return all policies, ordered by policyGroupId ASC, then version DESC", async () => {
+      it('should return all policies, ordered by policyGroupId ASC, then version DESC', async () => {
         const allPolicies = await dataAdapter.listPolicies();
 
         expect(allPolicies.length).toBeGreaterThanOrEqual(4); // At least the ones we specifically created
 
         // Verify that our specific policies are present
         expect(
-          allPolicies.find((p) => p.id === policy_A_v1_listed.id)
+          allPolicies.find((p) => p.id === policy_A_v1_listed.id),
         ).toBeDefined();
         expect(
-          allPolicies.find((p) => p.id === policy_A_v2_listed.id)
+          allPolicies.find((p) => p.id === policy_A_v2_listed.id),
         ).toBeDefined();
         expect(
-          allPolicies.find((p) => p.id === policy_B_v1_listed.id)
+          allPolicies.find((p) => p.id === policy_B_v1_listed.id),
         ).toBeDefined();
         expect(
-          allPolicies.find((p) => p.id === policy_C_v1_listed.id)
+          allPolicies.find((p) => p.id === policy_C_v1_listed.id),
         ).toBeDefined();
 
         // Check sorting logic for a known subset of policies
         // Find indices of the first policy of each group we are interested in.
         const firstIndexOfGroupA = allPolicies.findIndex(
-          (p) => p.policyGroupId === P_GROUP_LIST_A
+          (p) => p.policyGroupId === P_GROUP_LIST_A,
         );
         const firstIndexOfGroupB = allPolicies.findIndex(
-          (p) => p.policyGroupId === P_GROUP_LIST_B
+          (p) => p.policyGroupId === P_GROUP_LIST_B,
         );
         const firstIndexOfGroupC = allPolicies.findIndex(
-          (p) => p.policyGroupId === P_GROUP_LIST_C
+          (p) => p.policyGroupId === P_GROUP_LIST_C,
         );
 
         // Assert that these groups appear in the expected order (A, then B, then C)
@@ -1075,7 +1075,7 @@ describe("CosmosDBDataAdapter", () => {
 
         // For a specific group (e.g., P_GROUP_LIST_A), verify version sorting (DESC)
         const groupAPolicies = allPolicies.filter(
-          (p) => p.policyGroupId === P_GROUP_LIST_A
+          (p) => p.policyGroupId === P_GROUP_LIST_A,
         );
         if (groupAPolicies.length >= 2) {
           const v2Index = groupAPolicies.findIndex((p) => p.version === 2);

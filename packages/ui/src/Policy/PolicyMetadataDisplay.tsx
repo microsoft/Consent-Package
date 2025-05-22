@@ -1,14 +1,14 @@
-import React from "react";
-import { makeStyles, Text, Tag, tokens } from "@fluentui/react-components";
-import type { Policy } from "@open-source-consent/types";
+import React from 'react';
+import { makeStyles, Text, Tag, tokens } from '@fluentui/react-components';
+import type { Policy } from '@open-source-consent/types';
 
 const useStyles = makeStyles({
   metadataGrid: {
-    display: "grid",
-    gridTemplateColumns: "auto 1fr",
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr',
     gap: `${tokens.spacingVerticalM} ${tokens.spacingHorizontalXXL}`,
     marginBottom: tokens.spacingVerticalXXL,
-    alignItems: "center",
+    alignItems: 'center',
   },
   label: {
     fontWeight: tokens.fontWeightSemibold,
@@ -22,15 +22,15 @@ const useStyles = makeStyles({
 interface PolicyMetadataDisplayProps {
   policy: Pick<
     Policy,
-    | "id"
-    | "policyGroupId"
-    | "version"
-    | "status"
-    | "effectiveDate"
-    | "jurisdiction"
-    | "requiresProxyForMinors"
-    | "createdAt"
-    | "updatedAt"
+    | 'id'
+    | 'policyGroupId'
+    | 'version'
+    | 'status'
+    | 'effectiveDate'
+    | 'jurisdiction'
+    | 'requiresProxyForMinors'
+    | 'createdAt'
+    | 'updatedAt'
   >;
 }
 
@@ -40,14 +40,14 @@ const PolicyMetadataDisplay: React.FC<PolicyMetadataDisplayProps> = ({
   const styles = useStyles();
 
   const formatDate = (date: Date | string | undefined): string => {
-    if (!date) return "N/A";
+    if (!date) return 'N/A';
     return date instanceof Date
       ? date.toLocaleDateString()
       : new Date(date).toLocaleDateString();
   };
 
   const formatDateTime = (date: Date | string | undefined): string => {
-    if (!date) return "N/A";
+    if (!date) return 'N/A';
     return date instanceof Date
       ? date.toLocaleString()
       : new Date(date).toLocaleString();
@@ -81,7 +81,7 @@ const PolicyMetadataDisplay: React.FC<PolicyMetadataDisplayProps> = ({
 
       <Text className={styles.label}>Proxy for Minors:</Text>
       <Text className={styles.value}>
-        {policy.requiresProxyForMinors ? "Yes" : "No"}
+        {policy.requiresProxyForMinors ? 'Yes' : 'No'}
       </Text>
 
       <Text className={styles.label}>Created At:</Text>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   makeStyles,
   shorthands,
@@ -13,7 +13,7 @@ import {
   DialogBody,
   DialogActions,
   DialogContent,
-} from "@fluentui/react-components";
+} from '@fluentui/react-components';
 
 interface LoginFormProps {
   isOpen: boolean;
@@ -23,10 +23,10 @@ interface LoginFormProps {
 
 const useStyles = makeStyles({
   loginForm: {
-    display: "flex",
-    flexDirection: "column",
-    ...shorthands.gap("16px"),
-    width: "300px",
+    display: 'flex',
+    flexDirection: 'column',
+    ...shorthands.gap('16px'),
+    width: '300px',
   },
 });
 
@@ -36,7 +36,7 @@ export function LoginForm({
   onLoginSubmit,
 }: LoginFormProps): JSX.Element | null {
   const styles = useStyles();
-  const [loginSubjectId, setLoginSubjectId] = useState("");
+  const [loginSubjectId, setLoginSubjectId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,14 +49,14 @@ export function LoginForm({
     setError(null);
     try {
       await onLoginSubmit(trimmedSubjectId);
-      setLoginSubjectId("");
+      setLoginSubjectId('');
       onClose();
     } catch (err) {
-      console.error("Login submission failed:", err);
+      console.error('Login submission failed:', err);
       setError(
         err instanceof Error
           ? err.message
-          : "An unknown error occurred during login."
+          : 'An unknown error occurred during login.',
       );
     }
     setIsSubmitting(false);
@@ -84,7 +84,7 @@ export function LoginForm({
                   value={loginSubjectId}
                   onChange={(
                     _event: React.ChangeEvent<HTMLInputElement>,
-                    data: { value: string }
+                    data: { value: string },
                   ) => setLoginSubjectId(data.value)}
                   placeholder="Enter Subject ID to login"
                   required
@@ -92,7 +92,7 @@ export function LoginForm({
                 />
               </Field>
               {error && (
-                <div style={{ color: "red", marginTop: "8px" }}>{error}</div>
+                <div style={{ color: 'red', marginTop: '8px' }}>{error}</div>
               )}
             </DialogContent>
             <DialogActions>
@@ -110,7 +110,7 @@ export function LoginForm({
                 type="submit"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? <Spinner size="tiny" /> : "Login"}
+                {isSubmitting ? <Spinner size="tiny" /> : 'Login'}
               </Button>
             </DialogActions>
           </DialogBody>
