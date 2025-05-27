@@ -5,7 +5,7 @@ import { githubPagesSpa } from '@sctg/vite-plugin-github-pages-spa';
 const baseUrl = '/Open-Source-Consent-Package';
 
 export default defineConfig({
-  base: `${baseUrl}/`,
+  base: baseUrl,
   plugins: [react(), githubPagesSpa()],
   server: {
     port: 5173,

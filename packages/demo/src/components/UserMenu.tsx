@@ -59,7 +59,7 @@ export function UserMenu({
             <MenuItem onClick={() => handleNavigate(`/profile/${user.id}`)}>
               View Profile
             </MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            <MenuItem onClick={handleLogout}>Restart Demo</MenuItem>
           </MenuList>
         </MenuPopover>
       </Menu>

@@ -1,5 +1,4 @@
 import type { ProfileData } from '@open-source-consent/ui';
-import { defaultMockUser } from '../../../api/src/mock/data/defaultUser.js';
 
 /**
  * This module handles mock user management.
@@ -8,7 +7,6 @@ import { defaultMockUser } from '../../../api/src/mock/data/defaultUser.js';
  */
 
 const USER_ID_STORAGE_KEY = 'currentUserId';
-let hasDefaultUserInitializationAttempted = false;
 
 export function getCurrentUserId(): string | null {
   return localStorage.getItem(USER_ID_STORAGE_KEY);
@@ -22,24 +20,9 @@ export function logout(): void {
   localStorage.removeItem(USER_ID_STORAGE_KEY);
 }
 
-export async function initializeDefaultUser(): Promise<void> {
-  if (hasDefaultUserInitializationAttempted) return;
-  hasDefaultUserInitializationAttempted = true;
-
-  const currentUserId = getCurrentUserId();
-  if (!currentUserId) {
-    localStorage.setItem(USER_ID_STORAGE_KEY, defaultMockUser.id);
-  }
-}
-
-void initializeDefaultUser();
-
 export async function fetchUserProfile(
   userId: string,
 ): Promise<ProfileData | null> {
-  if (userId === defaultMockUser.id) {
-    return defaultMockUser;
-  }
   return {
     id: userId,
     name: `${userId}`,
