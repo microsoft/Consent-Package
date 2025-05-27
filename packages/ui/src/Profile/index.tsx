@@ -11,7 +11,6 @@ import ManagedSubjectsTab from './ManagedSubjectsTab.js';
 import ConsentsTab from './ConsentsTab.js';
 import type {
   ProfileProps,
-  ProfileData,
   ManagedSubject,
   SubjectForConsentUpdate,
 } from './Profile.type.js';
@@ -31,7 +30,6 @@ enum PROFILE_TABS {
 
 export const Profile: React.FC<ProfileProps> = ({
   profileData: initialProfileData,
-  onProfileUpdate,
   onManagedSubjectSelect,
   subjectIdToDisplayName,
 }) => {
@@ -40,8 +38,7 @@ export const Profile: React.FC<ProfileProps> = ({
     null,
   );
 
-  const { profileData, setProfileData, handleSave, handleSubjectUpdate } =
-    useProfileData(initialProfileData);
+  const { profileData, setProfileData } = useProfileData(initialProfileData);
   const { status, updateStatus } = useStatus();
   const { refreshConsentsForSubject, updateConsents, handleScopeChange } =
     useConsents(profileData, updateStatus);
@@ -130,16 +127,6 @@ export const Profile: React.FC<ProfileProps> = ({
     setSelectedTab(data.value as PROFILE_TABS);
   };
 
-  const handleExternalProfileUpdate = useCallback(
-    (id: string, updates: Partial<ProfileData>) => {
-      if (onProfileUpdate) {
-        onProfileUpdate(id, updates);
-      }
-      handleSave(updates);
-    },
-    [onProfileUpdate, handleSave],
-  );
-
   const handleSubjectSelect = useCallback(
     (subjectId: string): void => {
       const subject = profileData?.managedSubjects?.find(
@@ -212,7 +199,6 @@ export const Profile: React.FC<ProfileProps> = ({
             role: selectedSubject.ageGroup,
             ...selectedSubject,
           }}
-          onSave={(updates) => handleSubjectUpdate(selectedSubject.id, updates)}
         />
         <ConsentsTab
           consents={selectedSubject.consents}
@@ -248,72 +234,61 @@ export const Profile: React.FC<ProfileProps> = ({
 
   return (
     <div className="profile-container">
+      {statusDisplay}
       <TabList selectedValue={selectedTab} onTabSelect={handleTabSelect}>
-        <Tab value={PROFILE_TABS.PERSONAL}>Personal Profile</Tab>
+        <Tab value={PROFILE_TABS.PERSONAL}>Personal Information</Tab>
         {hasManagedSubjects && (
           <Tab value={PROFILE_TABS.MANAGED}>Managed Subjects</Tab>
         )}
-        {!hasManagedSubjects && (
-          <Tab value={PROFILE_TABS.CONSENTS}>Consents</Tab>
-        )}
+        <Tab value={PROFILE_TABS.CONSENTS}>Consents</Tab>
       </TabList>
 
-      {statusDisplay}
-
-      <div>
-        {selectedTab === PROFILE_TABS.PERSONAL && (
-          <PersonalProfileTab
-            profileData={profileData}
-            onSave={(updates) =>
-              handleExternalProfileUpdate(profileData.id, updates)
-            }
-          />
-        )}
-
-        {selectedTab === PROFILE_TABS.MANAGED && hasManagedSubjects && (
-          <ManagedSubjectsTab
-            managedSubjects={profileData.managedSubjects}
-            onSubjectSelect={handleSubjectSelect}
-            onSubjectUpdate={handleSubjectUpdate}
-          />
-        )}
-
-        {selectedTab === PROFILE_TABS.CONSENTS && !hasManagedSubjects && (
-          <ConsentsTab
-            consents={profileData.consents}
-            onGrantScope={(_, policyId, scopeId, currentScopes) => {
-              void handleScopeChangeAndUpdateConsent(
-                {
-                  id: profileData.id,
-                  name: profileData.name,
-                  roleForRelationship: profileData.role?.label,
-                },
-                false,
-                profileData.id,
-                policyId,
-                scopeId,
-                currentScopes,
-                'grant',
-              );
-            }}
-            onRevokeScope={(_, policyId, scopeId, currentScopes) => {
-              void handleScopeChangeAndUpdateConsent(
-                {
-                  id: profileData.id,
-                  name: profileData.name,
-                  roleForRelationship: profileData.role?.label,
-                },
-                false,
-                profileData.id,
-                policyId,
-                scopeId,
-                currentScopes,
-                'revoke',
-              );
-            }}
-          />
-        )}
-      </div>
+      {selectedTab === PROFILE_TABS.PERSONAL && (
+        <PersonalProfileTab profileData={profileData} />
+      )}
+      {selectedTab === PROFILE_TABS.MANAGED && hasManagedSubjects && (
+        <ManagedSubjectsTab
+          managedSubjects={profileData.managedSubjects}
+          onSubjectSelect={handleSubjectSelect}
+        />
+      )}
+      {selectedTab === PROFILE_TABS.CONSENTS && (
+        <ConsentsTab
+          consents={profileData.consents}
+          onGrantScope={(_, policyId, scopeId, currentScopes) => {
+            const subjectArgsForUpdate: SubjectForConsentUpdate = {
+              id: profileData.id,
+              name: profileData.name,
+              directAgeGroup: profileData.role.id as AgeGroup,
+            };
+            void handleScopeChangeAndUpdateConsent(
+              subjectArgsForUpdate,
+              false,
+              profileData.id,
+              policyId,
+              scopeId,
+              currentScopes,
+              'grant',
+            );
+          }}
+          onRevokeScope={(_, policyId, scopeId, currentScopes) => {
+            const subjectArgsForUpdate: SubjectForConsentUpdate = {
+              id: profileData.id,
+              name: profileData.name,
+              directAgeGroup: profileData.role.id as AgeGroup,
+            };
+            void handleScopeChangeAndUpdateConsent(
+              subjectArgsForUpdate,
+              false,
+              profileData.id,
+              policyId,
+              scopeId,
+              currentScopes,
+              'revoke',
+            );
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -67,13 +67,6 @@ export function ProfilePage(): JSX.Element {
     void loadProfile();
   }, [userId]);
 
-  const handleProfileUpdate = (
-    profileId: string,
-    updates: Partial<ProfileData>,
-  ): void => {
-    console.info('Profile updated (mock):', { profileId, updates });
-  };
-
   const handleManagedSubjectSelect = (subjectId: string): void => {
     console.info('Managed subject selected:', subjectId);
   };
@@ -118,7 +111,6 @@ export function ProfilePage(): JSX.Element {
           profileToDisplay.managedSubjects &&
           profileToDisplay.managedSubjects.length > 0
         }
-        onProfileUpdate={handleProfileUpdate}
         onManagedSubjectSelect={handleManagedSubjectSelect}
         subjectIdToDisplayName={(subjectId: string): string => {
           return subjectId;
