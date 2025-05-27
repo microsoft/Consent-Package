@@ -10,14 +10,11 @@ import { BaseService } from './BaseService.js';
 
 export class ConsentService extends BaseService<IConsentDataAdapter> {
   private async getRevokedScopesMap(
-    grantedScopes: string[],
-    revokedScopesInput: string[] | undefined,
+    effectivelyGrantedScopeKeys: string[],
+    explicitlyRevokedByInputScopeKeys: string[] | undefined,
     policyId: string,
     timestamp: Date,
   ): Promise<Record<string, PolicyScope & { revokedAt: Date }>> {
-    let finalRevokedScopeKeys: string[];
-    const policyScopesMap: Record<string, PolicyScope> = {};
-
     const policyAdapter = this.adapter as IDataAdapter;
     const policy = await policyAdapter.findPolicyById(policyId);
     if (!policy || !policy.availableScopes) {
@@ -26,23 +23,29 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
       );
     }
 
+    const policyScopesMap: Record<string, PolicyScope> = {};
     policy.availableScopes.forEach((scope: PolicyScope) => {
       policyScopesMap[scope.key] = scope;
     });
 
-    if (revokedScopesInput) {
-      finalRevokedScopeKeys = revokedScopesInput;
-    } else {
-      const policyAvailableScopes = policy.availableScopes.map(
-        (scope: PolicyScope) => scope.key,
-      );
-      finalRevokedScopeKeys = policyAvailableScopes.filter(
-        (key: string) => key !== undefined && !grantedScopes.includes(key),
+    const allAvailableScopeKeys = policy.availableScopes.map(
+      (scope) => scope.key,
+    );
+
+    const finalRevokedScopeKeysSet = new Set<string>(
+      allAvailableScopeKeys.filter(
+        (key) => !effectivelyGrantedScopeKeys.includes(key),
+      ),
+    );
+
+    if (explicitlyRevokedByInputScopeKeys) {
+      explicitlyRevokedByInputScopeKeys.forEach((key) =>
+        finalRevokedScopeKeysSet.add(key),
       );
     }
 
     const map: Record<string, PolicyScope & { revokedAt: Date }> = {};
-    finalRevokedScopeKeys.forEach((scopeKey) => {
+    finalRevokedScopeKeysSet.forEach((scopeKey) => {
       const policyScope = policyScopesMap[scopeKey];
       if (policyScope) {
         map[scopeKey] = {
@@ -70,20 +73,20 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
       );
     }
 
-    // Create a map of policy scopes by key for easier lookup
     const policyScopesMap: Record<string, PolicyScope> = {};
     policy.availableScopes.forEach((scope: PolicyScope) => {
       policyScopesMap[scope.key] = scope;
     });
 
-    const inputGrantedScopesMap: Record<
+    // This map is based on the original input.grantedScopes, used for initial checks or if no "revoke all" logic triggers.
+    const originalInputGrantedScopesMap: Record<
       string,
       PolicyScope & { grantedAt: Date }
     > = {};
     input.grantedScopes.forEach((scopeKey) => {
       const policyScope = policyScopesMap[scopeKey];
       if (policyScope) {
-        inputGrantedScopesMap[scopeKey] = {
+        originalInputGrantedScopesMap[scopeKey] = {
           ...policyScope,
           grantedAt: operationTimestamp,
         };
@@ -109,15 +112,65 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
     }
 
     if (latestConsentRecord) {
-      const currentEffectiveGrantedScopes = inputGrantedScopesMap;
+      let revokeAllScopes = false;
+      const requiredScopeKeys = policy.availableScopes
+        .filter((s) => s.required)
+        .map((s) => s.key);
+
+      // Condition 1: A required scope is EXPLICITLY being revoked in the input.
+      if (input.revokedScopes?.some((rs) => requiredScopeKeys.includes(rs))) {
+        revokeAllScopes = true;
+      }
+
+      // Condition 2: A previously granted required scope is being IMPLICITLY revoked
+      // by no longer being present in the new input.grantedScopes.
+      if (!revokeAllScopes) {
+        // Only check if not already decided to revoke all
+        const previouslyGrantedRequiredScopeKeys = Object.keys(
+          latestConsentRecord.grantedScopes,
+        ).filter((gsk) => requiredScopeKeys.includes(gsk));
+
+        const currentInputGrantedScopes = new Set(input.grantedScopes);
+
+        if (
+          previouslyGrantedRequiredScopeKeys.some(
+            (rgsk) => !currentInputGrantedScopes.has(rgsk),
+          )
+        ) {
+          revokeAllScopes = true;
+        }
+      }
+
+      let effectiveGrantedScopes = input.grantedScopes;
+      let effectiveRevokedScopesInput = input.revokedScopes;
+
+      if (revokeAllScopes) {
+        effectiveGrantedScopes = [];
+        effectiveRevokedScopesInput = policy.availableScopes.map((s) => s.key);
+      }
+
+      const currentEffectiveGrantedScopesMap: Record<
+        string,
+        PolicyScope & { grantedAt: Date }
+      > = {};
+      effectiveGrantedScopes.forEach((scopeKey) => {
+        const policyScope = policyScopesMap[scopeKey];
+        if (policyScope) {
+          currentEffectiveGrantedScopesMap[scopeKey] = {
+            ...policyScope,
+            grantedAt: operationTimestamp,
+          };
+        }
+      });
+
       const newStatus =
-        Object.keys(currentEffectiveGrantedScopes).length > 0
+        Object.keys(currentEffectiveGrantedScopesMap).length > 0
           ? 'granted'
           : 'revoked';
 
       const revokedScopesMapForNewVersion = await this.getRevokedScopesMap(
-        input.grantedScopes,
-        input.revokedScopes,
+        effectiveGrantedScopes,
+        effectiveRevokedScopesInput,
         input.policyId,
         operationTimestamp,
       );
@@ -127,7 +180,7 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
         consentedAt: latestConsentRecord.consentedAt,
         revokedAt: newStatus === 'revoked' ? operationTimestamp : undefined,
         consenter: input.consenter,
-        grantedScopes: currentEffectiveGrantedScopes,
+        grantedScopes: currentEffectiveGrantedScopesMap,
         revokedScopes: revokedScopesMapForNewVersion,
         metadata: {
           ...latestConsentRecord.metadata,
@@ -140,14 +193,52 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
         latestConsentRecord.version,
       );
     } else {
+      let effectiveGrantedScopes = input.grantedScopes;
+      let effectiveRevokedScopesInput = input.revokedScopes;
+      let revokeAllDueToRequiredOnInitial = false;
+
+      if (policy.availableScopes) {
+        const requiredScopeKeys = policy.availableScopes
+          .filter((s) => s.required)
+          .map((s) => s.key);
+
+        if (
+          (input.revokedScopes || []).some((rs) =>
+            requiredScopeKeys.includes(rs),
+          )
+        ) {
+          revokeAllDueToRequiredOnInitial = true;
+        }
+      }
+
+      if (revokeAllDueToRequiredOnInitial) {
+        effectiveGrantedScopes = [];
+        effectiveRevokedScopesInput = policy.availableScopes.map((s) => s.key);
+      }
+
+      const initialGrantedScopesMapForCreation: Record<
+        string,
+        PolicyScope & { grantedAt: Date }
+      > = {};
+      effectiveGrantedScopes.forEach((scopeKey) => {
+        const policyScope = policyScopesMap[scopeKey];
+        if (policyScope) {
+          initialGrantedScopesMapForCreation[scopeKey] = {
+            ...policyScope,
+            grantedAt: operationTimestamp,
+          };
+        }
+      });
+
       const initialRevokedScopesMap = await this.getRevokedScopesMap(
-        input.grantedScopes,
-        input.revokedScopes,
+        effectiveGrantedScopes,
+        effectiveRevokedScopesInput,
         input.policyId,
         operationTimestamp,
       );
 
-      const isGranted = input.grantedScopes.length > 0;
+      const isGranted =
+        Object.keys(initialGrantedScopesMapForCreation).length > 0;
       const initialConsentData: Omit<
         ConsentRecord,
         'id' | 'createdAt' | 'updatedAt'
@@ -160,7 +251,7 @@ export class ConsentService extends BaseService<IConsentDataAdapter> {
         revokedAt: isGranted ? undefined : operationTimestamp,
         dateOfBirth: input.dateOfBirth,
         consenter: input.consenter,
-        grantedScopes: inputGrantedScopesMap,
+        grantedScopes: initialGrantedScopesMapForCreation,
         revokedScopes: initialRevokedScopesMap,
         metadata: input.metadata,
       };

@@ -716,6 +716,396 @@ describe('ConsentService', () => {
     });
   });
 
+  describe('grantConsent scenarios for required scope revocation', () => {
+    const subjectId = 'user-req-test';
+    const policyId = 'policy-req-test';
+    const mockPolicyReq: Policy = {
+      id: policyId,
+      policyGroupId: 'groupReqTest',
+      version: 1,
+      status: 'active',
+      effectiveDate: new Date('2025-01-01'),
+      title: 'Required Scope Test Policy',
+      contentSections: [{ title: 's1', content: 'c1', description: 'd1' }],
+      availableScopes: [
+        {
+          key: 'email',
+          name: 'Email',
+          description: 'Access to email',
+          required: true,
+        },
+        {
+          key: 'profile',
+          name: 'Profile',
+          description: 'Access to profile',
+          required: false,
+        },
+        {
+          key: 'notifications',
+          name: 'Notifications',
+          description: 'Access to notifications',
+          required: false,
+        },
+        {
+          key: 'offline_access',
+          name: 'Offline Access',
+          description: 'Offline access',
+          required: true,
+        },
+      ],
+      createdAt: mockDate,
+      updatedAt: mockDate,
+    };
+
+    beforeEach(() => {
+      // Ensure findPolicyById is mocked for these specific tests
+      (
+        (mockDataAdapter as unknown as IDataAdapter).findPolicyById as any
+      ).mockResolvedValue(mockPolicyReq);
+    });
+
+    it('UPDATE: should revoke all scopes and set status to "revoked" if a required scope is revoked', async () => {
+      const existingConsent: ConsentRecord = {
+        id: 'existingConsentWithReq',
+        subjectId,
+        policyId,
+        version: 1,
+        status: 'granted',
+        consentedAt: new Date('2024-12-01T00:00:00Z'),
+        consenter: { type: 'self', userId: subjectId },
+        grantedScopes: {
+          email: {
+            key: 'email',
+            name: 'Email',
+            description: 'Access to email',
+            required: true,
+            grantedAt: new Date('2024-12-01T00:00:00Z'),
+          },
+          profile: {
+            key: 'profile',
+            name: 'Profile',
+            description: 'Access to profile',
+            required: false,
+            grantedAt: new Date('2024-12-01T00:00:00Z'),
+          },
+        },
+        metadata: { consentMethod: 'digital_form' },
+        createdAt: new Date('2024-12-01T00:00:00Z'),
+        updatedAt: new Date('2024-12-01T00:00:00Z'),
+      };
+
+      (
+        mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
+      ).mockResolvedValue(existingConsent);
+      (mockDataAdapter.findConsentById as any).mockResolvedValue(
+        existingConsent,
+      ); // For supersedeConsent internal call
+      const newVersionId = 'newVersionRevokedAll';
+      (mockDataAdapter.createConsent as any).mockImplementation(
+        async (data: any) => ({
+          ...data,
+          id: newVersionId,
+          version: existingConsent.version + 1,
+          createdAt: mockDate,
+          updatedAt: mockDate,
+        }),
+      );
+
+      const grantInput: CreateConsentInput = {
+        subjectId,
+        policyId,
+        consenter: { type: 'self' as const, userId: subjectId },
+        grantedScopes: ['profile'], // Attempting to keep 'profile'
+        revokedScopes: ['email'], // Revoking the required 'email' scope
+        metadata: { consentMethod: 'digital_form', ipAddress: '1.2.3.4' },
+      };
+
+      const result = await consentService.grantConsent(grantInput);
+
+      expect(result.status).toBe('revoked');
+      expect(result.grantedScopes).toEqual({});
+      expect(result.revokedScopes).toHaveProperty('email');
+      expect(result.revokedScopes?.['email'].revokedAt).toEqual(mockDate);
+      expect(result.revokedScopes).toHaveProperty('profile');
+      expect(result.revokedScopes?.['profile'].revokedAt).toEqual(mockDate);
+      expect(result.revokedScopes).toHaveProperty('notifications');
+      expect(result.revokedScopes?.['notifications'].revokedAt).toEqual(
+        mockDate,
+      );
+      expect(result.revokedScopes).toHaveProperty('offline_access');
+      expect(result.revokedScopes?.['offline_access'].revokedAt).toEqual(
+        mockDate,
+      );
+      expect(result.revokedAt).toEqual(mockDate);
+
+      expect(mockDataAdapter.createConsent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'revoked',
+          grantedScopes: {},
+          revokedScopes: expect.objectContaining({
+            email: expect.objectContaining({ revokedAt: mockDate }),
+            profile: expect.objectContaining({ revokedAt: mockDate }),
+            notifications: expect.objectContaining({ revokedAt: mockDate }),
+            offline_access: expect.objectContaining({ revokedAt: mockDate }),
+          }),
+          revokedAt: mockDate,
+        }),
+      );
+      expect(mockDataAdapter.updateConsentStatus).toHaveBeenCalledWith(
+        existingConsent.id,
+        'superseded',
+        existingConsent.version,
+      );
+    });
+
+    it('UPDATE: should NOT revoke all if a non-required scope is revoked and a required scope remains granted', async () => {
+      const existingConsent: ConsentRecord = {
+        id: 'existingConsentWithReqNonReq',
+        subjectId,
+        policyId,
+        version: 1,
+        status: 'granted',
+        consentedAt: new Date('2024-12-01T00:00:00Z'),
+        consenter: { type: 'self', userId: subjectId },
+        grantedScopes: {
+          email: {
+            key: 'email',
+            name: 'Email',
+            description: 'Access to email',
+            required: true,
+            grantedAt: new Date('2024-12-01T00:00:00Z'),
+          },
+          profile: {
+            key: 'profile',
+            name: 'Profile',
+            description: 'Access to profile',
+            required: false,
+            grantedAt: new Date('2024-12-01T00:00:00Z'),
+          },
+        },
+        metadata: { consentMethod: 'digital_form' },
+        createdAt: new Date('2024-12-01T00:00:00Z'),
+        updatedAt: new Date('2024-12-01T00:00:00Z'),
+      };
+
+      (
+        mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
+      ).mockResolvedValue(existingConsent);
+      (mockDataAdapter.findConsentById as any).mockResolvedValue(
+        existingConsent,
+      );
+      const newVersionId = 'newVersionNonReqRevoked';
+      (mockDataAdapter.createConsent as any).mockImplementation(
+        async (data: any) => ({
+          ...data,
+          id: newVersionId,
+          version: existingConsent.version + 1,
+          createdAt: mockDate,
+          updatedAt: mockDate,
+        }),
+      );
+
+      const grantInput: CreateConsentInput = {
+        subjectId,
+        policyId,
+        consenter: { type: 'self' as const, userId: subjectId },
+        grantedScopes: ['email'], // Keeping required 'email'
+        revokedScopes: ['profile'], // Revoking non-required 'profile'
+        metadata: { consentMethod: 'digital_form', ipAddress: '1.2.3.5' },
+      };
+
+      const result = await consentService.grantConsent(grantInput);
+
+      expect(result.status).toBe('granted');
+      expect(result.grantedScopes).toHaveProperty('email');
+      expect(result.grantedScopes?.['email'].grantedAt).toEqual(mockDate); // GrantedAt is updated to operationTimestamp
+      expect(result.revokedScopes).toHaveProperty('profile');
+      expect(result.revokedScopes?.['profile'].revokedAt).toEqual(mockDate);
+      expect(result.revokedScopes).toHaveProperty('notifications'); // Was not granted, so should be in revoked
+      expect(result.revokedScopes).toHaveProperty('offline_access'); // Was not granted, so should be in revoked
+      expect(result.revokedAt).toBeUndefined();
+
+      expect(mockDataAdapter.createConsent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'granted',
+          grantedScopes: expect.objectContaining({
+            email: expect.objectContaining({ grantedAt: mockDate }),
+          }),
+          revokedScopes: expect.objectContaining({
+            profile: expect.objectContaining({ revokedAt: mockDate }),
+            notifications: expect.objectContaining({ revokedAt: mockDate }),
+            offline_access: expect.objectContaining({ revokedAt: mockDate }),
+          }),
+          revokedAt: undefined,
+        }),
+      );
+    });
+
+    it('CREATE: should revoke all and set status to "revoked" if a required scope is in revokedScopes and no scopes are granted', async () => {
+      (
+        mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
+      ).mockResolvedValue(null); // No existing consent
+      const createdConsentId = 'createdRevokedAll';
+      (mockDataAdapter.createConsent as any).mockImplementation(
+        async (data: any) => ({
+          ...data,
+          id: createdConsentId,
+          version: 1,
+          createdAt: mockDate,
+          updatedAt: mockDate,
+        }),
+      );
+
+      const grantInput: CreateConsentInput = {
+        subjectId,
+        policyId,
+        consenter: { type: 'self' as const, userId: subjectId },
+        grantedScopes: [], // No scopes granted
+        revokedScopes: ['email'], // Revoking required 'email'
+        metadata: { consentMethod: 'digital_form', ipAddress: '1.2.3.6' },
+      };
+
+      const result = await consentService.grantConsent(grantInput);
+
+      expect(result.status).toBe('revoked');
+      expect(result.grantedScopes).toEqual({});
+      expect(result.revokedScopes).toHaveProperty('email');
+      expect(result.revokedScopes?.['email'].revokedAt).toEqual(mockDate);
+      expect(result.revokedScopes).toHaveProperty('profile');
+      expect(result.revokedScopes?.['profile'].revokedAt).toEqual(mockDate);
+      // All available scopes should be in revokedScopes
+      expect(Object.keys(result.revokedScopes || {}).length).toBe(
+        mockPolicyReq.availableScopes.length,
+      );
+      mockPolicyReq.availableScopes.forEach((scope) => {
+        expect(result.revokedScopes).toHaveProperty(scope.key);
+        expect(result.revokedScopes?.[scope.key]?.revokedAt).toEqual(mockDate);
+      });
+      expect(result.revokedAt).toEqual(mockDate);
+
+      expect(mockDataAdapter.createConsent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'revoked',
+          grantedScopes: {},
+          revokedScopes: expect.objectContaining({
+            email: expect.objectContaining({ revokedAt: mockDate }),
+            profile: expect.objectContaining({ revokedAt: mockDate }),
+            notifications: expect.objectContaining({ revokedAt: mockDate }),
+            offline_access: expect.objectContaining({ revokedAt: mockDate }),
+          }),
+          revokedAt: mockDate,
+        }),
+      );
+    });
+
+    it('CREATE: should revoke all if attempting to grant some scopes while a required scope is revoked', async () => {
+      (
+        mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
+      ).mockResolvedValue(null);
+      const createdConsentId = 'createdReqGrantedAnotherReqRevokedToFullRevoke';
+      (mockDataAdapter.createConsent as any).mockImplementation(
+        async (data: any) => ({
+          ...data,
+          id: createdConsentId,
+          version: 1,
+          createdAt: mockDate,
+          updatedAt: mockDate,
+        }),
+      );
+
+      const grantInput: CreateConsentInput = {
+        subjectId,
+        policyId,
+        consenter: { type: 'self' as const, userId: subjectId },
+        grantedScopes: ['email'], // Attempting to grant required 'email'
+        revokedScopes: ['offline_access'], // Revoking required 'offline_access'
+        metadata: { consentMethod: 'digital_form', ipAddress: '1.2.3.8' },
+      };
+
+      // NEW EXPECTATION: With the updated logic, if any required scope (offline_access)
+      // is in input.revokedScopes during an initial consent creation, all scopes are revoked.
+      const result = await consentService.grantConsent(grantInput);
+
+      expect(result.status).toBe('revoked');
+      expect(result.grantedScopes).toEqual({}); // No scopes should be granted
+      // All available scopes from the policy should be in revokedScopes
+      expect(result.revokedScopes).toHaveProperty('email');
+      expect(result.revokedScopes?.['email']?.revokedAt).toEqual(mockDate);
+      expect(result.revokedScopes).toHaveProperty('profile');
+      expect(result.revokedScopes?.['profile']?.revokedAt).toEqual(mockDate);
+      expect(result.revokedScopes).toHaveProperty('notifications');
+      expect(result.revokedScopes?.['notifications']?.revokedAt).toEqual(
+        mockDate,
+      );
+      expect(result.revokedScopes).toHaveProperty('offline_access');
+      expect(result.revokedScopes?.['offline_access']?.revokedAt).toEqual(
+        mockDate,
+      );
+      expect(result.revokedAt).toEqual(mockDate); // Overall record should be marked revoked at this time
+
+      expect(mockDataAdapter.createConsent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'revoked',
+          grantedScopes: {},
+          revokedScopes: expect.objectContaining({
+            email: expect.objectContaining({ revokedAt: mockDate }),
+            profile: expect.objectContaining({ revokedAt: mockDate }),
+            notifications: expect.objectContaining({ revokedAt: mockDate }),
+            offline_access: expect.objectContaining({ revokedAt: mockDate }),
+          }),
+          revokedAt: mockDate,
+        }),
+      );
+    });
+
+    it('CREATE: should revoke all if granting a required scope that is also explicitly in revokedScopes', async () => {
+      (
+        mockDataAdapter.findLatestConsentBySubjectAndPolicy as any
+      ).mockResolvedValue(null);
+      const createdConsentId = 'createdReqGrantedAndRevoked';
+      (mockDataAdapter.createConsent as any).mockImplementation(
+        async (data: any) => ({
+          ...data,
+          id: createdConsentId,
+          version: 1,
+          createdAt: mockDate,
+          updatedAt: mockDate,
+        }),
+      );
+
+      const grantInput: CreateConsentInput = {
+        subjectId,
+        policyId,
+        consenter: { type: 'self' as const, userId: subjectId },
+        grantedScopes: ['email'], // Granting required 'email'
+        revokedScopes: ['email'], // Also revoking required 'email'
+        metadata: { consentMethod: 'digital_form', ipAddress: '1.2.3.9' },
+      };
+
+      const result = await consentService.grantConsent(grantInput);
+      expect(result.status).toBe('revoked');
+      expect(result.grantedScopes).toEqual({});
+      mockPolicyReq.availableScopes.forEach((scope) => {
+        expect(result.revokedScopes).toHaveProperty(scope.key);
+        expect(result.revokedScopes?.[scope.key]?.revokedAt).toEqual(mockDate);
+      });
+      expect(result.revokedAt).toEqual(mockDate);
+
+      expect(mockDataAdapter.createConsent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'revoked',
+          grantedScopes: {},
+          revokedScopes: expect.objectContaining({
+            email: expect.objectContaining({ revokedAt: mockDate }),
+            profile: expect.objectContaining({ revokedAt: mockDate }),
+            // ... and others
+          }),
+          revokedAt: mockDate,
+        }),
+      );
+    });
+  });
+
   describe('getConsentDetails', () => {
     it('should retrieve consent details by id', async () => {
       // Arrange
