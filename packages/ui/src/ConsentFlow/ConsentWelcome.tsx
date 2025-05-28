@@ -49,7 +49,6 @@ const useStyles = makeStyles({
     gap: '16px',
     marginTop: '16px',
     padding: '16px',
-    border: `1px solid ${tokens.colorNeutralStroke1}`,
     borderRadius: tokens.borderRadiusMedium,
   },
   managedSubject: {
@@ -57,7 +56,6 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     gap: '16px',
     padding: '16px',
-    border: `1px solid ${tokens.colorNeutralStroke1}`,
     borderRadius: tokens.borderRadiusMedium,
   },
   managedSubjectHeader: {
@@ -203,7 +201,7 @@ const ConsentWelcome = ({
               >
                 <div className={styles.managedSubjectHeader}>
                   <Button
-                    appearance="subtle"
+                    appearance="outline"
                     onClick={() => handleRemoveSubject(index)}
                   >
                     Remove
@@ -236,7 +234,7 @@ const ConsentWelcome = ({
                 />
               </div>
             ))}
-            <Button appearance="secondary" onClick={handleAddSubject}>
+            <Button appearance="outline" onClick={handleAddSubject}>
               Add Subject
             </Button>
           </div>

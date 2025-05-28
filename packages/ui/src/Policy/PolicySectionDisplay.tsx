@@ -4,17 +4,15 @@ import type { PolicyContentSection } from '@open-source-consent/types';
 
 const useStyles = makeStyles({
   section: {
-    marginBottom: tokens.spacingVerticalXL,
-    paddingBottom: tokens.spacingVerticalXL,
-    borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+    marginBottom: tokens.spacingVerticalXXL,
+    paddingBottom: tokens.spacingVerticalXXL,
     '&:last-child': {
-      borderBottom: 'none',
-      marginBottom: tokens.spacingVerticalL,
-      paddingBottom: tokens.spacingVerticalL,
+      marginBottom: tokens.spacingVerticalXXL,
+      paddingBottom: tokens.spacingVerticalXXL,
     },
   },
   sectionTitle: {
-    marginBottom: tokens.spacingVerticalL,
+    marginBottom: tokens.spacingVerticalM,
     color: tokens.colorNeutralForeground1,
     fontSize: tokens.fontSizeHero700,
     fontWeight: tokens.fontWeightSemibold,

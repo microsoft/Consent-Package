@@ -37,10 +37,11 @@ const useStyles = makeStyles({
   tableRow: {
     '@media (max-width: 768px)': {
       display: 'block',
-      border: `1px solid ${tokens.colorNeutralStroke2}`,
+      border: 'none',
+      boxShadow: 'none',
       borderRadius: tokens.borderRadiusMedium,
       marginBottom: tokens.spacingVerticalM,
-      padding: tokens.spacingVerticalS,
+      padding: tokens.spacingVerticalM,
     },
   },
   tableCell: {
@@ -49,8 +50,8 @@ const useStyles = makeStyles({
       textAlign: 'right',
       position: 'relative',
       paddingLeft: '50%',
-      paddingBottom: tokens.spacingVerticalXS,
-      paddingTop: tokens.spacingVerticalXS,
+      paddingBottom: tokens.spacingVerticalSN,
+      paddingTop: tokens.spacingVerticalSN,
       minHeight: '30px',
 
       '&::before': {
@@ -127,7 +128,7 @@ const PolicyTable: React.FC<PolicyTableProps> = ({
               {policy.version}
             </TableCell>
             <TableCell data-label="Status" className={styles.tableCell}>
-              <Tag appearance="brand" shape="rounded">
+              <Tag appearance="outline" shape="rounded">
                 {policy.status.toUpperCase()}
               </Tag>
             </TableCell>

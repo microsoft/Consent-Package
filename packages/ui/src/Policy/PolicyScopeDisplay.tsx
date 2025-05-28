@@ -12,20 +12,20 @@ import type { PolicyScope } from '@open-source-consent/types';
 const useStyles = makeStyles({
   scopesContainer: {
     marginTop: tokens.spacingVerticalXXL,
-    paddingTop: tokens.spacingVerticalL,
+    paddingTop: tokens.spacingVerticalXXL,
   },
   scopeSectionTitle: {
-    marginBottom: tokens.spacingVerticalL,
+    marginBottom: tokens.spacingVerticalM,
     color: tokens.colorNeutralForeground1,
     fontSize: tokens.fontSizeHero700,
     fontWeight: tokens.fontWeightSemibold,
   },
   scopeCard: {
-    ...shorthands.padding('20px'),
-    marginBottom: tokens.spacingVerticalL,
-    backgroundColor: tokens.colorNeutralBackground2,
+    ...shorthands.padding(tokens.spacingVerticalL),
+    marginBottom: tokens.spacingVerticalXXL,
     borderRadius: tokens.borderRadiusMedium,
-    boxShadow: tokens.shadow4,
+    border: 'none',
+    boxShadow: 'none',
   },
   scopeName: {
     marginBottom: tokens.spacingVerticalXS,

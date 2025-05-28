@@ -15,8 +15,9 @@ const useStyles = makeStyles({
   sectionCard: {
     padding: tokens.spacingVerticalL,
     border: `1px solid ${tokens.colorNeutralStroke2}`,
+    boxShadow: tokens.shadow4,
     borderRadius: tokens.borderRadiusMedium,
-    marginBottom: tokens.spacingVerticalM,
+    marginBottom: tokens.spacingVerticalXXL,
     display: 'flex',
     flexDirection: 'column',
     gap: tokens.spacingVerticalM,
@@ -24,6 +25,12 @@ const useStyles = makeStyles({
   removeButton: {
     marginTop: tokens.spacingVerticalM,
     alignSelf: 'flex-end',
+    backgroundColor: tokens.colorPaletteRedBackground1,
+    color: tokens.colorPaletteRedForeground1,
+    '&:hover': {
+      backgroundColor: tokens.colorPaletteRedBackground2,
+      color: tokens.colorPaletteRedForeground2,
+    },
   },
 });
 
@@ -83,7 +90,7 @@ const PolicyScopeEditor: React.FC<PolicyScopeEditorProps> = ({
       <Button
         type="button"
         onClick={() => onRemoveScope(index)}
-        appearance="subtle"
+        appearance="outline"
         className={styles.removeButton}
       >
         Remove Scope

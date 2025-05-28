@@ -20,8 +20,9 @@ const useStyles = makeStyles({
   sectionCard: {
     padding: tokens.spacingVerticalL,
     border: `1px solid ${tokens.colorNeutralStroke2}`,
+    boxShadow: tokens.shadow4,
     borderRadius: tokens.borderRadiusMedium,
-    marginBottom: tokens.spacingVerticalM,
+    marginBottom: tokens.spacingVerticalXXL,
     display: 'flex',
     flexDirection: 'column',
     gap: tokens.spacingVerticalM,
@@ -29,8 +30,13 @@ const useStyles = makeStyles({
     paddingBottom: '100px',
   },
   removeButton: {
-    backgroundColor: tokens.colorNeutralBackground3,
     width: '180px',
+    backgroundColor: tokens.colorPaletteRedBackground1,
+    color: tokens.colorPaletteRedForeground1,
+    '&:hover': {
+      backgroundColor: tokens.colorPaletteRedBackground2,
+      color: tokens.colorPaletteRedForeground2,
+    },
   },
   quillEditor: {
     height: '200px',
@@ -38,17 +44,31 @@ const useStyles = makeStyles({
   editorWrapper: {
     display: 'flex',
     flexDirection: 'column',
+    gap: tokens.spacingVerticalSN,
   },
   previewContainer: {
-    marginTop: tokens.spacingVerticalL,
-    padding: tokens.spacingHorizontalM,
-    border: `1px solid ${tokens.colorNeutralStroke2}`,
+    marginTop: tokens.spacingVerticalM,
+    padding: tokens.spacingVerticalM,
+    border: 'none',
+    boxShadow: 'none',
     borderRadius: tokens.borderRadiusMedium,
     minHeight: '100px',
     backgroundColor: tokens.colorSubtleBackground,
+    '& ul, & ol': {
+      paddingLeft: '20px',
+      margin: '8px 0',
+    },
+    '& li': {
+      marginBottom: '4px',
+    },
+    '& h4, & h5, & h6': {
+      marginTop: '12px',
+      marginBottom: '4px',
+      fontWeight: tokens.fontWeightSemibold,
+    },
   },
   previewTitle: {
-    marginBottom: tokens.spacingVerticalS,
+    marginBottom: tokens.spacingVerticalSN,
   },
   tabPanel: {
     marginTop: tokens.spacingVerticalM,
@@ -153,7 +173,7 @@ const PolicyContentSectionEditor: React.FC<PolicyContentSectionEditorProps> = ({
         onTabSelect={handleTabSelect}
         style={{
           marginTop: tokens.spacingVerticalM,
-          marginBottom: tokens.spacingVerticalS,
+          marginBottom: tokens.spacingVerticalSN,
         }}
       >
         <Tab
@@ -206,6 +226,7 @@ const PolicyContentSectionEditor: React.FC<PolicyContentSectionEditorProps> = ({
           <Subtitle2 as="h4" className={styles.previewTitle}>
             Content Preview
           </Subtitle2>
+          {/* Content directly from the client-side editor */}
           <div dangerouslySetInnerHTML={{ __html: section.content }} />
         </div>
       )}

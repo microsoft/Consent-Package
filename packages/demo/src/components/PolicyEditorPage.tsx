@@ -21,6 +21,7 @@ const useStyles = makeStyles({
     padding: '24px',
     margin: '0 auto',
     display: 'flex',
+    maxWidth: '1200px',
     flexDirection: 'column',
     gap: tokens.spacingVerticalXXL,
     '@media (max-width: 768px)': {
@@ -35,8 +36,9 @@ const useStyles = makeStyles({
   card: {
     padding: tokens.spacingVerticalL,
     marginBottom: tokens.spacingVerticalL,
-    border: `1px solid ${tokens.colorNeutralStroke1}`,
+    border: 'none',
     borderRadius: tokens.borderRadiusMedium,
+    boxShadow: 'none',
   },
   cardHeader: {
     marginBottom: tokens.spacingVerticalM,
@@ -49,6 +51,15 @@ const useStyles = makeStyles({
   },
   addSectionButton: {
     marginTop: tokens.spacingVerticalS,
+    maxWidth: '200px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    backgroundColor: tokens.colorPaletteBlueBackground1,
+    color: tokens.colorPaletteBlueForeground1,
+    '&:hover': {
+      backgroundColor: tokens.colorPaletteBlueBackground2,
+      color: tokens.colorPaletteBlueForeground2,
+    },
   },
 });
 

@@ -3,11 +3,16 @@ import { makeStyles, Text, Tag, tokens } from '@fluentui/react-components';
 import type { Policy } from '@open-source-consent/types';
 
 const useStyles = makeStyles({
-  metadataGrid: {
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalM,
+    marginBottom: tokens.spacingVerticalXXL,
+  },
+  metadataRow: {
     display: 'grid',
     gridTemplateColumns: 'auto 1fr',
-    gap: `${tokens.spacingVerticalM} ${tokens.spacingHorizontalXXL}`,
-    marginBottom: tokens.spacingVerticalXXL,
+    gap: `${tokens.spacingVerticalSN} ${tokens.spacingHorizontalL}`,
     alignItems: 'center',
   },
   label: {
@@ -54,41 +59,57 @@ const PolicyMetadataDisplay: React.FC<PolicyMetadataDisplayProps> = ({
   };
 
   return (
-    <div className={styles.metadataGrid}>
-      <Text className={styles.label}>Policy ID:</Text>
-      <Text className={styles.value}>{policy.id}</Text>
+    <div className={styles.root}>
+      <div className={styles.metadataRow}>
+        <Text className={styles.label}>Policy ID:</Text>
+        <Text className={styles.value}>{policy.id}</Text>
+      </div>
 
-      <Text className={styles.label}>Policy Group ID:</Text>
-      <Text className={styles.value}>{policy.policyGroupId}</Text>
+      <div className={styles.metadataRow}>
+        <Text className={styles.label}>Policy Group ID:</Text>
+        <Text className={styles.value}>{policy.policyGroupId}</Text>
+      </div>
 
-      <Text className={styles.label}>Version:</Text>
-      <Text className={styles.value}>{policy.version}</Text>
+      <div className={styles.metadataRow}>
+        <Text className={styles.label}>Version:</Text>
+        <Text className={styles.value}>{policy.version}</Text>
+      </div>
 
-      <Text className={styles.label}>Status:</Text>
-      <Tag appearance="brand" shape="rounded">
-        {policy.status.toUpperCase()}
-      </Tag>
+      <div className={styles.metadataRow}>
+        <Text className={styles.label}>Status:</Text>
+        <Tag appearance="outline" shape="rounded">
+          {policy.status.toUpperCase()}
+        </Tag>
+      </div>
 
-      <Text className={styles.label}>Effective Date:</Text>
-      <Text className={styles.value}>{formatDate(policy.effectiveDate)}</Text>
+      <div className={styles.metadataRow}>
+        <Text className={styles.label}>Effective Date:</Text>
+        <Text className={styles.value}>{formatDate(policy.effectiveDate)}</Text>
+      </div>
 
       {policy.jurisdiction && (
-        <>
+        <div className={styles.metadataRow}>
           <Text className={styles.label}>Jurisdiction:</Text>
           <Text className={styles.value}>{policy.jurisdiction}</Text>
-        </>
+        </div>
       )}
 
-      <Text className={styles.label}>Proxy for Minors:</Text>
-      <Text className={styles.value}>
-        {policy.requiresProxyForMinors ? 'Yes' : 'No'}
-      </Text>
+      <div className={styles.metadataRow}>
+        <Text className={styles.label}>Proxy for Minors:</Text>
+        <Text className={styles.value}>
+          {policy.requiresProxyForMinors ? 'Yes' : 'No'}
+        </Text>
+      </div>
 
-      <Text className={styles.label}>Created At:</Text>
-      <Text className={styles.value}>{formatDateTime(policy.createdAt)}</Text>
+      <div className={styles.metadataRow}>
+        <Text className={styles.label}>Created At:</Text>
+        <Text className={styles.value}>{formatDateTime(policy.createdAt)}</Text>
+      </div>
 
-      <Text className={styles.label}>Last Updated:</Text>
-      <Text className={styles.value}>{formatDateTime(policy.updatedAt)}</Text>
+      <div className={styles.metadataRow}>
+        <Text className={styles.label}>Last Updated:</Text>
+        <Text className={styles.value}>{formatDateTime(policy.updatedAt)}</Text>
+      </div>
     </div>
   );
 };

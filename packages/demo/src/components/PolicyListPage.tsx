@@ -22,12 +22,11 @@ const useStyles = makeStyles({
   },
   card: {
     ...shorthands.padding('20px'),
-    boxShadow: tokens.shadow8,
+    boxShadow: 'none',
     borderRadius: tokens.borderRadiusMedium,
   },
   headerContainer: {
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: tokens.spacingVerticalL,
   },
@@ -36,6 +35,10 @@ const useStyles = makeStyles({
     justifyContent: 'center',
     alignItems: 'center',
     height: '400px',
+  },
+  createButton: {
+    maxWidth: '200px',
+    margin: tokens.spacingHorizontalXXL,
   },
 });
 
@@ -80,7 +83,9 @@ const PolicyListPage: React.FC = () => {
             Manage Policies
           </Text>
           <Link to="/policy/new">
-            <Button appearance="primary">Create New Policy</Button>
+            <Button appearance="primary" className={styles.createButton}>
+              Create New Policy
+            </Button>
           </Link>
         </div>
 
