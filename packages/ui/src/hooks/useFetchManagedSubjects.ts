@@ -3,6 +3,7 @@ import { deserializeConsentRecord } from '../utils/consentUtils.js';
 import type { ProfileData } from '../Profile/Profile.type.js';
 import type { StatusState } from './useStatus.js';
 import type { ConsentRecord } from '@open-source-consent/types';
+import { fetchWithConfig } from '../utils/fetchWithConfig.js';
 
 interface ProxySubject {
   id: string;
@@ -35,7 +36,9 @@ export default function useFetchManagedSubjects(
   const fetchConsentsForSubject = useCallback(
     async (subjectId: string): Promise<ConsentRecord[]> => {
       try {
-        const response = await fetch(`/api/subjects/${subjectId}/consents`);
+        const response = await fetchWithConfig(
+          `/api/subjects/${subjectId}/consents`,
+        );
         if (!response.ok) {
           throw new Error(`Failed to fetch consents: ${response.status}`);
         }
@@ -58,7 +61,9 @@ export default function useFetchManagedSubjects(
     updateStatus({ isLoadingProxySubjects: true, proxySubjectsError: null });
 
     try {
-      const response = await fetch(`/api/proxies/${profileId}/consents`);
+      const response = await fetchWithConfig(
+        `/api/proxies/${profileId}/consents`,
+      );
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(

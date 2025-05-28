@@ -40,6 +40,7 @@ export * from './Profile/index.js';
 export * from './RoleSelect/index.js';
 export * from './Signature/index.js';
 export * from './AgeSelect/index.js';
+export { setApiConfig } from './utils/apiConfig.js';
 
 export {
   // Hooks

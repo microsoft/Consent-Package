@@ -8,6 +8,7 @@ import type {
 import { getAgeGroup } from '../utils/ageUtils.js';
 import type { StatusState } from './useStatus.js';
 import useFetchConsents from './useFetchConsents.js';
+import { fetchWithConfig } from '../utils/fetchWithConfig.js';
 
 export const useConsents = (
   profileData: ProfileData | null,
@@ -158,9 +159,8 @@ export const useConsents = (
           },
         };
 
-        const response = await fetch('/api/consents', {
+        const response = await fetchWithConfig('/api/consents', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(consentInput),
         });
 

@@ -6,6 +6,7 @@ import type {
 } from '@open-source-consent/types';
 import type { ConsentFlowFormData } from '../ConsentFlow/ConsentFlow.type.js';
 import { getAgeGroup } from '../utils/ageUtils.js';
+import { fetchWithConfig } from '../utils/fetchWithConfig.js';
 
 interface UseConsentFlowResult {
   policy: Policy | null;
@@ -47,7 +48,7 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
     setIsLoading(true);
     setError(null);
 
-    fetch(`/api/policyGroups/${policyGroupId}/latest`)
+    fetchWithConfig(`/api/policyGroups/${policyGroupId}/latest`)
       .then((response) => {
         if (!response.ok) {
           if (response.status === 404) {
@@ -214,11 +215,8 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
 
     try {
       for (const consentInput of consentsToCreate) {
-        const response = await fetch('/api/consents', {
+        const response = await fetchWithConfig('/api/consents', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify(consentInput),
         });
 

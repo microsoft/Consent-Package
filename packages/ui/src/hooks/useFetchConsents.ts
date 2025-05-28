@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { deserializeConsentRecord } from '../utils/consentUtils.js';
 import type { ConsentRecord } from '@open-source-consent/types';
 import type { StatusState } from './useStatus.js';
+import { fetchWithConfig } from '../utils/fetchWithConfig.js';
 
 /**
  * Hook for fetching consents for a subject
@@ -17,7 +18,9 @@ export default function useFetchConsents(
   const fetchConsentsForSubject = useCallback(
     async (subjectId: string): Promise<ConsentRecord[] | null> => {
       try {
-        const response = await fetch(`/api/subjects/${subjectId}/consents`);
+        const response = await fetchWithConfig(
+          `/api/subjects/${subjectId}/consents`,
+        );
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(

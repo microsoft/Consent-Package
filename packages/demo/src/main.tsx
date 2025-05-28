@@ -19,11 +19,32 @@ import PolicyViewPage from './components/PolicyViewPage.js';
 import { AuthProvider } from './utils/AuthContext.js';
 
 import { setDataAdapter } from '@open-source-consent/api/shared';
+import { setApiConfig } from '@open-source-consent/ui';
 import { IndexedDBDataAdapter } from '@open-source-consent/data-adapter-indexeddb';
 
 // Initialize and set the data adapter before rendering the application
 const dataAdapter = new IndexedDBDataAdapter();
 setDataAdapter(dataAdapter);
+
+/**
+ * Our demo app uses a mock API by default but
+ * the API config can be overridden to supply generic
+ * configuration for the API. The UI package will
+ * use any baseURL and headers from the API config by default.
+ */
+setApiConfig({
+  // baseUrl: 'https://api.example.com',
+  // headers: {
+  //   'Authorization': 'Bearer MY_API_TOKEN',
+  //   'X-Custom-Header': 'DemoAppValue'
+  // },
+  // credentials: 'include',
+  // mode: 'cors',
+  // cache: 'no-store',
+  // redirect: 'follow',
+  // timeout: 15000,
+  arbitraryKey: 'arbitraryValue',
+});
 
 const router = createBrowserRouter(
   [

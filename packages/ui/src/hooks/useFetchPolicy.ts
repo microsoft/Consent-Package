@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import type { Policy } from '@open-source-consent/types';
+import { fetchWithConfig } from '../utils/fetchWithConfig.js';
 
 interface FetchPolicyResult {
   fetchPolicy(policyId: string): Promise<Policy>;
@@ -18,7 +19,7 @@ export default function useFetchPolicy(): FetchPolicyResult {
     }
 
     try {
-      const response = await fetch(`/api/policies/${policyId}`);
+      const response = await fetchWithConfig(`/api/policies/${policyId}`);
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error(`Policy with ID "${policyId}" not found.`);

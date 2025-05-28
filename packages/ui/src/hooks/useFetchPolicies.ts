@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import type { Policy } from '@open-source-consent/types';
+import { fetchWithConfig } from '../utils/fetchWithConfig.js';
 
 interface FetchPoliciesResult {
   fetchPolicies(): Promise<Policy[]>;
@@ -14,7 +15,7 @@ export default function useFetchPolicies(): FetchPoliciesResult {
    */
   const fetchPolicies = useCallback(async (): Promise<Policy[]> => {
     try {
-      const response = await fetch('/api/policies');
+      const response = await fetchWithConfig('/api/policies');
       if (!response.ok) {
         throw new Error(
           `Failed to fetch policies: ${response.status} ${response.statusText}`,

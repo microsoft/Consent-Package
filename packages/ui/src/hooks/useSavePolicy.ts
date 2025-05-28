@@ -4,6 +4,7 @@ import type {
   CreatePolicyInput,
   NewPolicyVersionDataInput,
 } from '@open-source-consent/types';
+import { fetchWithConfig } from '../utils/fetchWithConfig.js';
 
 interface SavePolicyResult {
   savePolicy(
@@ -26,11 +27,8 @@ export default function useSavePolicy(): SavePolicyResult {
         const endpoint = '/api/policies';
         const method = 'POST';
 
-        const response = await fetch(endpoint, {
+        const response = await fetchWithConfig(endpoint, {
           method: method,
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify(policyData),
         });
 
