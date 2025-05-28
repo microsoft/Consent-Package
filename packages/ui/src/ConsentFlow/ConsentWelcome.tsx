@@ -170,7 +170,8 @@ const ConsentWelcome = ({
           }
         />
 
-        {formData.age === undefined ? null : formData.age < 18 ? (
+        {formData.age === undefined ? null : formData.age < 18 &&
+          policy.requiresProxyForMinors === true ? (
           <Text>
             Research is great. But you must be at least 18 years old to consent
             on behalf of yourself or someone else to use this service. Please
@@ -186,6 +187,19 @@ const ConsentWelcome = ({
               initialRoleIdValue={formData.roleId}
               onChange={(roleId: string) =>
                 handleFormDataChange({ roleId, isProxy: roleId === 'proxy' })
+              }
+              roles={
+                formData.age !== undefined &&
+                formData.age < 18 &&
+                policy.requiresProxyForMinors === false
+                  ? [
+                      {
+                        id: 'self',
+                        label: 'Self',
+                        description: 'I am providing consent for myself',
+                      },
+                    ]
+                  : undefined
               }
             />
           </>

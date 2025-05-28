@@ -16,6 +16,11 @@ const useStyles = makeStyles({
     paddingBottom: '8px',
     borderBottom: `1px solid ${tokens.colorNeutralStroke1}`,
   },
+  description: {
+    display: 'inline-block',
+    marginBottom: tokens.spacingVerticalL,
+    fontStyle: 'italic',
+  },
   content: {
     '& ul, & ol': {
       paddingLeft: '20px',
@@ -42,14 +47,15 @@ const ConsentContentSectionStep = ({
       <div className={styles.sectionHeader}>
         <Title2 align="center">{section.title}</Title2>
       </div>
-      {/* Consider displaying section.description here if appropriate for the UI design */}
+      {section.description && (
+        <div className={styles.description}>{section.description}</div>
+      )}
       {section.content && (
         <div
           className={styles.content}
           dangerouslySetInnerHTML={{ __html: section.content }}
         />
       )}
-      {/* TODO: Display risks, dataTypes, compensation if needed in separate sections or integrate here */}
     </div>
   );
 };

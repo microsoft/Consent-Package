@@ -46,6 +46,8 @@ export class PolicyService extends BaseService<IPolicyDataAdapter> {
         availableScopes: data.availableScopes,
         effectiveDate: data.effectiveDate,
         status: data.status,
+        jurisdiction: data.jurisdiction,
+        requiresProxyForMinors: data.requiresProxyForMinors,
       };
 
       return this.createNewPolicyVersion(

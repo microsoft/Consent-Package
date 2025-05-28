@@ -14,6 +14,7 @@ import ConsentReview from './ConsentFlow/ConsentReview.js';
 import ConsentScopes from './ConsentFlow/ConsentScopes.js';
 import ConsentWelcome from './ConsentFlow/ConsentWelcome.js';
 import ConsentContentSectionStep from './ConsentFlow/ConsentContentSectionStep.js';
+import ConsentConfirmation from './ConsentFlow/ConsentConfirmation.js';
 import type {
   ConsentFlowFormData,
   ConsentFlowPolicy,
@@ -61,13 +62,14 @@ export {
   ConsentScopes,
   ConsentWelcome,
   ConsentContentSectionStep,
-  PolicySectionDisplay, // Added new component
-  PolicyMetadataDisplay, // Added new component
-  PolicyTable, // Added new component
-  PolicyScopeDisplay, // Added new component
-  PolicyMetadataForm, // Added new component
-  PolicyContentSectionEditor, // Added new component
-  PolicyScopeEditor, // Added new component
+  ConsentConfirmation,
+  PolicySectionDisplay,
+  PolicyMetadataDisplay,
+  PolicyTable,
+  PolicyScopeDisplay,
+  PolicyMetadataForm,
+  PolicyContentSectionEditor,
+  PolicyScopeEditor,
   // Types
   type ProfileData,
   type ConsentFlowFormData,

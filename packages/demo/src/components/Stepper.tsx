@@ -4,6 +4,8 @@ import { useStyles } from './GetStarted.styles.js';
 
 export type StepId =
   | 'welcome'
+  | 'guardianReminder'
+  | 'proxyReminder'
   | 'scopes'
   | 'review'
   | `contentSection_${string}`;

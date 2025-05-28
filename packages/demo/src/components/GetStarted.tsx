@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Button, Text, Spinner } from '@fluentui/react-components';
 import {
   ConsentWelcome,
@@ -6,14 +6,21 @@ import {
   ConsentReview,
   useConsentFlow,
   ConsentContentSectionStep,
+  ConsentConfirmation,
 } from '@open-source-consent/ui';
 import type { ConsentFlowFormData } from '@open-source-consent/ui';
 import type { PolicyContentSection } from '@open-source-consent/types';
 import { useAuth } from '../utils/useAuth.js';
 import { useStyles } from './GetStarted.styles.js';
-import { type StepGroupsConfigType, Stepper } from './Stepper.js';
+import {
+  type StepGroupsConfigType,
+  Stepper,
+  type AppStep,
+  type StepId as StepperStepId,
+} from './Stepper.js';
+import { Important24Filled, PeopleTeam24Filled } from '@fluentui/react-icons';
 
-type StepId = 'welcome' | 'scopes' | 'review' | `contentSection_${number}`;
+export type StepId = StepperStepId;
 
 const stepGroupsConfig: StepGroupsConfigType = {
   basicInfo: {
@@ -34,14 +41,6 @@ const stepGroupsConfig: StepGroupsConfigType = {
   },
 };
 
-interface AppStep {
-  id: StepId;
-  label: string;
-  groupId: string;
-  groupLabel: string;
-  primaryColorToken: string;
-}
-
 export function GetStarted(): JSX.Element {
   const styles = useStyles();
   const {
@@ -57,6 +56,11 @@ export function GetStarted(): JSX.Element {
   const { isLoading: isAuthLoading, login } = useAuth();
 
   const isPageLoading = isLoading || isAuthLoading;
+
+  const [guardianConsentConfirmed, setGuardianConsentConfirmed] =
+    useState(false);
+  const [proxyDiscussionConfirmed, setProxyDiscussionConfirmed] =
+    useState(false);
 
   const dynamicSteps = useMemo<AppStep[]>(() => {
     const steps: AppStep[] = [];
@@ -81,6 +85,30 @@ export function GetStarted(): JSX.Element {
           primaryColorToken: programDetails.primaryColorToken,
         });
       });
+
+      if (
+        formData.age !== undefined &&
+        formData.age < 18 &&
+        !formData.isProxy
+      ) {
+        steps.push({
+          id: 'guardianReminder',
+          label: 'Guardian Approval',
+          groupId: 'consent',
+          groupLabel: consent.label,
+          primaryColorToken: consent.primaryColorToken,
+        });
+      }
+
+      if (formData.isProxy && formData.managedSubjects.length > 0) {
+        steps.push({
+          id: 'proxyReminder',
+          label: 'Proxy Confirmation',
+          groupId: 'consent',
+          groupLabel: consent.label,
+          primaryColorToken: consent.primaryColorToken,
+        });
+      }
     }
 
     steps.push({
@@ -104,10 +132,10 @@ export function GetStarted(): JSX.Element {
     }
 
     return steps;
-  }, [policy]);
+  }, [policy, formData]);
 
   const [currentStepId, setCurrentStepId] = useState<StepId>(
-    dynamicSteps[0]?.id ?? 'welcome',
+    dynamicSteps[0]?.id ?? ('welcome' as StepId),
   );
 
   const currentStepIndex = useMemo(
@@ -115,54 +143,95 @@ export function GetStarted(): JSX.Element {
     [dynamicSteps, currentStepId],
   );
 
-  const isStepValid = useMemo(() => {
-    const isReviewStep = currentStepId === 'review';
-    const isContentSectionStep = currentStepId.startsWith('contentSection_');
-    const isScopesStep = currentStepId === 'scopes';
+  const [maxVisitedStepIndex, setMaxVisitedStepIndex] = useState<number>(-1);
 
-    if (isContentSectionStep) {
-      return true;
-    } else if (isReviewStep) {
-      return !!formData.signature && formData.signature.length > 0;
-    } else if (isScopesStep) {
-      let hasRequiredScopes = true;
-      if (policy && !formData.isProxy) {
-        const requiredScopeKeys = policy.availableScopes
-          .filter((s) => s.required)
-          .map((s) => s.key);
-        if (requiredScopeKeys.length > 0) {
-          hasRequiredScopes = requiredScopeKeys.every((key) =>
-            formData.grantedScopes?.includes(key),
-          );
-        }
-      } else if (policy && formData.isProxy) {
-        const requiredScopeKeys = policy.availableScopes
-          .filter((s) => s.required)
-          .map((s) => s.key);
-        if (requiredScopeKeys.length > 0) {
-          hasRequiredScopes = formData.managedSubjects.every((subject) =>
-            requiredScopeKeys.every((key) =>
-              subject.grantedScopes?.includes(key),
-            ),
-          );
-        }
-      }
-      return isFormValid && hasRequiredScopes;
-    } else {
-      return isFormValid;
+  useEffect(() => {
+    if (currentStepIndex > -1 && dynamicSteps.length > 0) {
+      setMaxVisitedStepIndex((prevMax) => {
+        const newMax = Math.max(prevMax, currentStepIndex);
+        return Math.min(newMax, dynamicSteps.length - 1);
+      });
+    } else if (dynamicSteps.length === 0) {
+      setMaxVisitedStepIndex(-1);
     }
-  }, [currentStepId, isFormValid, formData, policy]);
+  }, [currentStepIndex, dynamicSteps.length]);
+
+  const getStepValidity = useCallback(
+    (stepIdToEvaluate: StepId): boolean => {
+      const isReviewStepEval = stepIdToEvaluate === 'review';
+      const isContentSectionStepEval =
+        stepIdToEvaluate.startsWith('contentSection_');
+      const isScopesStepEval = stepIdToEvaluate === 'scopes';
+      const isGuardianReminderStepEval =
+        stepIdToEvaluate === 'guardianReminder';
+      const isProxyReminderStepEval = stepIdToEvaluate === 'proxyReminder';
+
+      if (isContentSectionStepEval) {
+        return true;
+      } else if (isGuardianReminderStepEval) {
+        return guardianConsentConfirmed;
+      } else if (isProxyReminderStepEval) {
+        return proxyDiscussionConfirmed;
+      } else if (isReviewStepEval) {
+        return !!formData.signature && formData.signature.length > 0;
+      } else if (isScopesStepEval) {
+        let hasRequiredScopes = true;
+        if (policy && !formData.isProxy) {
+          const requiredScopeKeys = policy.availableScopes
+            .filter((s) => s.required)
+            .map((s) => s.key);
+          if (requiredScopeKeys.length > 0) {
+            hasRequiredScopes = requiredScopeKeys.every((key) =>
+              formData.grantedScopes?.includes(key),
+            );
+          }
+        } else if (policy && formData.isProxy) {
+          const requiredScopeKeys = policy.availableScopes
+            .filter((s) => s.required)
+            .map((s) => s.key);
+          if (requiredScopeKeys.length > 0) {
+            hasRequiredScopes = formData.managedSubjects.every((subject) =>
+              requiredScopeKeys.every((key) =>
+                subject.grantedScopes?.includes(key),
+              ),
+            );
+          }
+        }
+        return isFormValid && hasRequiredScopes;
+      } else {
+        return isFormValid;
+      }
+    },
+    [
+      isFormValid,
+      formData,
+      policy,
+      guardianConsentConfirmed,
+      proxyDiscussionConfirmed,
+    ],
+  );
+
+  const isStepValid = useMemo(() => {
+    if (currentStepId === null || currentStepIndex < 0) return false;
+    return getStepValidity(currentStepId);
+  }, [currentStepId, currentStepIndex, getStepValidity]);
 
   const handleNext = async (): Promise<void> => {
     const nextIndex = currentStepIndex + 1;
     if (nextIndex < dynamicSteps.length) {
       setCurrentStepId(dynamicSteps[nextIndex].id);
+      setTimeout(() => {
+        window.scrollTo({ top: 0 });
+      }, 0);
     } else {
       if (saveConsent) {
         await saveConsent();
         if (!error) {
           try {
-            const subjectId = formData.name.trim();
+            const subjectId = formData.name
+              .trim()
+              .toLowerCase()
+              .replace(/\s+/g, '.');
             await login(subjectId);
           } catch (err) {
             console.error('Login failed:', err);
@@ -180,27 +249,50 @@ export function GetStarted(): JSX.Element {
     const prevIndex = currentStepIndex - 1;
     if (prevIndex >= 0) {
       setCurrentStepId(dynamicSteps[prevIndex].id);
+      setTimeout(() => {
+        window.scrollTo({ top: 0 });
+      }, 0);
     }
   };
 
-  const handleStepClick = (stepId: StepId): void => {
-    const targetStepIndex = dynamicSteps.findIndex(
-      (step) => step.id === stepId,
+  const handleStepClick = (clickedStepId: StepId): void => {
+    const clickedStepIndex = dynamicSteps.findIndex(
+      (step) => step.id === clickedStepId,
     );
 
-    if (!isStepValid) return;
-
-    if (stepId === 'welcome') {
-      setCurrentStepId(stepId);
+    if (clickedStepIndex === -1) {
       return;
     }
 
-    if (targetStepIndex <= currentStepIndex + 1) {
-      if ((stepId === 'scopes' || stepId === 'review') && !isStepValid) {
-        console.warn('Cannot proceed, form is not valid.');
+    if (clickedStepIndex <= maxVisitedStepIndex) {
+      setCurrentStepId(clickedStepId);
+    } else {
+      const validationCandidateIndex = maxVisitedStepIndex;
+
+      if (
+        validationCandidateIndex < 0 ||
+        validationCandidateIndex >= dynamicSteps.length
+      ) {
+        if (clickedStepIndex === 0 && dynamicSteps.length > 0) {
+          setCurrentStepId(dynamicSteps[0].id);
+        }
         return;
       }
-      setCurrentStepId(stepId);
+
+      const stepToValidateId = dynamicSteps[validationCandidateIndex].id;
+      const isStepToValidateComplete = getStepValidity(stepToValidateId);
+
+      if (clickedStepIndex === validationCandidateIndex + 1) {
+        if (isStepToValidateComplete) {
+          setCurrentStepId(clickedStepId);
+        } else {
+          setCurrentStepId(stepToValidateId);
+        }
+      } else {
+        if (!isStepToValidateComplete) {
+          setCurrentStepId(stepToValidateId);
+        }
+      }
     }
   };
 
@@ -285,6 +377,46 @@ export function GetStarted(): JSX.Element {
           }}
         />
       );
+    } else if (currentStepId === 'guardianReminder') {
+      return (
+        <ConsentConfirmation
+          title="Important: Guardian Approval Needed"
+          icon={<Important24Filled />}
+          messageBody={
+            <Text>
+              Hi {formData.name || 'there'}! Since you are under 18, it's
+              important to talk to your parent or guardian about this. Please
+              make sure they review this information and give you permission to
+              proceed.
+            </Text>
+          }
+          checkboxLabel="I have discussed this with my parent or guardian, and they have approved my participation."
+          isChecked={guardianConsentConfirmed}
+          onCheckboxChange={setGuardianConsentConfirmed}
+        />
+      );
+    } else if (currentStepId === 'proxyReminder') {
+      const subjectName = formData.managedSubjects[0]?.name || 'the individual';
+      return (
+        <ConsentConfirmation
+          title={`Important: Discuss with ${subjectName}`}
+          icon={<PeopleTeam24Filled />}
+          messageBody={
+            <Text>
+              Hi {formData.name || 'there'}! As you are consenting on behalf of
+              {subjectName !== 'the individual'
+                ? ` ${subjectName}`
+                : ' someone else'}
+              , please ensure you have discussed this information with them to
+              the best of their understanding and that they agree to
+              participate.
+            </Text>
+          }
+          checkboxLabel={`I have discussed this with ${subjectName} and confirmed their willingness to participate.`}
+          isChecked={proxyDiscussionConfirmed}
+          onCheckboxChange={setProxyDiscussionConfirmed}
+        />
+      );
     }
     return null;
   };
@@ -311,7 +443,10 @@ export function GetStarted(): JSX.Element {
           onClick={handleNext}
           disabled={
             isPageLoading ||
-            ((currentStepId === 'welcome' || currentStepId === 'review') &&
+            ((currentStepId === 'welcome' ||
+              currentStepId === 'review' ||
+              currentStepId === 'guardianReminder' ||
+              currentStepId === 'proxyReminder') &&
               !isStepValid) ||
             (!currentStepId.startsWith('contentSection_') && !isStepValid)
           }
