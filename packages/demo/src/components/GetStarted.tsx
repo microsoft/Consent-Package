@@ -1,11 +1,5 @@
 import { useState, useMemo } from 'react';
-import {
-  makeStyles,
-  Button,
-  tokens,
-  Text,
-  Spinner,
-} from '@fluentui/react-components';
+import { Button, Text, Spinner } from '@fluentui/react-components';
 import {
   ConsentWelcome,
   ConsentScopes,
@@ -16,131 +10,36 @@ import {
 import type { ConsentFlowFormData } from '@open-source-consent/ui';
 import type { PolicyContentSection } from '@open-source-consent/types';
 import { useAuth } from '../utils/useAuth.js';
+import { useStyles } from './GetStarted.styles.js';
+import { type StepGroupsConfigType, Stepper } from './Stepper.js';
 
-const useStyles = makeStyles({
-  root: {
-    padding: '24px 64px',
-    margin: '0 auto',
-    '@media (max-width: 768px)': {
-      padding: '24px',
-    },
-  },
-  stepper: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '48px',
-    position: 'relative',
-    padding: '0 16px',
-    paddingTop: '4px',
-    overflowX: 'auto',
-    '@media (max-width: 768px)': {
-      justifyContent: 'flex-start',
-      gap: '12px',
-      paddingBottom: '8px',
-    },
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      top: '20px',
-      left: '40px',
-      right: '40px',
-      height: '3px',
-      backgroundColor: tokens.colorNeutralStroke1,
-      zIndex: 0,
-      transition: 'background-color 0.3s ease',
-      '@media (max-width: 768px)': {
-        left: '20px',
-        right: '20px',
-      },
-    },
-  },
-  step: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    position: 'relative',
-    zIndex: 1,
-    transition: 'transform 0.2s ease',
-    minWidth: '80px',
-    textAlign: 'center',
-    '&:hover': {
-      transform: 'translateY(-2px)',
-    },
-    '@media (max-width: 768px)': {
-      minWidth: '60px',
-      flexShrink: 0,
-    },
-  },
-  stepNumber: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    border: '2px solid',
-    background: tokens.colorNeutralBackground1,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: '12px',
-    transition: 'all 0.3s ease',
-    boxShadow: tokens.shadow2,
-    cursor: 'pointer',
-    '@media (max-width: 768px)': {
-      width: '32px',
-      height: '32px',
-      fontSize: '14px',
-      marginBottom: '8px',
-    },
-  },
-  stepNumberActive: {
-    backgroundColor: tokens.colorBrandBackground,
-    color: tokens.colorNeutralForegroundInverted,
-    transform: 'scale(1.1)',
-  },
-  stepLabel: {
-    fontSize: '12px',
-    color: tokens.colorNeutralForeground1,
-    transition: 'color 0.3s ease',
-    '@media (max-width: 768px)': {
-      fontSize: '10px',
-      maxWidth: '60px',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    },
-  },
-  slide: {
-    minHeight: '400px',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  navigation: {
-    marginTop: 'auto',
-    display: 'flex',
-    justifyContent: 'flex-end',
-    paddingTop: '24px',
-    '& button:first-child': {
-      marginRight: '8px',
-    },
-  },
-  loading: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '400px',
-  },
-});
+type StepId = 'welcome' | 'scopes' | 'review' | `contentSection_${number}`;
 
-const baseSteps = [
-  { id: 'welcome' as const, label: 'Welcome' },
-  { id: 'scopes' as const, label: 'Scopes' },
-  { id: 'review' as const, label: 'Review & Sign' },
-] as const;
+const stepGroupsConfig: StepGroupsConfigType = {
+  basicInfo: {
+    label: 'Basic Information',
+    primaryColorToken: 'colorBrandForeground1',
+  },
+  programDetails: {
+    label: 'Program Details',
+    primaryColorToken: 'colorPaletteGreenForeground2',
+  },
+  consent: {
+    label: 'Consent',
+    primaryColorToken: 'colorPaletteDarkOrangeForeground2',
+  },
+  reviewAndAgree: {
+    label: 'Review & Agree',
+    primaryColorToken: 'colorPaletteYellowForeground2',
+  },
+};
 
-type StepId = (typeof baseSteps)[number]['id'] | `contentSection_${number}`;
-
-interface Step {
+interface AppStep {
   id: StepId;
   label: string;
+  groupId: string;
+  groupLabel: string;
+  primaryColorToken: string;
 }
 
 export function GetStarted(): JSX.Element {
@@ -159,27 +58,57 @@ export function GetStarted(): JSX.Element {
 
   const isPageLoading = isLoading || isAuthLoading;
 
-  const dynamicSteps = useMemo<Step[]>(() => {
-    if (!policy) return baseSteps.filter((step) => step.id === 'welcome');
+  const dynamicSteps = useMemo<AppStep[]>(() => {
+    const steps: AppStep[] = [];
+    const { basicInfo, programDetails, consent, reviewAndAgree } =
+      stepGroupsConfig;
 
-    const contentSectionSteps: Step[] = policy.contentSections.map(
-      (section: PolicyContentSection, index) => ({
-        id: `contentSection_${index}` as StepId,
-        label:
-          section.title.length > 15
-            ? `${section.title.substring(0, 12)}...`
-            : section.title,
-      }),
-    );
+    steps.push({
+      id: 'welcome',
+      label: basicInfo.label,
+      groupId: 'basicInfo',
+      groupLabel: basicInfo.label,
+      primaryColorToken: basicInfo.primaryColorToken,
+    });
 
-    return [
-      baseSteps.find((s) => s.id === 'welcome')!,
-      ...contentSectionSteps,
-      ...baseSteps.filter((s) => s.id !== 'welcome'),
-    ];
+    if (policy) {
+      policy.contentSections.forEach((section: PolicyContentSection, index) => {
+        steps.push({
+          id: `contentSection_${index}` as StepId,
+          label: section.title,
+          groupId: 'programDetails',
+          groupLabel: programDetails.label,
+          primaryColorToken: programDetails.primaryColorToken,
+        });
+      });
+    }
+
+    steps.push({
+      id: 'scopes',
+      label: consent.label,
+      groupId: 'consent',
+      groupLabel: consent.label,
+      primaryColorToken: consent.primaryColorToken,
+    });
+
+    steps.push({
+      id: 'review',
+      label: reviewAndAgree.label,
+      groupId: 'reviewAndAgree',
+      groupLabel: reviewAndAgree.label,
+      primaryColorToken: reviewAndAgree.primaryColorToken,
+    });
+
+    if (!policy && steps.length > 0) {
+      return steps.filter((step) => step.groupId === 'basicInfo');
+    }
+
+    return steps;
   }, [policy]);
 
-  const [currentStepId, setCurrentStepId] = useState<StepId>('welcome');
+  const [currentStepId, setCurrentStepId] = useState<StepId>(
+    dynamicSteps[0]?.id ?? 'welcome',
+  );
 
   const currentStepIndex = useMemo(
     () => dynamicSteps.findIndex((step) => step.id === currentStepId),
@@ -196,10 +125,8 @@ export function GetStarted(): JSX.Element {
     } else if (isReviewStep) {
       return !!formData.signature && formData.signature.length > 0;
     } else if (isScopesStep) {
-      // For scopes, we always need to check that required scopes exist
       let hasRequiredScopes = true;
       if (policy && !formData.isProxy) {
-        // Only for self-consenter for now
         const requiredScopeKeys = policy.availableScopes
           .filter((s) => s.required)
           .map((s) => s.key);
@@ -209,7 +136,6 @@ export function GetStarted(): JSX.Element {
           );
         }
       } else if (policy && formData.isProxy) {
-        // If proxy, check required scopes for each subject
         const requiredScopeKeys = policy.availableScopes
           .filter((s) => s.required)
           .map((s) => s.key);
@@ -237,7 +163,6 @@ export function GetStarted(): JSX.Element {
         if (!error) {
           try {
             const subjectId = formData.name.trim();
-            // Will push to '/' because of routing rules
             await login(subjectId);
           } catch (err) {
             console.error('Login failed:', err);
@@ -366,24 +291,12 @@ export function GetStarted(): JSX.Element {
 
   return (
     <div className={styles.root}>
-      <div className={styles.stepper}>
-        {dynamicSteps.map((step, index) => (
-          <div
-            key={step.id}
-            className={styles.step}
-            onClick={() => handleStepClick(step.id)}
-          >
-            <div
-              className={`${styles.stepNumber} ${
-                currentStepIndex === index ? styles.stepNumberActive : ''
-              }`}
-            >
-              {index + 1}
-            </div>
-            <Text className={styles.stepLabel}>{step.label}</Text>
-          </div>
-        ))}
-      </div>
+      <Stepper
+        steps={dynamicSteps}
+        currentStepId={currentStepId}
+        onStepClick={handleStepClick}
+        stepGroupsConfig={stepGroupsConfig}
+      />
 
       <div className={styles.slide}>{renderSlide()}</div>
 

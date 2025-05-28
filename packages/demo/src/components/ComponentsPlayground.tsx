@@ -11,7 +11,8 @@ import {
 const useStyles = makeStyles({
   root: {
     padding: '24px',
-    margin: '16px',
+    maxWidth: '1200px',
+    margin: '0 auto',
     '@media (max-width: 768px)': {
       padding: '24px',
     },
