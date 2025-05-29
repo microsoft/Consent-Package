@@ -43,6 +43,10 @@ const useStyles = makeStyles({
   cardHeader: {
     marginBottom: tokens.spacingVerticalM,
   },
+  cardHeaderContent: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
   buttonContainer: {
     display: 'flex',
     justifyContent: 'flex-end',
@@ -79,11 +83,13 @@ const PolicyEditorPage: React.FC = () => {
     updateScope,
     removeScope,
   } = usePolicyEditor(policyId);
+
   const styles = useStyles();
   const navigate = useNavigate();
+
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  ): void => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -98,7 +104,7 @@ const PolicyEditorPage: React.FC = () => {
   const handleCheckboxChange = (
     name: keyof typeof formData,
     checked: boolean,
-  ) => {
+  ): void => {
     setFormData({ ...formData, [name]: checked });
   };
 
@@ -121,11 +127,18 @@ const PolicyEditorPage: React.FC = () => {
         <CardHeader
           className={styles.cardHeader}
           header={
-            <Title3>
-              {policyId
-                ? `Edit Policy (ID: ${policy?.id || policyId})`
-                : 'Create New Policy'}
-            </Title3>
+            <div className={styles.cardHeaderContent}>
+              <Title3>
+                {policyId
+                  ? `Edit Policy (ID: ${policy?.id || policyId})`
+                  : 'Create New Policy'}
+              </Title3>
+              <Subtitle2>
+                {policy?.policyGroupId === 'sample-group-1'
+                  ? 'Note: Updating this policy will update the content for the Consent Demo.'
+                  : 'Note: Creating this new policy is purely for demo purposes and will not be available for the Consent Demo.'}
+              </Subtitle2>
+            </div>
           }
         />
         <form

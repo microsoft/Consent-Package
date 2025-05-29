@@ -225,6 +225,9 @@ export function Header(): JSX.Element {
     if (path === '/') {
       return location.pathname === '/';
     }
+    if (path === '/policies' && location.pathname.includes('/policy'))
+      return true;
+
     return location.pathname.startsWith(path);
   };
 
