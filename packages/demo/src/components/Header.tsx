@@ -217,8 +217,8 @@ export function Header(): JSX.Element {
   const navItems = [
     { path: '/', label: 'Home' },
     ...(currentUser ? [] : [{ path: '/get-started', label: 'Consent Demo' }]),
-    { path: '/playground', label: 'Playground' },
     { path: '/policies', label: 'Admin Demo' },
+    { path: '/playground', label: 'Playground' },
   ];
 
   const isActive = (path: string): boolean => {

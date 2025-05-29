@@ -79,6 +79,11 @@ export function Footer(): JSX.Element {
               </li>
             )}
             <li>
+              <Link to="/policies" className={styles.link}>
+                Admin Demo
+              </Link>
+            </li>
+            <li>
               <Link to="/playground" className={styles.link}>
                 Playground
               </Link>

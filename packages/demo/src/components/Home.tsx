@@ -276,7 +276,11 @@ export function Home(): JSX.Element {
               </li>
             </ul>
             Please visit the{' '}
-            <a href="https://github.com/microsoft/Open-Source-Consent-Package">
+            <a
+              href="https://github.com/microsoft/Open-Source-Consent-Package"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Consent Package on GitHub
             </a>{' '}
             to collaborate, contribute, and integrate into your own work!
