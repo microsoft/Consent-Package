@@ -129,7 +129,7 @@ const ConsentReview = ({
         formData.managedSubjects &&
         formData.managedSubjects.length > 0 && (
           <div className={styles.section}>
-            <Text className={styles.sectionTitle}>Managed Subjects</Text>
+            <Text className={styles.sectionTitle}>Managed Proxies</Text>
             {formData.managedSubjects.map((subject, index) => (
               <div key={`subject-${index}`} className={styles.section}>
                 <Text>Name: {subject.name}</Text>

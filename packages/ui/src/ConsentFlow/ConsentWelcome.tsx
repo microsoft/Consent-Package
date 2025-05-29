@@ -302,7 +302,7 @@ const ConsentWelcome = ({
               </div>
             ))}
             <Button appearance="outline" onClick={handleAddSubject}>
-              Add Subject
+              Add Managed Proxy
             </Button>
           </div>
         )}

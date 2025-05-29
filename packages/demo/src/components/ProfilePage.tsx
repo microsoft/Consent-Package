@@ -68,7 +68,7 @@ export function ProfilePage(): JSX.Element {
   }, [userId]);
 
   const handleManagedSubjectSelect = (subjectId: string): void => {
-    console.info('Managed subject selected:', subjectId);
+    console.info('Managed proxy selected:', subjectId);
   };
 
   if (isLoadingProfile) {

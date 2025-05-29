@@ -22,7 +22,7 @@ interface FetchManagedSubjectsResult {
 }
 
 /**
- * Hook for fetching managed subjects with their consents
+ * Hook for fetching managed proxies with their consents
  */
 export default function useFetchManagedSubjects(
   profileId: string | undefined,
@@ -102,7 +102,7 @@ export default function useFetchManagedSubjects(
     } catch (err: any) {
       console.error('Error fetching proxy subjects:', err);
       updateStatus({
-        proxySubjectsError: err.message || 'Failed to load managed subjects',
+        proxySubjectsError: err.message || 'Failed to load managed proxies',
       });
       return null;
     } finally {

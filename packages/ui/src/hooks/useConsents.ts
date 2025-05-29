@@ -73,7 +73,7 @@ export const useConsents = (
           updatedProfile.consents = mainConsents;
         }
 
-        // Fetch consents for all managed subjects
+        // Fetch consents for all managed proxies
         if (managedSubjects?.length) {
           const results = await Promise.all(
             managedSubjects.map(async (ms) => {

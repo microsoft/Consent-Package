@@ -50,7 +50,7 @@ A monorepo structure (`pnpm workspaces`).
 │   │   │   ├── ConsentFlow/    # Supporting steps components for stepping through the consent flow
 │   │   │   ├── hooks/          # e.g., useConsent*, usePolicy*
 │   │   │   ├── Policy/
-│   │   │   ├── Profile/        # Display Personal Information, Managed Subjects and status of Consents
+│   │   │   ├── Profile/        # Display Personal Information, Managed Proxies and status of Consents
 │   │   │   ├── RoleSelect/     
 │   │   │   ├── Signature/
 │   │   │   ├── index.css       # Base styles

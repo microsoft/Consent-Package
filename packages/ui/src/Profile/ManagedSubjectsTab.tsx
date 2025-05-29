@@ -23,7 +23,7 @@ const ManagedSubjectsTab: React.FC<ManagedSubjectsTabProps> = ({
     return (
       <Card className="profile-card">
         <CardPreview>
-          <Text>No managed subjects available</Text>
+          <Text>No managed proxies available</Text>
         </CardPreview>
       </Card>
     );

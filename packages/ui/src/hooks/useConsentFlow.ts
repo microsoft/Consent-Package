@@ -84,7 +84,7 @@ const useConsentFlow = (policyGroupId: string): UseConsentFlowResult => {
     const hasDob = formData.dob !== undefined;
     const hasRole = !!formData.roleId;
 
-    // For proxy role, validate managed subjects
+    // For proxy role, validate managed proxies
     const hasManagedSubjects =
       !formData.isProxy || formData.managedSubjects.length > 0;
     const hasValidManagedSubjects = formData.managedSubjects.every(

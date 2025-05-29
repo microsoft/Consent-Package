@@ -43,7 +43,7 @@ export const Profile: React.FC<ProfileProps> = ({
   const { refreshConsentsForSubject, updateConsents, handleScopeChange } =
     useConsents(profileData, updateStatus);
 
-  // Initialize the managed subjects fetching hook
+  // Initialize the managed proxies fetching hook
   useFetchManagedSubjects(
     profileData?.id,
     updateStatus,
@@ -157,12 +157,12 @@ export const Profile: React.FC<ProfileProps> = ({
         </div>
       )}
       {status.isLoadingProxySubjects && (
-        <Spinner label="Loading managed subjects..." />
+        <Spinner label="Loading managed proxies..." />
       )}
       {status.proxySubjectsError && (
         <div style={{ color: 'red' }}>
           <Text>
-            Error loading managed subjects: {status.proxySubjectsError}
+            Error loading managed proxies: {status.proxySubjectsError}
           </Text>
         </div>
       )}
@@ -238,9 +238,9 @@ export const Profile: React.FC<ProfileProps> = ({
       <TabList selectedValue={selectedTab} onTabSelect={handleTabSelect}>
         <Tab value={PROFILE_TABS.PERSONAL}>Personal Information</Tab>
         {hasManagedSubjects && (
-          <Tab value={PROFILE_TABS.MANAGED}>Managed Subjects</Tab>
+          <Tab value={PROFILE_TABS.MANAGED}>Managed Proxies</Tab>
         )}
-        <Tab value={PROFILE_TABS.CONSENTS}>Consents</Tab>
+        <Tab value={PROFILE_TABS.CONSENTS}>View/Edit Consent Data</Tab>
       </TabList>
 
       {selectedTab === PROFILE_TABS.PERSONAL && (

@@ -177,8 +177,8 @@ const ConsentScopes = ({
       </h2>
       <Text align="center">
         {requiredScopes.length > 0
-          ? 'Select additional data you wish to authorize for use with this service. Mandatory permissions cannot be modified.'
-          : 'Select the data you wish to authorize for use with this service. At least one permission must be enabled to proceed.'}
+          ? 'Select additional data you wish to authorize for use with this service. You can edit data permissions at any time. Mandatory permissions cannot be modified.'
+          : 'Select the data you wish to authorize for use with this service. You can edit data permissions at any time. At least one permission must be enabled to proceed.'}
       </Text>
 
       {!isProxy &&
@@ -190,7 +190,7 @@ const ConsentScopes = ({
 
       {isProxy && managedSubjects && managedSubjects.length > 0 && (
         <div className={styles.subjectSection}>
-          <Text weight="semibold">Managed Subjects Permissions</Text>
+          <Text weight="semibold">Managed Proxies Permissions</Text>
           <div className={styles.subjectPanel}>
             <Text weight="semibold" size={400}>
               {managedSubjects[currentSlide].name}

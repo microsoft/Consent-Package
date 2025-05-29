@@ -140,9 +140,9 @@ export function ComponentsPlayground(): JSX.Element {
       </Text>
 
       <Text size={400}>
-        To help present how the components can be used, we have created a
-        playground to provide examples of how they can be used. New components
-        or current component updates can be viewed here.
+        The Playground provides examples of how the components in the Consent
+        Package can be used. New components and current component updates can be
+        viewed here.
       </Text>
 
       <br />

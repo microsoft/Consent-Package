@@ -74,7 +74,7 @@ export function Footer(): JSX.Element {
             ) : (
               <li>
                 <Link to="/get-started" className={styles.link}>
-                  Get Started
+                  Consent Demo
                 </Link>
               </li>
             )}
