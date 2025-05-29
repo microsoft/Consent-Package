@@ -44,6 +44,15 @@ const useStyles = makeStyles({
     fontSize: tokens.fontSizeBase300,
     marginTop: 'calc(var(--spacing-unit) * 4)',
   },
+  list: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 'calc(var(--spacing-unit) * 2)',
+  },
 });
 
 export function Footer(): JSX.Element {
@@ -54,55 +63,87 @@ export function Footer(): JSX.Element {
     <footer className={styles.footer}>
       <div className={styles.container}>
         <div className={styles.section}>
-          <h3 className={styles.title}>Product</h3>
-          {currentUser ? (
-            <Link to={`/profile/${currentUser.id}`} className={styles.link}>
-              View Profile
-            </Link>
-          ) : (
-            <Link to="/get-started" className={styles.link}>
-              Get Started
-            </Link>
-          )}
-          <Link to="/playground" className={styles.link}>
-            Playground
-          </Link>
-          <Link
-            to="https://github.com/microsoft/Open-Source-Consent-Package/tree/main/docs"
-            className={styles.link}
-          >
-            Documentation
-          </Link>
+          <span className={styles.title}>Product</span>
+          <ul className={styles.list}>
+            {currentUser ? (
+              <li>
+                <Link to={`/profile/${currentUser.id}`} className={styles.link}>
+                  View Profile
+                </Link>
+              </li>
+            ) : (
+              <li>
+                <Link to="/get-started" className={styles.link}>
+                  Get Started
+                </Link>
+              </li>
+            )}
+            <li>
+              <Link to="/playground" className={styles.link}>
+                Playground
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="https://github.com/microsoft/Open-Source-Consent-Package/tree/main/docs"
+                className={styles.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Documentation
+              </Link>
+            </li>
+          </ul>
         </div>
         <div className={styles.section}>
-          <h3 className={styles.title}>Resources</h3>
-          <Link
-            to="https://github.com/microsoft/Open-Source-Consent-Package"
-            className={styles.link}
-          >
-            GitHub
-          </Link>
-          <Link
-            to="https://github.com/microsoft/Open-Source-Consent-Package/issues"
-            className={styles.link}
-          >
-            Report an issue
-          </Link>
+          <span className={styles.title}>Resources</span>
+          <ul className={styles.list}>
+            <li>
+              <Link
+                to="https://github.com/microsoft/Open-Source-Consent-Package"
+                className={styles.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="https://github.com/microsoft/Open-Source-Consent-Package/issues"
+                className={styles.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Report an issue
+              </Link>
+            </li>
+          </ul>
         </div>
         <div className={styles.section}>
-          <h3 className={styles.title}>Legal</h3>
-          <Link
-            to="https://github.com/microsoft/Open-Source-Consent-Package/blob/main/SECURITY.md"
-            className={styles.link}
-          >
-            Report Security Issue
-          </Link>
-          <Link
-            to="https://github.com/microsoft/Open-Source-Consent-Package/blob/main/LICENSE"
-            className={styles.link}
-          >
-            License
-          </Link>
+          <span className={styles.title}>Legal</span>
+          <ul className={styles.list}>
+            <li>
+              <Link
+                to="https://github.com/microsoft/Open-Source-Consent-Package/blob/main/SECURITY.md"
+                className={styles.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Report Security Issue
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="https://github.com/microsoft/Open-Source-Consent-Package/blob/main/LICENSE"
+                className={styles.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                License
+              </Link>
+            </li>
+          </ul>
         </div>
       </div>
       <div className={styles.copyright}>

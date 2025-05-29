@@ -1,11 +1,5 @@
-import React from 'react';
-import {
-  makeStyles,
-  tokens,
-  Text,
-  Checkbox,
-  Title3,
-} from '@fluentui/react-components';
+import React, { useEffect, useRef } from 'react';
+import { makeStyles, tokens, Text, Checkbox } from '@fluentui/react-components';
 import type { CheckboxProps } from '@fluentui/react-components';
 
 const useStyles = makeStyles({
@@ -21,6 +15,9 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     alignItems: 'center',
     gap: tokens.spacingVerticalM,
+    fontSize: tokens.fontSizeBase600,
+    fontWeight: tokens.fontWeightSemibold,
+    textAlign: 'center',
   },
   content: {
     display: 'flex',
@@ -57,20 +54,27 @@ const ConsentConfirmation: React.FC<ConsentConfirmationProps> = ({
   icon,
 }) => {
   const styles = useStyles();
+  const titleRef = useRef<HTMLHeadingElement>(null);
 
   const handleCheckboxChange = (
     _ev: React.FormEvent<HTMLInputElement | HTMLLabelElement>,
     data: CheckboxProps,
-  ) => {
+  ): void => {
     onCheckboxChange(!!data.checked);
   };
 
+  useEffect(() => {
+    if (titleRef.current) {
+      titleRef.current.focus();
+    }
+  }, []);
+
   return (
     <div className={styles.root}>
-      <Title3 align="center" className={styles.header}>
+      <h2 ref={titleRef} className={styles.header} tabIndex={-1}>
         {icon && React.cloneElement(icon, { className: styles.icon })}
         {title}
-      </Title3>
+      </h2>
       <div className={styles.content}>
         {typeof messageBody === 'string' ? (
           <Text>{messageBody}</Text>

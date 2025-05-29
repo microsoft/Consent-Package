@@ -1,4 +1,5 @@
-import { makeStyles, Text, Title2, tokens } from '@fluentui/react-components';
+import { useRef, useEffect, useState } from 'react';
+import { makeStyles, Text, tokens } from '@fluentui/react-components';
 import Signature from '../Signature/index.js';
 import type { ConsentFlowFormData } from './ConsentFlow.type.js';
 import type { Policy, PolicyScope } from '@open-source-consent/types';
@@ -8,6 +9,11 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     gap: '24px',
+  },
+  title: {
+    fontSize: tokens.fontSizeBase600,
+    fontWeight: tokens.fontWeightSemibold,
+    textAlign: 'center',
   },
   section: {
     display: 'flex',
@@ -33,6 +39,17 @@ const useStyles = makeStyles({
       marginBottom: '4px',
     },
   },
+  ariaLive: {
+    position: 'absolute',
+    width: '1px',
+    height: '1px',
+    padding: '0',
+    margin: '-1px',
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    whiteSpace: 'nowrap',
+    border: '0',
+  },
 });
 
 interface ConsentReviewProps {
@@ -54,10 +71,30 @@ const ConsentReview = ({
   onSignatureSubmit,
 }: ConsentReviewProps): JSX.Element => {
   const styles = useStyles();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [liveMessage, setLiveMessage] = useState<string>('');
+
+  useEffect(() => {
+    if (titleRef.current) {
+      titleRef.current.focus();
+    }
+  }, []);
+
+  const handleSignatureSubmit = (signature: string, date: Date): void => {
+    onSignatureSubmit(signature, date);
+    setLiveMessage(
+      'Signature submitted successfully. Your consent has been recorded. You may select Finish when ready.',
+    );
+  };
 
   return (
     <div className={styles.root}>
-      <Title2>Review Your Consent</Title2>
+      <div className={styles.ariaLive} aria-live="polite" aria-atomic="true">
+        {liveMessage}
+      </div>
+      <h2 ref={titleRef} className={styles.title} tabIndex={-1}>
+        Review Your Consent
+      </h2>
 
       <div className={styles.section}>
         <Text className={styles.sectionTitle}>Personal Information</Text>
@@ -123,7 +160,7 @@ const ConsentReview = ({
           consent form, and you agree to the terms and conditions outlined in
           this policy.
         </Text>
-        <Signature onSignatureSubmit={onSignatureSubmit} />
+        <Signature onSignatureSubmit={handleSignatureSubmit} />
       </div>
     </div>
   );

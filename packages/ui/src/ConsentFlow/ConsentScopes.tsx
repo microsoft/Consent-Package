@@ -1,8 +1,7 @@
-import { useState, useEffect, type ChangeEvent } from 'react';
+import { useState, useEffect, useRef, type ChangeEvent } from 'react';
 import {
   makeStyles,
   Text,
-  Title2,
   Checkbox,
   tokens,
   Button,
@@ -22,6 +21,11 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     gap: '24px',
     marginBottom: '32px',
+  },
+  title: {
+    fontSize: tokens.fontSizeBase600,
+    fontWeight: tokens.fontWeightSemibold,
+    textAlign: 'center',
   },
   scope: {
     display: 'flex',
@@ -88,6 +92,7 @@ const ConsentScopes = ({
 }: ConsentScopesProps): JSX.Element => {
   const styles = useStyles();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const titleRef = useRef<HTMLHeadingElement>(null);
 
   const requiredScopes = availableScopes
     .filter((scope) => scope.required)
@@ -110,6 +115,12 @@ const ConsentScopes = ({
           onChange(requiredScope, true, i);
         }
       }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (titleRef.current) {
+      titleRef.current.focus();
     }
   }, []);
 
@@ -161,7 +172,9 @@ const ConsentScopes = ({
 
   return (
     <div className={styles.root}>
-      <Title2 align="center">Select Data Access Permissions</Title2>
+      <h2 ref={titleRef} className={styles.title} tabIndex={-1}>
+        Select Data Access Permissions
+      </h2>
       <Text align="center">
         {requiredScopes.length > 0
           ? 'Select additional data you wish to authorize for use with this service. Mandatory permissions cannot be modified.'

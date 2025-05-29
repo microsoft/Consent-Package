@@ -1,15 +1,15 @@
-import AgeSelect from '../AgeSelect/index.js';
-import RoleSelect from '../RoleSelect/index.js';
+import { useRef, useEffect, useState } from 'react';
+import type { ChangeEvent, FocusEvent } from 'react';
 import {
   makeStyles,
   Text,
-  Title2,
   Input,
   Button,
   tokens,
 } from '@fluentui/react-components';
-import type { ChangeEvent, FocusEvent } from 'react';
 import type { Policy } from '@open-source-consent/types';
+import AgeSelect from '../AgeSelect/index.js';
+import RoleSelect from '../RoleSelect/index.js';
 import type {
   ConsentFlowFormData,
   ConsentFlowManagedSubject,
@@ -38,6 +38,11 @@ const useStyles = makeStyles({
     gap: '24px',
     marginBottom: '32px',
   },
+  title: {
+    fontSize: tokens.fontSizeBase600,
+    fontWeight: tokens.fontWeightSemibold,
+    textAlign: 'center',
+  },
   form: {
     display: 'flex',
     flexDirection: 'column',
@@ -64,6 +69,17 @@ const useStyles = makeStyles({
     justifyContent: 'space-between',
     alignItems: 'flex-end',
   },
+  ariaLive: {
+    position: 'absolute',
+    width: '1px',
+    height: '1px',
+    padding: '0',
+    margin: '-1px',
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    whiteSpace: 'nowrap',
+    border: '0',
+  },
 });
 
 const ConsentWelcome = ({
@@ -74,6 +90,16 @@ const ConsentWelcome = ({
   subjectIdToDisplayName,
 }: ConsentWelcomeProps): JSX.Element => {
   const styles = useStyles();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const conditionalAgeTextRef = useRef<HTMLParagraphElement>(null);
+
+  const [liveMessage, setLiveMessage] = useState<string>('');
+
+  useEffect(() => {
+    if (titleRef.current) {
+      titleRef.current.focus();
+    }
+  }, []);
 
   const handleFormDataChange = (
     updates: Partial<ConsentFlowFormData>,
@@ -149,9 +175,38 @@ const ConsentWelcome = ({
     }
   };
 
+  const handleAgeChange = (
+    ageRangeId: string,
+    dob?: Date,
+    age?: number,
+  ): void => {
+    handleFormDataChange({ ageRangeId, dob, age });
+
+    if (age !== undefined) {
+      if (age < 18) {
+        setLiveMessage(
+          'You must be at least 18 years old to consent. Please share this link with your parent or guardian to continue.',
+        );
+      } else {
+        setLiveMessage(
+          `Age verified: ${age} years old. You can now proceed with the consent process.`,
+        );
+      }
+
+      setTimeout(() => {
+        conditionalAgeTextRef.current?.focus();
+      }, 100);
+    }
+  };
+
   return (
     <div className={styles.root}>
-      <Title2 align="center">{policy.title}</Title2>
+      <div className={styles.ariaLive} aria-live="polite" aria-atomic="true">
+        {liveMessage}
+      </div>
+      <h2 ref={titleRef} className={styles.title} tabIndex={-1}>
+        {policy.title}
+      </h2>
       <div className={styles.form}>
         <Text weight="semibold">Please Enter your Full Name</Text>
         <Input
@@ -165,14 +220,12 @@ const ConsentWelcome = ({
         <AgeSelect
           initialDateValue={formData.dob}
           useDatePicker
-          onChange={(ageRangeId: string, dob?: Date, age?: number) =>
-            handleFormDataChange({ ageRangeId, dob, age })
-          }
+          onChange={handleAgeChange}
         />
 
         {formData.age === undefined ? null : formData.age < 18 &&
           policy.requiresProxyForMinors === true ? (
-          <Text>
+          <Text ref={conditionalAgeTextRef} tabIndex={-1}>
             Research is great. But you must be at least 18 years old to consent
             on behalf of yourself or someone else to use this service. Please
             share <a href="#">this link</a> with your parent or guardian to
@@ -180,7 +233,7 @@ const ConsentWelcome = ({
           </Text>
         ) : (
           <>
-            <Text weight="semibold">
+            <Text ref={conditionalAgeTextRef} weight="semibold" tabIndex={-1}>
               Are you consenting on behalf of yourself or someone else?
             </Text>
             <RoleSelect

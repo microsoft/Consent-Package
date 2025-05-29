@@ -1,4 +1,5 @@
-import { makeStyles, Title2, tokens } from '@fluentui/react-components';
+import { useRef, useEffect } from 'react';
+import { makeStyles, tokens } from '@fluentui/react-components';
 import type { PolicyContentSection } from '@open-source-consent/types';
 
 interface ConsentContentSectionStepProps {
@@ -15,6 +16,11 @@ const useStyles = makeStyles({
   sectionHeader: {
     paddingBottom: '8px',
     borderBottom: `1px solid ${tokens.colorNeutralStroke1}`,
+  },
+  title: {
+    fontSize: tokens.fontSizeBase600,
+    fontWeight: tokens.fontWeightSemibold,
+    textAlign: 'center',
   },
   description: {
     display: 'inline-block',
@@ -41,11 +47,20 @@ const ConsentContentSectionStep = ({
   section,
 }: ConsentContentSectionStepProps): JSX.Element => {
   const styles = useStyles();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (titleRef.current) {
+      titleRef.current.focus();
+    }
+  });
 
   return (
     <div className={styles.root}>
       <div className={styles.sectionHeader}>
-        <Title2 align="center">{section.title}</Title2>
+        <h2 ref={titleRef} className={styles.title} tabIndex={-1}>
+          {section.title}
+        </h2>
       </div>
       {section.description && (
         <div className={styles.description}>{section.description}</div>

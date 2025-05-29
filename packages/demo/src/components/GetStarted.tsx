@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Button, Text, Spinner } from '@fluentui/react-components';
+import { Button, Text, Spinner, Title1 } from '@fluentui/react-components';
 import {
   ConsentWelcome,
   ConsentScopes,
@@ -381,7 +381,7 @@ export function GetStarted(): JSX.Element {
       return (
         <ConsentConfirmation
           title="Important: Guardian Approval Needed"
-          icon={<Important24Filled />}
+          icon={<Important24Filled aria-hidden />}
           messageBody={
             <Text>
               Hi {formData.name || 'there'}! Since you are under 18, it's
@@ -400,7 +400,7 @@ export function GetStarted(): JSX.Element {
       return (
         <ConsentConfirmation
           title={`Important: Discuss with ${subjectName}`}
-          icon={<PeopleTeam24Filled />}
+          icon={<PeopleTeam24Filled aria-hidden />}
           messageBody={
             <Text>
               Hi {formData.name || 'there'}! As you are consenting on behalf of
@@ -423,6 +423,20 @@ export function GetStarted(): JSX.Element {
 
   return (
     <div className={styles.root}>
+      <Title1
+        as="h1"
+        weight="semibold"
+        align="center"
+        block
+        style={{ marginBottom: '24px' }}
+      >
+        Get Started with Consent Package
+      </Title1>
+      <Text size={400} align="center" block style={{ marginBottom: '32px' }}>
+        Follow the steps below to configure and implement consent management for
+        your application. You'll review program details, set consent
+        preferences, and complete the consent process.
+      </Text>
       <Stepper
         steps={dynamicSteps}
         currentStepId={currentStepId}

@@ -82,12 +82,14 @@ export function Stepper({
               style={{
                 flexGrow: group.stepCount,
               }}
+              aria-label={`Steps Group ${group.groupLabel} with ${group.stepCount} ${group.stepCount === 1 ? 'step' : 'steps'}`}
             >
               <Text
                 className={styles.groupLabelText}
                 style={{
                   color: tokens[group.primaryColorToken as keyof typeof tokens],
                 }}
+                aria-hidden="true"
               >
                 {group.groupLabel}
               </Text>
@@ -107,6 +109,7 @@ export function Stepper({
               className={styles.step}
               onClick={() => onStepClick(step.id)}
               style={{ flexGrow: 1, flexBasis: '0' }}
+              aria-label={`Step ${index + 1}: ${step.label} from Steps Group ${step.groupLabel}`}
             >
               <div
                 className={`${styles.stepNumber} ${
@@ -121,6 +124,7 @@ export function Stepper({
                     ? tokens.colorNeutralForegroundInverted
                     : stepPrimaryColor,
                 }}
+                aria-hidden="true"
               >
                 {index + 1}
               </div>
@@ -129,6 +133,7 @@ export function Stepper({
                 style={{
                   color: stepPrimaryColor,
                 }}
+                aria-hidden="true"
               >
                 {step.label}
               </Text>

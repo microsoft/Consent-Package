@@ -26,7 +26,7 @@ export default function App(): JSX.Element {
       <ScrollRestoration />
       <div className={styles.root}>
         <Header />
-        <main className={styles.main}>
+        <main className={styles.main} id="main" tabIndex={-1}>
           <Outlet context={{ user: currentUser }} />
         </main>
         <Footer />

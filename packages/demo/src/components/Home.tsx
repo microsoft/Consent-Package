@@ -110,7 +110,7 @@ export function Home(): JSX.Element {
     <div className={styles.root}>
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <Title1 className={styles.title}>
+          <Title1 as="h1" className={styles.title}>
             Share Consent with Confidence
           </Title1>
           <Text className={styles.description}>
@@ -143,7 +143,9 @@ export function Home(): JSX.Element {
               aria-hidden="true"
               className={styles.featureIcon}
             />
-            <Title2 className={styles.featureTitle}>Auditable by Design</Title2>
+            <Title2 as="h2" className={styles.featureTitle}>
+              Auditable by Design
+            </Title2>
             <Text className={styles.featureDescription}>
               Built with auditability and immutability as first principles,
               ensuring your consent stores are always auditable and traceable.
@@ -154,7 +156,9 @@ export function Home(): JSX.Element {
               aria-hidden="true"
               className={styles.featureIcon}
             />
-            <Title2 className={styles.featureTitle}>Privacy-Focused</Title2>
+            <Title2 as="h2" className={styles.featureTitle}>
+              Privacy-Focused
+            </Title2>
             <Text className={styles.featureDescription}>
               Empowers users with control over their data by encouraging
               granular consent systems.
@@ -162,7 +166,9 @@ export function Home(): JSX.Element {
           </div>
           <div className={styles.featureCard}>
             <CodeRegular aria-hidden="true" className={styles.featureIcon} />
-            <Title2 className={styles.featureTitle}>Open Source</Title2>
+            <Title2 as="h2" className={styles.featureTitle}>
+              Open Source
+            </Title2>
             <Text className={styles.featureDescription}>
               Transparent, community-driven development that you can trust and
               contribute to.

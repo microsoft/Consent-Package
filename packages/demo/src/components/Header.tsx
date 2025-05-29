@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router';
 import {
   makeStyles,
@@ -193,12 +193,24 @@ const useStyles = makeStyles({
       marginRight: '8px',
     },
   },
+  skipLink: {
+    position: 'absolute',
+    left: '-9999px',
+    top: 'auto',
+    width: '1px',
+    height: '1px',
+    overflow: 'hidden',
+    zIndex: -1,
+  },
 });
 
 export function Header(): JSX.Element {
   const styles = useStyles();
   const location = useLocation();
   const { currentUser } = useAuth();
+
+  const hamburgerButtonRef = useRef<HTMLButtonElement>(null);
+  const skipLinkRef = useRef<HTMLAnchorElement>(null);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -222,15 +234,31 @@ export function Header(): JSX.Element {
 
   const closeMobileMenu = (): void => {
     setIsMobileMenuOpen(false);
+    hamburgerButtonRef.current?.focus();
+  };
+
+  const handleNavigation = (): void => {
+    closeMobileMenu();
+    // Focus the skip link after a short delay to ensure the page has updated
+    setTimeout(() => {
+      skipLinkRef.current?.focus();
+    }, 100);
   };
 
   return (
     <header className={styles.headerWrapper}>
-      <nav className={styles.navBar}>
-        <Link to="/" className={styles.logo}>
+      <a href="#main" className={styles.skipLink} ref={skipLinkRef}>
+        Skip to main content
+      </a>
+      <nav className={styles.navBar} role="navigation">
+        <Link to="/" className={styles.logo} aria-label="Consent Package Home">
           <span>Consent Package</span>
         </Link>
-        <div className={styles.navLinks}>
+        <div
+          className={styles.navLinks}
+          role="menubar"
+          aria-label="Main navigation"
+        >
           {navItems.map((item) => (
             <Link
               key={item.path}
@@ -238,7 +266,9 @@ export function Header(): JSX.Element {
               className={`${styles.navLink} ${
                 isActive(item.path) ? styles.active : ''
               }`}
-              onClick={closeMobileMenu}
+              onClick={handleNavigation}
+              role="menuitem"
+              aria-current={isActive(item.path) ? 'page' : false}
             >
               {item.label}
             </Link>
@@ -250,10 +280,13 @@ export function Header(): JSX.Element {
         </div>
 
         <FluentButton
+          ref={hamburgerButtonRef}
           appearance="transparent"
           className={styles.hamburgerButton}
           onClick={toggleMobileMenu}
-          aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-label="Toggle menu open"
+          aria-expanded={isMobileMenuOpen}
+          aria-controls="mobile-menu"
         >
           <span
             className={`${styles.hamburgerIcon} ${
@@ -264,25 +297,30 @@ export function Header(): JSX.Element {
       </nav>
 
       <Drawer
+        id="mobile-menu"
         type="overlay"
         open={isMobileMenuOpen}
-        onOpenChange={(_e: unknown, data: { open: boolean }) =>
-          setIsMobileMenuOpen(data.open)
-        }
+        onOpenChange={(_e: unknown, data: { open: boolean }) => {
+          if (!data.open) return closeMobileMenu();
+          return setIsMobileMenuOpen(data.open);
+        }}
         position="end"
+        modalType="modal"
+        inertTrapFocus={true}
+        aria-label="Pop-out navigation menu"
       >
         <DrawerHeader className={styles.drawerHeaderStyle}>
           <DrawerHeaderTitle>Menu</DrawerHeaderTitle>
           <FluentButton
             appearance="subtle"
-            aria-label="Close panel"
+            aria-label="Close menu"
             onClick={closeMobileMenu}
           >
             &times;
           </FluentButton>
         </DrawerHeader>
         <DrawerBody>
-          <div className={styles.mobileNavLinks}>
+          <div className={styles.mobileNavLinks} role="menu">
             {navItems.map((item) => (
               <Link
                 key={item.path}
@@ -291,8 +329,10 @@ export function Header(): JSX.Element {
                   isActive(item.path) ? styles.active : ''
                 }`}
                 onClick={() => {
-                  closeMobileMenu();
+                  handleNavigation();
                 }}
+                role="menuitem"
+                aria-current={isActive(item.path) ? 'page' : false}
               >
                 {item.label}
               </Link>

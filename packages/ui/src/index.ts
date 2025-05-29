@@ -9,7 +9,6 @@ import useFetchPolicy from './hooks/useFetchPolicy.js';
 import useSavePolicy from './hooks/useSavePolicy.js';
 import type { PolicyEditorFormData } from './hooks/usePolicyEditor.js';
 
-import ConsentDetails from './ConsentFlow/ConsentDetails.js';
 import ConsentReview from './ConsentFlow/ConsentReview.js';
 import ConsentScopes from './ConsentFlow/ConsentScopes.js';
 import ConsentWelcome from './ConsentFlow/ConsentWelcome.js';
@@ -17,10 +16,7 @@ import ConsentContentSectionStep from './ConsentFlow/ConsentContentSectionStep.j
 import ConsentConfirmation from './ConsentFlow/ConsentConfirmation.js';
 import type {
   ConsentFlowFormData,
-  ConsentFlowPolicy,
   ConsentFlowManagedSubject,
-  ConsentFlowContentSection,
-  ConsentFlowScope,
 } from './ConsentFlow/ConsentFlow.type.js';
 
 import AgeSelect from './AgeSelect/index.js';
@@ -57,7 +53,6 @@ export {
   Profile,
   RoleSelect,
   Signature,
-  ConsentDetails,
   ConsentReview,
   ConsentScopes,
   ConsentWelcome,
@@ -73,9 +68,6 @@ export {
   // Types
   type ProfileData,
   type ConsentFlowFormData,
-  type ConsentFlowPolicy,
   type ConsentFlowManagedSubject,
-  type ConsentFlowContentSection,
-  type ConsentFlowScope,
   type PolicyEditorFormData,
 };

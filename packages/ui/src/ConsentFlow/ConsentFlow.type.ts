@@ -21,23 +21,3 @@ export interface ConsentFlowFormData {
   signature?: string;
   grantedAt?: Date;
 }
-
-export interface ConsentFlowContentSection {
-  title: string;
-  content: string;
-}
-
-export interface ConsentFlowScope {
-  key: string;
-  name: string;
-  description: string;
-  required: boolean;
-}
-
-export interface ConsentFlowPolicy {
-  id: string;
-  title: string;
-  description: string;
-  contentSections: ConsentFlowContentSection[];
-  scopes: ConsentFlowScope[];
-}
