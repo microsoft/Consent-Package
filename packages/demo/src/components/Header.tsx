@@ -5,7 +5,6 @@ import {
   shorthands,
   Drawer,
   DrawerHeader,
-  DrawerHeaderTitle,
   DrawerBody,
   Button as FluentButton,
 } from '@fluentui/react-components';
@@ -164,8 +163,16 @@ const useStyles = makeStyles({
   },
   drawerHeaderStyle: {
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
+    padding: '0',
+    height: '68px',
+  },
+  drawerHeaderCloseButton: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    borderRadius: '0',
   },
   mobileNavLinks: {
     display: 'flex',
@@ -232,16 +239,15 @@ export function Header(): JSX.Element {
   };
 
   const toggleMobileMenu = (): void => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+    const newState = !isMobileMenuOpen;
 
-  const closeMobileMenu = (): void => {
-    setIsMobileMenuOpen(false);
-    hamburgerButtonRef.current?.focus();
+    setIsMobileMenuOpen(newState);
+    if (!newState) hamburgerButtonRef.current?.focus();
   };
 
   const handleNavigation = (): void => {
-    closeMobileMenu();
+    if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+
     // Focus the skip link after a short delay to ensure the page has updated
     setTimeout(() => {
       skipLinkRef.current?.focus();
@@ -260,7 +266,7 @@ export function Header(): JSX.Element {
         <div
           className={styles.navLinks}
           role="menubar"
-          aria-label="Main navigation"
+          aria-label="Navigation Menu"
         >
           {navItems.map((item) => (
             <Link
@@ -287,14 +293,12 @@ export function Header(): JSX.Element {
           appearance="transparent"
           className={styles.hamburgerButton}
           onClick={toggleMobileMenu}
-          aria-label="Toggle menu open"
+          aria-label="Open navigation menu"
           aria-expanded={isMobileMenuOpen}
           aria-controls="mobile-menu"
         >
           <span
-            className={`${styles.hamburgerIcon} ${
-              isMobileMenuOpen ? styles.hamburgerIconOpen : ''
-            }`}
+            className={`${styles.hamburgerIcon} ${isMobileMenuOpen ? styles.hamburgerIconOpen : ''}`}
           />
         </FluentButton>
       </nav>
@@ -304,8 +308,7 @@ export function Header(): JSX.Element {
         type="overlay"
         open={isMobileMenuOpen}
         onOpenChange={(_e: unknown, data: { open: boolean }) => {
-          if (!data.open) return closeMobileMenu();
-          return setIsMobileMenuOpen(data.open);
+          return toggleMobileMenu();
         }}
         position="end"
         modalType="modal"
@@ -313,13 +316,15 @@ export function Header(): JSX.Element {
         aria-label="Pop-out navigation menu"
       >
         <DrawerHeader className={styles.drawerHeaderStyle}>
-          <DrawerHeaderTitle>Menu</DrawerHeaderTitle>
           <FluentButton
             appearance="subtle"
-            aria-label="Close menu"
-            onClick={closeMobileMenu}
+            className={styles.drawerHeaderCloseButton}
+            onClick={() => toggleMobileMenu()}
+            aria-label="Close navigation menu"
           >
-            &times;
+            <span
+              className={`${styles.hamburgerIcon} ${isMobileMenuOpen ? styles.hamburgerIconOpen : ''}`}
+            />
           </FluentButton>
         </DrawerHeader>
         <DrawerBody>
@@ -328,12 +333,8 @@ export function Header(): JSX.Element {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`${styles.navLink} ${styles.mobileNavLink} ${
-                  isActive(item.path) ? styles.active : ''
-                }`}
-                onClick={() => {
-                  handleNavigation();
-                }}
+                className={`${styles.navLink} ${styles.mobileNavLink} ${isActive(item.path) ? styles.active : ''}`}
+                onClick={handleNavigation}
                 role="menuitem"
                 aria-current={isActive(item.path) ? 'page' : false}
               >
