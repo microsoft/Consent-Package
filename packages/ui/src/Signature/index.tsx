@@ -7,12 +7,14 @@ interface SignatureProps {
   onSignatureSubmit(signature: string, date: Date): void;
   canvasHeight?: number;
   isDrawnSignature?: boolean;
+  disableInputAfterSubmit?: boolean;
 }
 
 const Signature: React.FC<SignatureProps> = ({
   onSignatureSubmit,
   canvasHeight = 200,
   isDrawnSignature = false,
+  disableInputAfterSubmit = false,
 }) => {
   return (
     <div className="signature-root">
@@ -21,9 +23,13 @@ const Signature: React.FC<SignatureProps> = ({
           <DrawingPadSignature
             onSignatureSubmit={onSignatureSubmit}
             canvasHeight={canvasHeight}
+            disableInputAfterSubmit={disableInputAfterSubmit}
           />
         ) : (
-          <DigitalSignature onSignatureSubmit={onSignatureSubmit} />
+          <DigitalSignature
+            onSignatureSubmit={onSignatureSubmit}
+            disableInputAfterSubmit={disableInputAfterSubmit}
+          />
         )}
       </div>
     </div>

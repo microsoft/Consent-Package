@@ -8,21 +8,25 @@ interface DrawingPadProps {
     date: Date,
   ): void;
   canvasHeight: number;
+  disableInputAfterSubmit?: boolean;
 }
 
 const DrawingPad: React.FC<DrawingPadProps> = ({
   onSignatureSubmit,
   canvasHeight,
+  disableInputAfterSubmit = false,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [drawnSignature, setDrawnSignature] = useState<string>('');
   const [signatureDate, setSignatureDate] = useState<Date | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = (): void => {
     const signatureDate = new Date();
     setSignatureDate(signatureDate);
+    setIsSubmitted(true);
 
     if (drawnSignature) onSignatureSubmit(drawnSignature, signatureDate);
   };
@@ -38,6 +42,8 @@ const DrawingPad: React.FC<DrawingPadProps> = ({
         yPosition: number,
       ]
     | undefined => {
+    if (isSubmitted && disableInputAfterSubmit) return undefined;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -58,8 +64,11 @@ const DrawingPad: React.FC<DrawingPadProps> = ({
       | React.MouseEvent<HTMLCanvasElement>
       | React.TouchEvent<HTMLCanvasElement>,
   ): void => {
+    if (isSubmitted && disableInputAfterSubmit) return;
+
     // If user needs to continue signing after submitting
     setSignatureDate(null);
+    setIsSubmitted(false);
 
     const canvasPoint = drawToCanvas(e);
     if (canvasPoint) {
@@ -94,6 +103,8 @@ const DrawingPad: React.FC<DrawingPadProps> = ({
   };
 
   const clearCanvas = (): void => {
+    if (isSubmitted && disableInputAfterSubmit) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -104,6 +115,7 @@ const DrawingPad: React.FC<DrawingPadProps> = ({
     setIsDrawing(false);
     setDrawnSignature('');
     setSignatureDate(null);
+    setIsSubmitted(false);
   };
 
   useEffect(() => {
@@ -159,6 +171,12 @@ const DrawingPad: React.FC<DrawingPadProps> = ({
         onTouchMove={draw}
         onTouchEnd={stopDrawing}
         height={canvasHeight}
+        style={{
+          cursor:
+            isSubmitted && disableInputAfterSubmit
+              ? 'not-allowed'
+              : 'crosshair',
+        }}
       />
       {drawnSignature && signatureDate ? (
         <div className="signature-capture-container">
@@ -166,10 +184,15 @@ const DrawingPad: React.FC<DrawingPadProps> = ({
         </div>
       ) : null}
       <div className="signature-controls">
-        <Button onClick={clearCanvas}>Clear</Button>
+        <Button
+          onClick={clearCanvas}
+          disabled={isSubmitted && disableInputAfterSubmit}
+        >
+          Clear
+        </Button>
         <Button
           appearance="primary"
-          disabled={!drawnSignature}
+          disabled={!drawnSignature || (isSubmitted && disableInputAfterSubmit)}
           onClick={handleSubmit}
         >
           Sign

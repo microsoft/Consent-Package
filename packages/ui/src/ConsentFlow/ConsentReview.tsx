@@ -212,7 +212,10 @@ const ConsentReview = ({
 
       <div className={styles.signatureSection}>
         <Text>{mergedLabels.signatureMessage}</Text>
-        <Signature onSignatureSubmit={handleSignatureSubmit} />
+        <Signature
+          onSignatureSubmit={handleSignatureSubmit}
+          disableInputAfterSubmit
+        />
       </div>
     </div>
   );
