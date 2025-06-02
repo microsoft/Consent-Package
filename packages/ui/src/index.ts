@@ -33,6 +33,9 @@ import PolicyMetadataForm from './Policy/PolicyMetadataForm.js';
 import PolicyContentSectionEditor from './Policy/PolicyContentSectionEditor.js';
 import PolicyScopeEditor from './Policy/PolicyScopeEditor.js';
 
+import { ThemeProvider } from './ThemeProvider.js';
+import type { ThemeProviderProps } from './ThemeProvider.js';
+
 export * from './Profile/index.js';
 export * from './RoleSelect/index.js';
 export * from './Signature/index.js';
@@ -40,6 +43,9 @@ export * from './AgeSelect/index.js';
 export { setApiConfig } from './utils/apiConfig.js';
 
 export {
+  // Theme
+  ThemeProvider,
+
   // Hooks
   useConsentFlow,
   usePolicyEditor,
@@ -48,6 +54,7 @@ export {
   useFetchPolicies,
   useFetchPolicy,
   useSavePolicy,
+
   // UI Components
   AgeSelect,
   Profile,
@@ -65,7 +72,9 @@ export {
   PolicyMetadataForm,
   PolicyContentSectionEditor,
   PolicyScopeEditor,
+
   // Types
+  type ThemeProviderProps,
   type ProfileData,
   type ConsentFlowFormData,
   type ConsentFlowManagedSubject,

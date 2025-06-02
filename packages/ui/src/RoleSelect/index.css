@@ -14,12 +14,12 @@
 }
 
 .role-button:hover {
-  background-color: var(--border-1);
+  background-color: var(--osc-border-primary);
 }
 
 .role-button.selected {
-  border-color: var(--border-3);
-  background-color: var(--bg-primary);
+  border-color: var(--osc-border-tertiary);
+  background-color: var(--osc-bg-primary);
 }
 
 .role-content {
@@ -30,6 +30,6 @@
 }
 
 .role-description {
-  color: var(--text-primary);
+  color: var(--osc-text-primary);
   font-style: italic;
 }

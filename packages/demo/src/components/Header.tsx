@@ -89,7 +89,7 @@ const useStyles = makeStyles({
     ...shorthands.padding('8px', '0px'),
     border: 'none',
     background: 'none',
-    transition: 'color 0.15s',
+    transition: 'color var(--transition-speed)',
     position: 'relative',
     '&:hover': {
       color: 'var(--colorBrandForegroundLink)',
@@ -134,7 +134,7 @@ const useStyles = makeStyles({
     height: '2px',
     backgroundColor: 'var(--colorNeutralForeground1)',
     position: 'relative',
-    transition: 'background-color 0.3s',
+    transition: 'background-color var(--transition-speed)',
     '&::before, &::after': {
       content: '""',
       position: 'absolute',
@@ -142,7 +142,7 @@ const useStyles = makeStyles({
       height: '2px',
       left: '0',
       backgroundColor: 'var(--colorNeutralForeground1)',
-      transition: 'transform 0.3s',
+      transition: 'transform var(--transition-speed)',
     },
     '&::before': {
       top: '-8px',

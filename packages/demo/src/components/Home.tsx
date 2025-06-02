@@ -132,7 +132,7 @@ const useStyles = makeStyles({
   },
 });
 
-export function Home(): JSX.Element {
+export default function Home(): JSX.Element {
   const styles = useStyles();
   const navigate = useNavigate();
   const { currentUser } = useAuth();

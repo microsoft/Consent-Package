@@ -130,7 +130,7 @@ const defaultRoles = [
   },
 ];
 
-export function ComponentsPlayground(): JSX.Element {
+export default function ComponentsPlayground(): JSX.Element {
   const styles = useStyles();
 
   return (

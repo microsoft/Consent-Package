@@ -9,7 +9,7 @@
   --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --spacing-unit: 8px;
   --border-radius: 8px;
-  --transition-speed: 0.2s;
+  --transition-speed: 0.3s;
 }
 
 * {

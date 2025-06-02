@@ -41,7 +41,7 @@ const stepGroupsConfig: StepGroupsConfigType = {
   },
 };
 
-export function GetStarted(): JSX.Element {
+export default function GetStarted(): JSX.Element {
   const styles = useStyles();
   const {
     policy,

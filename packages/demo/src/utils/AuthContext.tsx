@@ -42,7 +42,9 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
+export default function AuthProvider({
+  children,
+}: AuthProviderProps): JSX.Element {
   const [currentUser, setCurrentUser] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

@@ -57,7 +57,7 @@ export const useStyles = makeStyles({
       right: '40px',
       height: '3px',
       zIndex: 0,
-      transition: 'background-color 0.3s ease',
+      transition: 'background-color var(--transition-speed) ease',
       '@media (max-width: 768px)': {
         left: '20px',
         right: '20px',
@@ -70,7 +70,7 @@ export const useStyles = makeStyles({
     alignItems: 'center',
     position: 'relative',
     zIndex: 1,
-    transition: 'transform 0.2s ease',
+    transition: 'transform var(--transition-speed) ease',
     minWidth: 'auto',
     maxWidth: '120px',
     textAlign: 'center',
@@ -96,7 +96,7 @@ export const useStyles = makeStyles({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: '12px',
-    transition: 'all 0.3s ease',
+    transition: 'all var(--transition-speed) ease',
     boxShadow: tokens.shadow2,
     '@media (max-width: 768px)': {
       width: '32px',
@@ -111,7 +111,7 @@ export const useStyles = makeStyles({
   },
   stepLabel: {
     fontSize: '12px',
-    transition: 'color 0.3s ease',
+    transition: 'color var(--transition-speed) ease',
     wordBreak: 'break-word',
     whiteSpace: 'normal',
     lineHeight: '1.2',

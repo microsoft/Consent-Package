@@ -27,7 +27,7 @@ interface AppOutletContext {
   user: ProfileData | null;
 }
 
-export function ProfilePage(): JSX.Element {
+export default function ProfilePage(): JSX.Element {
   const styles = useStyles();
   const { user: loggedInUser } = useOutletContext<AppOutletContext>();
   const { userId } = useParams<{ userId: string }>();

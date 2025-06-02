@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
   requireNoUser?: boolean;
 }
 
-export function ProtectedRoute({
+export default function ProtectedRoute({
   children,
   requireNoUser = false,
 }: ProtectedRouteProps): JSX.Element {
