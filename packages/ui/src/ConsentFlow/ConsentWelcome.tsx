@@ -15,6 +15,19 @@ import type {
   ConsentFlowManagedSubject,
 } from './ConsentFlow.type.js';
 
+interface ConsentWelcomeLabels {
+  nameLabel?: string;
+  dobLabel?: string;
+  ageRestrictionEl?: JSX.Element;
+  ageRestrictionMessage?: string;
+  ageRestrictionLink?: string;
+  ageRestrictionLinkText?: string;
+  roleSelectionLabel?: string;
+  managedSubjectsLabel?: string;
+  addManagedSubjectButtonText?: string;
+  removeButtonText?: string;
+}
+
 interface ConsentWelcomeProps {
   policy: Policy;
   formData: ConsentFlowFormData;
@@ -29,7 +42,38 @@ interface ConsentWelcomeProps {
    * Convert a subject ID to a display name.
    */
   subjectIdToDisplayName(subjectId: string): string;
+  uiLabels?: ConsentWelcomeLabels;
 }
+
+const defaultLabels: ConsentWelcomeLabels = {
+  nameLabel: 'Please Enter your Full Name',
+  dobLabel: 'Please Enter your Date of Birth',
+  // To provide rich text, if wanted.
+  //
+  // If not provided, a default templated message will be displayed using
+  // ageRestrictionMessage, ageRestrictionLink and ageRestrictionLinkText as shown below:
+  // <>
+  //   {ageRestrictionMessage} Please share{' '} <a href={ageRestrictionLink}>{ageRestrictionLinkText}</a>
+  //   with your parent or guardian to continue.
+  // </>
+  //
+  // Example Usage:
+  // <>
+  //   Research is great. But you must be at least 18 years old to consent on behalf of yourself
+  //   or someone else to use this service. Please share <a href="#">this link</a>
+  //   with your parent or guardian to continue.
+  // </>
+  ageRestrictionEl: undefined,
+  ageRestrictionMessage:
+    'Research is great. But you must be at least 18 years old to consent on behalf of yourself or someone else to use this service.',
+  ageRestrictionLink: '#',
+  ageRestrictionLinkText: 'this link',
+  roleSelectionLabel:
+    'Are you consenting on behalf of yourself or someone else?',
+  managedSubjectsLabel: 'Consenting on behalf of:',
+  addManagedSubjectButtonText: 'Add Managed Proxy',
+  removeButtonText: 'Remove',
+};
 
 const useStyles = makeStyles({
   root: {
@@ -88,12 +132,15 @@ const ConsentWelcome = ({
   onFormDataChange,
   getSubjectId,
   subjectIdToDisplayName,
+  uiLabels = {},
 }: ConsentWelcomeProps): JSX.Element => {
   const styles = useStyles();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const conditionalAgeTextRef = useRef<HTMLParagraphElement>(null);
 
   const [liveMessage, setLiveMessage] = useState<string>('');
+
+  const mergedLabels = { ...defaultLabels, ...uiLabels };
 
   useEffect(() => {
     if (titleRef.current) {
@@ -199,6 +246,16 @@ const ConsentWelcome = ({
     }
   };
 
+  const ageRestrictionEl: JSX.Element = mergedLabels.ageRestrictionEl ?? (
+    <>
+      {mergedLabels.ageRestrictionMessage} Please share{' '}
+      <a href={mergedLabels.ageRestrictionLink}>
+        {mergedLabels.ageRestrictionLinkText}
+      </a>{' '}
+      with your parent or guardian to continue.
+    </>
+  );
+
   return (
     <div className={styles.root}>
       <div className={styles.ariaLive} aria-live="polite" aria-atomic="true">
@@ -208,7 +265,7 @@ const ConsentWelcome = ({
         {policy.title}
       </h2>
       <div className={styles.form}>
-        <Text weight="semibold">Please Enter your Full Name</Text>
+        <Text weight="semibold">{mergedLabels.nameLabel}</Text>
         <Input
           value={formData.name}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -216,7 +273,7 @@ const ConsentWelcome = ({
           }
           required
         />
-        <Text weight="semibold">Please Enter your Date of Birth</Text>
+        <Text weight="semibold">{mergedLabels.dobLabel}</Text>
         <AgeSelect
           initialDateValue={formData.dob}
           useDatePicker
@@ -226,15 +283,12 @@ const ConsentWelcome = ({
         {formData.age === undefined ? null : formData.age < 18 &&
           policy.requiresProxyForMinors === true ? (
           <Text ref={conditionalAgeTextRef} tabIndex={-1}>
-            Research is great. But you must be at least 18 years old to consent
-            on behalf of yourself or someone else to use this service. Please
-            share <a href="#">this link</a> with your parent or guardian to
-            continue.
+            {ageRestrictionEl}
           </Text>
         ) : (
           <>
             <Text ref={conditionalAgeTextRef} weight="semibold" tabIndex={-1}>
-              Are you consenting on behalf of yourself or someone else?
+              {mergedLabels.roleSelectionLabel}
             </Text>
             <RoleSelect
               initialRoleIdValue={formData.roleId}
@@ -260,7 +314,7 @@ const ConsentWelcome = ({
 
         {formData.isProxy && (
           <div className={styles.managedSubjectsForm}>
-            <Text weight="semibold">Consenting on behalf of:</Text>
+            <Text weight="semibold">{mergedLabels.managedSubjectsLabel}</Text>
             {formData.managedSubjects.map((subject, index) => (
               <div
                 key={subject.id || `temp-key-${index}`}
@@ -271,9 +325,9 @@ const ConsentWelcome = ({
                     appearance="outline"
                     onClick={() => handleRemoveSubject(index)}
                   >
-                    Remove
+                    {mergedLabels.removeButtonText}
                   </Button>
-                  <Text weight="semibold">Full Name</Text>
+                  <Text weight="semibold">{mergedLabels.nameLabel}</Text>
                 </div>
                 <Input
                   value={subject.name}
@@ -287,7 +341,7 @@ const ConsentWelcome = ({
                   }
                   required
                 />
-                <Text weight="semibold">Date of Birth</Text>
+                <Text weight="semibold">{mergedLabels.dobLabel}</Text>
                 <AgeSelect
                   initialDateValue={subject.dob}
                   useDatePicker
@@ -302,7 +356,7 @@ const ConsentWelcome = ({
               </div>
             ))}
             <Button appearance="outline" onClick={handleAddSubject}>
-              Add Managed Proxy
+              {mergedLabels.addManagedSubjectButtonText}
             </Button>
           </div>
         )}

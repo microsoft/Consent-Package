@@ -9,11 +9,34 @@ import {
 import type { ConsentFlowFormData } from './ConsentFlow.type.js';
 import type { PolicyScope } from '@open-source-consent/types';
 
+interface ConsentScopesLabels {
+  title?: string;
+  descriptionWithRequired?: string;
+  descriptionWithoutRequired?: string;
+  managedProxiesLabel?: string;
+  previousSubjectButtonText?: string;
+  nextSubjectButtonText?: string;
+  mandatoryScopeSuffix?: string;
+}
+
 interface ConsentScopesProps {
   formData: ConsentFlowFormData;
   availableScopes: readonly PolicyScope[];
   onChange(scopeId: string, isChecked: boolean, subjectIndex?: number): void;
+  uiLabels?: ConsentScopesLabels;
 }
+
+const defaultLabels: ConsentScopesLabels = {
+  title: 'Select Data Access Permissions',
+  descriptionWithRequired:
+    'Select additional data you wish to authorize for use with this service. You can edit data permissions at any time. Mandatory permissions cannot be modified.',
+  descriptionWithoutRequired:
+    'Select the data you wish to authorize for use with this service. You can edit data permissions at any time. At least one permission must be enabled to proceed.',
+  managedProxiesLabel: 'Managed Proxies Permissions',
+  previousSubjectButtonText: 'Previous Subject',
+  nextSubjectButtonText: 'Next Subject',
+  mandatoryScopeSuffix: '(Mandatory)',
+};
 
 const useStyles = makeStyles({
   root: {
@@ -89,10 +112,13 @@ const ConsentScopes = ({
   formData,
   availableScopes,
   onChange,
+  uiLabels = {},
 }: ConsentScopesProps): JSX.Element => {
   const styles = useStyles();
   const [currentSlide, setCurrentSlide] = useState(0);
   const titleRef = useRef<HTMLHeadingElement>(null);
+
+  const mergedLabels = { ...defaultLabels, ...uiLabels };
 
   const requiredScopes = availableScopes
     .filter((scope) => scope.required)
@@ -156,7 +182,7 @@ const ConsentScopes = ({
     return (
       <>
         <Checkbox
-          label={`${scope.name}${scope.required ? ' (Mandatory)' : ''}`}
+          label={`${scope.name}${scope.required ? ` ${mergedLabels.mandatoryScopeSuffix}` : ''}`}
           checked={
             scope.required || (subjectScopes?.includes(scope.key) ?? false)
           }
@@ -173,12 +199,12 @@ const ConsentScopes = ({
   return (
     <div className={styles.root}>
       <h2 ref={titleRef} className={styles.title} tabIndex={-1}>
-        Select Data Access Permissions
+        {mergedLabels.title}
       </h2>
       <Text align="center">
         {requiredScopes.length > 0
-          ? 'Select additional data you wish to authorize for use with this service. You can edit data permissions at any time. Mandatory permissions cannot be modified.'
-          : 'Select the data you wish to authorize for use with this service. You can edit data permissions at any time. At least one permission must be enabled to proceed.'}
+          ? mergedLabels.descriptionWithRequired
+          : mergedLabels.descriptionWithoutRequired}
       </Text>
 
       {!isProxy &&
@@ -190,7 +216,7 @@ const ConsentScopes = ({
 
       {isProxy && managedSubjects && managedSubjects.length > 0 && (
         <div className={styles.subjectSection}>
-          <Text weight="semibold">Managed Proxies Permissions</Text>
+          <Text weight="semibold">{mergedLabels.managedProxiesLabel}</Text>
           <div className={styles.subjectPanel}>
             <Text weight="semibold" size={400}>
               {managedSubjects[currentSlide].name}
@@ -219,14 +245,14 @@ const ConsentScopes = ({
               onClick={handlePreviousSubject}
               disabled={currentSlide === 0}
             >
-              Previous Subject
+              {mergedLabels.previousSubjectButtonText}
             </Button>
             <Button
               appearance="subtle"
               onClick={handleNextSubject}
               disabled={currentSlide === managedSubjects.length - 1}
             >
-              Next Subject
+              {mergedLabels.nextSubjectButtonText}
             </Button>
           </div>
 

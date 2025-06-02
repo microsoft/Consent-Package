@@ -4,6 +4,45 @@ import Signature from '../Signature/index.js';
 import type { ConsentFlowFormData } from './ConsentFlow.type.js';
 import type { Policy, PolicyScope } from '@open-source-consent/types';
 
+interface ConsentReviewLabels {
+  title?: string;
+  personalInfoLabel?: string;
+  nameLabel?: string;
+  dobLabel?: string;
+  ageLabel?: string;
+  roleLabel?: string;
+  roleSelfValue?: string;
+  roleProxyValue?: string;
+  grantedScopesLabel?: string;
+  managedProxiesLabel?: string;
+  signatureMessage?: string;
+  signatureSuccessMessage?: string;
+}
+
+interface ConsentReviewProps {
+  policy: Policy;
+  formData: ConsentFlowFormData;
+  onSignatureSubmit(signature: string, date: Date): void;
+  uiLabels?: ConsentReviewLabels;
+}
+
+const defaultLabels: ConsentReviewLabels = {
+  title: 'Review Your Consent',
+  personalInfoLabel: 'Personal Information',
+  nameLabel: 'Name',
+  dobLabel: 'Date of Birth',
+  ageLabel: 'Age',
+  roleLabel: 'Role',
+  roleSelfValue: 'Self',
+  roleProxyValue: 'Proxy (Consenting on behalf of others)',
+  grantedScopesLabel: 'Granted Scopes',
+  managedProxiesLabel: 'Managed Proxies',
+  signatureMessage:
+    'By signing below, you confirm that you have read and understood the consent form, and you agree to the terms and conditions outlined in this policy.',
+  signatureSuccessMessage:
+    'Signature submitted successfully. Your consent has been recorded. You may select Finish when ready.',
+};
+
 const useStyles = makeStyles({
   root: {
     display: 'flex',
@@ -52,12 +91,6 @@ const useStyles = makeStyles({
   },
 });
 
-interface ConsentReviewProps {
-  policy: Policy;
-  formData: ConsentFlowFormData;
-  onSignatureSubmit(signature: string, date: Date): void;
-}
-
 const formatAge = (age: number | undefined): string => {
   if (age === undefined) return 'N/A';
 
@@ -69,10 +102,13 @@ const ConsentReview = ({
   policy,
   formData,
   onSignatureSubmit,
+  uiLabels = {},
 }: ConsentReviewProps): JSX.Element => {
   const styles = useStyles();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [liveMessage, setLiveMessage] = useState<string>('');
+
+  const mergedLabels = { ...defaultLabels, ...uiLabels };
 
   useEffect(() => {
     if (titleRef.current) {
@@ -82,9 +118,7 @@ const ConsentReview = ({
 
   const handleSignatureSubmit = (signature: string, date: Date): void => {
     onSignatureSubmit(signature, date);
-    setLiveMessage(
-      'Signature submitted successfully. Your consent has been recorded. You may select Finish when ready.',
-    );
+    setLiveMessage(mergedLabels.signatureSuccessMessage || '');
   };
 
   return (
@@ -93,23 +127,35 @@ const ConsentReview = ({
         {liveMessage}
       </div>
       <h2 ref={titleRef} className={styles.title} tabIndex={-1}>
-        Review Your Consent
+        {mergedLabels.title}
       </h2>
 
       <div className={styles.section}>
-        <Text className={styles.sectionTitle}>Personal Information</Text>
-        <Text>Name: {formData.name}</Text>
-        <Text>Date of Birth: {formData.dob?.toLocaleDateString()}</Text>
-        <Text>Age: {formatAge(formData.age)}</Text>
+        <Text className={styles.sectionTitle}>
+          {mergedLabels.personalInfoLabel}
+        </Text>
         <Text>
-          Role:{' '}
-          {formData.isProxy ? 'Proxy (Consenting on behalf of others)' : 'Self'}
+          {mergedLabels.nameLabel}: {formData.name}
+        </Text>
+        <Text>
+          {mergedLabels.dobLabel}: {formData.dob?.toLocaleDateString()}
+        </Text>
+        <Text>
+          {mergedLabels.ageLabel}: {formatAge(formData.age)}
+        </Text>
+        <Text>
+          {mergedLabels.roleLabel}:{' '}
+          {formData.isProxy
+            ? mergedLabels.roleProxyValue
+            : mergedLabels.roleSelfValue}
         </Text>
       </div>
 
       {!formData.isProxy && (
         <div className={styles.section}>
-          <Text className={styles.sectionTitle}>Granted Scopes</Text>
+          <Text className={styles.sectionTitle}>
+            {mergedLabels.grantedScopesLabel}
+          </Text>
           <ul className={styles.list}>
             {formData.grantedScopes?.map((scopeId) => {
               const scope = policy.availableScopes.find(
@@ -129,14 +175,24 @@ const ConsentReview = ({
         formData.managedSubjects &&
         formData.managedSubjects.length > 0 && (
           <div className={styles.section}>
-            <Text className={styles.sectionTitle}>Managed Proxies</Text>
+            <Text className={styles.sectionTitle}>
+              {mergedLabels.managedProxiesLabel}
+            </Text>
             {formData.managedSubjects.map((subject, index) => (
               <div key={`subject-${index}`} className={styles.section}>
-                <Text>Name: {subject.name}</Text>
-                <Text>Date of Birth: {subject.dob?.toLocaleDateString()}</Text>
-                <Text>Age: {formatAge(subject.age)}</Text>
+                <Text>
+                  {mergedLabels.nameLabel}: {subject.name}
+                </Text>
+                <Text>
+                  {mergedLabels.dobLabel}: {subject.dob?.toLocaleDateString()}
+                </Text>
+                <Text>
+                  {mergedLabels.ageLabel}: {formatAge(subject.age)}
+                </Text>
                 <br />
-                <Text className={styles.sectionTitle}>Granted Scopes</Text>
+                <Text className={styles.sectionTitle}>
+                  {mergedLabels.grantedScopesLabel}
+                </Text>
                 <ul className={styles.list}>
                   {subject.grantedScopes?.map((scopeId) => {
                     const scope = policy.availableScopes.find(
@@ -155,11 +211,7 @@ const ConsentReview = ({
         )}
 
       <div className={styles.signatureSection}>
-        <Text>
-          By signing below, you confirm that you have read and understood the
-          consent form, and you agree to the terms and conditions outlined in
-          this policy.
-        </Text>
+        <Text>{mergedLabels.signatureMessage}</Text>
         <Signature onSignatureSubmit={handleSignatureSubmit} />
       </div>
     </div>

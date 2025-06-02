@@ -340,6 +340,20 @@ export function GetStarted(): JSX.Element {
           subjectIdToDisplayName={(subjectId: string): string => {
             return subjectId;
           }}
+          // uiLabels is an optional prop that allows you to override the default labels as shown below.
+          /* uiLabels={{
+            nameLabel: 'Please Enter your Full Name',
+            dobLabel: 'Please Enter your Date of Birth',
+            ageRestrictionEl: undefined,
+            ageRestrictionMessage:
+              'Research is great. But you must be at least 18 years old to consent on behalf of yourself or someone else to use this service.',
+            ageRestrictionLink: '#',
+            ageRestrictionLinkText: 'this link',
+            roleSelectionLabel: 'Are you consenting on behalf of yourself or someone else?',
+            managedSubjectsLabel: 'Consenting on behalf of:',
+            addManagedSubjectButtonText: 'Add Managed Proxy',
+            removeButtonText: 'Remove',
+          }} */
         />
       );
     } else if (currentStepId.startsWith('contentSection_')) {
@@ -361,6 +375,18 @@ export function GetStarted(): JSX.Element {
           ) => {
             updateScopes(scopeId, isChecked, subjectIndex);
           }}
+          // uiLabels is an optional prop that allows you to override the default labels as shown below.
+          /* uiLabels={{
+            title: 'Select Data Access Permissions',
+            descriptionWithRequired:
+              'Select additional data you wish to authorize for use with this service. You can edit data permissions at any time. Mandatory permissions cannot be modified.',
+            descriptionWithoutRequired:
+              'Select the data you wish to authorize for use with this service. You can edit data permissions at any time. At least one permission must be enabled to proceed.',
+            managedProxiesLabel: 'Managed Proxies Permissions',
+            previousSubjectButtonText: 'Previous Subject',
+            nextSubjectButtonText: 'Next Subject',
+            mandatoryScopeSuffix: '(Mandatory)',
+          }} */
         />
       );
     } else if (currentStepId === 'review') {
@@ -375,6 +401,23 @@ export function GetStarted(): JSX.Element {
               grantedAt: date,
             });
           }}
+          // uiLabels is an optional prop that allows you to override the default labels as shown below.
+          /* uiLabels={{
+            title: 'Review Your Consent',
+            personalInfoLabel: 'Personal Information',
+            nameLabel: 'Name',
+            dobLabel: 'Date of Birth',
+            ageLabel: 'Age',
+            roleLabel: 'Role',
+            roleSelfValue: 'Self',
+            roleProxyValue: 'Proxy (Consenting on behalf of others)',
+            grantedScopesLabel: 'Granted Scopes',
+            managedProxiesLabel: 'Managed Proxies',
+            signatureMessage:
+              'By signing below, you confirm that you have read and understood the consent form, and you agree to the terms and conditions outlined in this policy.',
+            signatureSuccessMessage:
+              'Signature submitted successfully. Your consent has been recorded. You may select Finish when ready.',
+          }} */
         />
       );
     } else if (currentStepId === 'guardianReminder') {
