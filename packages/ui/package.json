@@ -1,0 +1,35 @@
+{
+  "name": "@open-source-consent/ui",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "copy-css": "copyfiles -u 1 \"src/**/*.css\" dist",
+    "build": "tsc && pnpm copy-css"
+  },
+  "dependencies": {
+    "@fluentui/react-components": "^9.63.0",
+    "@fluentui/react-datepicker-compat": "^0.5.6",
+    "@fluentui/react-icons": "^2.0.298",
+    "@open-source-consent/types": "workspace:*",
+    "react": "^18.2.0",
+    "react-quill": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "copyfiles": "^2.4.1",
+    "typescript": "^5.0.0"
+  }
+}

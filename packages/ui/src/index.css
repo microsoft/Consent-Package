@@ -1,0 +1,51 @@
+/* Theme System - All variables can be overridden by consumers */
+
+:root {
+  /* Color System */
+  --osc-primary: #0078d4;
+  --osc-primary-hover: #106ebe;
+  --osc-primary-disabled: rgba(0, 120, 212, 0.1);
+  
+  --osc-secondary: #f3f2f1;
+  --osc-secondary-hover: #e1dfdd;
+  --osc-secondary-foreground: #323130;
+  
+  --osc-danger: #d13438;
+  --osc-danger-hover: #c50f1f;
+  --osc-danger-disabled: rgba(209, 52, 56, 0.1);
+  
+  /* Background Colors */
+  --osc-bg-primary: #fdf8f0;
+  --osc-bg-secondary: #fff;
+  --osc-bg-tertiary: #f3f2f1;
+  
+  /* Text Colors */
+  --osc-text-primary: #1e232c;
+  --osc-text-secondary: #a19983;
+  --osc-text-tertiary: #fff;
+  --osc-text-disabled: #a19f9d;
+  
+  /* Border Colors */
+  --osc-border-primary: #fcdaa4;
+  --osc-border-secondary: #f8b5ab;
+  --osc-border-tertiary: #f3cbb7;
+  --osc-border-quaternary: #a0cbc6;
+}
+
+/* Component-specific styles that may use theme variables */
+.submit-button {
+  width: 100%;
+  height: 44px;
+  background-color: var(--osc-primary);
+  color: var(--osc-text-tertiary);
+  border-radius: 4px;
+}
+
+.submit-button:hover {
+  background-color: var(--osc-primary-hover);
+}
+
+.submit-button:disabled {
+  background-color: var(--osc-primary-disabled);
+  cursor: not-allowed;
+}

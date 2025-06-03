@@ -1,0 +1,35 @@
+.age-select-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  width: 100%;
+}
+
+.age-range-button {
+  width: 100%;
+  height: auto;
+  padding: 24px !important;
+  border-width: 2px !important;
+}
+
+.age-range-button:hover {
+  background-color: var(--osc-border-primary);
+}
+
+.age-range-button.selected {
+  border-color: var(--osc-border-tertiary);
+  background-color: var(--osc-bg-primary);
+}
+
+.age-range-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.age-range-description {
+  color: var(--osc-text-primary);
+  font-style: italic;
+}

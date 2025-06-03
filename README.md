@@ -1,6 +1,6 @@
-# Project
+# Open Source Consent Package
 
-More info soon!
+WIP
 
 ## Contributing
 

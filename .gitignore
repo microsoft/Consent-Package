@@ -198,8 +198,6 @@ PublishScripts/
 *.nupkg
 # NuGet Symbol Packages
 *.snupkg
-# The packages folder can be ignored because of Package Restore
-**/[Pp]ackages/*
 # except build/, which is used as an MSBuild target.
 !**/[Pp]ackages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
@@ -398,3 +396,20 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# macOS files
+.DS_Store
+
+# package dist
+packages/*/dist/*
+
+# cosmosdb emulator cert
+*.crt
+
+# local development settings
+local.settings.json
+
+tsconfig.tsbuildinfo
+
+# coverage
+coverage/

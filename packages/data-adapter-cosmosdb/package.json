@@ -1,0 +1,36 @@
+{
+  "name": "@open-source-consent/data-adapter-cosmosdb",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "NODE_TLS_REJECT_UNAUTHORIZED=0 vitest run",
+    "test:coverage": "NODE_TLS_REJECT_UNAUTHORIZED=0 vitest run --coverage",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@azure/cosmos": "4.3.0",
+    "@open-source-consent/core": "workspace:*",
+    "@open-source-consent/types": "workspace:*",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.6.1"
+  }
+}
