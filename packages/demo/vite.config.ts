@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { githubPagesSpa } from '@sctg/vite-plugin-github-pages-spa';
 
-const baseUrl = '/Open-Source-Consent-Package';
+const baseUrl = '/';
 
 export default defineConfig({
   base: baseUrl,
