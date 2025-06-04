@@ -62,14 +62,23 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     gap: '24px',
     padding: '16px',
     color: 'var(--color-text-light)',
     marginTop: '0',
   },
+  linksContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '24px',
+  },
+  copyrightContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '24px',
+  },
   copyright: {
-    marginLeft: 'auto',
     color: 'var(--color-text-light)',
     fontSize: tokens.fontSizeBase200,
   },
@@ -179,41 +188,45 @@ export function Footer(): JSX.Element {
       </div>
       <div className={styles.bottomRowContainer}>
         <div className={styles.bottomRow}>
-          <a
-            href="https://go.microsoft.com/fwlink/?LinkId=521839"
-            className={`${styles.link} bottom-section`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Privacy & Cookies
-          </a>
-          <a
-            href="https://go.microsoft.com/fwlink/?linkid=2259814"
-            className={`${styles.link} bottom-section`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Consumer Health Privacy
-          </a>
-          <a
-            href="https://www.microsoft.com/trademarks"
-            className={`${styles.link} bottom-section`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Trademarks
-          </a>
-          <a
-            href="https://go.microsoft.com/fwlink/?LinkID=206977"
-            className={`${styles.link} bottom-section`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Terms of use
-          </a>
-          <span className={styles.copyright}>
-            &copy; Microsoft {new Date().getFullYear()}
-          </span>
+          <div className={styles.linksContainer}>
+            <a
+              href="https://go.microsoft.com/fwlink/?LinkId=521839"
+              className={`${styles.link} bottom-section`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Privacy & Cookies
+            </a>
+            <a
+              href="https://go.microsoft.com/fwlink/?linkid=2259814"
+              className={`${styles.link} bottom-section`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Consumer Health Privacy
+            </a>
+            <a
+              href="https://www.microsoft.com/trademarks"
+              className={`${styles.link} bottom-section`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Trademarks
+            </a>
+          </div>
+          <div className={styles.copyrightContainer}>
+            <a
+              href="https://go.microsoft.com/fwlink/?LinkID=206977"
+              className={`${styles.link} bottom-section`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Terms of use
+            </a>
+            <span className={styles.copyright}>
+              &copy; Microsoft {new Date().getFullYear()}
+            </span>
+          </div>
         </div>
       </div>
     </footer>
