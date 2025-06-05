@@ -32,17 +32,16 @@ const useStyles = makeStyles({
   link: {
     color: 'var(--color-text-light)',
     textDecoration: 'none',
-    fontSize: tokens.fontSizeBase300,
     transition: 'color var(--transition-speed) ease',
+    '&.top-section': {
+      fontSize: tokens.fontSizeBase300,
+    },
+    '&.bottom-section': {
+      fontSize: tokens.fontSizeBase200,
+    },
     '&:hover': {
       color: 'var(--color-primary)',
     },
-  },
-  copyright: {
-    textAlign: 'center',
-    color: 'var(--color-text-light)',
-    fontSize: tokens.fontSizeBase300,
-    marginTop: 'calc(var(--spacing-unit) * 4)',
   },
   list: {
     listStyle: 'none',
@@ -52,6 +51,36 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     alignItems: 'center',
     gap: 'calc(var(--spacing-unit) * 2)',
+  },
+  bottomRowContainer: {
+    maxWidth: '1200px',
+    margin: '16px auto 0',
+    width: '100%',
+  },
+  bottomRow: {
+    borderTop: 'var(--border-width) solid var(--color-border)',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '24px',
+    padding: '16px',
+    color: 'var(--color-text-light)',
+    marginTop: '0',
+  },
+  linksContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '24px',
+  },
+  copyrightContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '24px',
+  },
+  copyright: {
+    color: 'var(--color-text-light)',
+    fontSize: tokens.fontSizeBase200,
   },
 });
 
@@ -67,31 +96,37 @@ export function Footer(): JSX.Element {
           <ul className={styles.list}>
             {currentUser ? (
               <li>
-                <Link to={`/profile/${currentUser.id}`} className={styles.link}>
+                <Link
+                  to={`/profile/${currentUser.id}`}
+                  className={`${styles.link} top-section`}
+                >
                   View Profile
                 </Link>
               </li>
             ) : (
               <li>
-                <Link to="/get-started" className={styles.link}>
+                <Link
+                  to="/get-started"
+                  className={`${styles.link} top-section`}
+                >
                   Consent Demo
                 </Link>
               </li>
             )}
             <li>
-              <Link to="/policies" className={styles.link}>
+              <Link to="/policies" className={`${styles.link} top-section`}>
                 Admin Demo
               </Link>
             </li>
             <li>
-              <Link to="/playground" className={styles.link}>
+              <Link to="/playground" className={`${styles.link} top-section`}>
                 Playground
               </Link>
             </li>
             <li>
               <Link
                 to="https://github.com/microsoft/Open-Source-Consent-Package/tree/main/docs"
-                className={styles.link}
+                className={`${styles.link} top-section`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -106,7 +141,7 @@ export function Footer(): JSX.Element {
             <li>
               <Link
                 to="https://github.com/microsoft/Open-Source-Consent-Package"
-                className={styles.link}
+                className={`${styles.link} top-section`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -116,7 +151,7 @@ export function Footer(): JSX.Element {
             <li>
               <Link
                 to="https://github.com/microsoft/Open-Source-Consent-Package/issues"
-                className={styles.link}
+                className={`${styles.link} top-section`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -131,7 +166,7 @@ export function Footer(): JSX.Element {
             <li>
               <Link
                 to="https://github.com/microsoft/Open-Source-Consent-Package/blob/main/SECURITY.md"
-                className={styles.link}
+                className={`${styles.link} top-section`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -141,7 +176,7 @@ export function Footer(): JSX.Element {
             <li>
               <Link
                 to="https://github.com/microsoft/Open-Source-Consent-Package/blob/main/LICENSE"
-                className={styles.link}
+                className={`${styles.link} top-section`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -151,8 +186,48 @@ export function Footer(): JSX.Element {
           </ul>
         </div>
       </div>
-      <div className={styles.copyright}>
-        © {new Date().getFullYear()} Microsoft. All rights reserved.
+      <div className={styles.bottomRowContainer}>
+        <div className={styles.bottomRow}>
+          <div className={styles.linksContainer}>
+            <a
+              href="https://go.microsoft.com/fwlink/?LinkId=521839"
+              className={`${styles.link} bottom-section`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Privacy & Cookies
+            </a>
+            <a
+              href="https://go.microsoft.com/fwlink/?linkid=2259814"
+              className={`${styles.link} bottom-section`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Consumer Health Privacy
+            </a>
+            <a
+              href="https://www.microsoft.com/trademarks"
+              className={`${styles.link} bottom-section`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Trademarks
+            </a>
+          </div>
+          <div className={styles.copyrightContainer}>
+            <a
+              href="https://go.microsoft.com/fwlink/?LinkID=206977"
+              className={`${styles.link} bottom-section`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Terms of use
+            </a>
+            <span className={styles.copyright}>
+              &copy; Microsoft {new Date().getFullYear()}
+            </span>
+          </div>
+        </div>
       </div>
     </footer>
   );
