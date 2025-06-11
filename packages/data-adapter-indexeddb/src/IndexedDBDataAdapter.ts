@@ -460,15 +460,24 @@ export class IndexedDBDataAdapter implements IDataAdapter {
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(CONSENT_STORE_NAME, 'readonly');
       const store = transaction.objectStore(CONSENT_STORE_NAME);
-      const index = store.index('consenterUserId_idx');
-      const request = index.getAll(proxyId);
+
+      let request: IDBRequest<ConsentRecord[]>;
+
+      if (store.indexNames.contains('consenterUserId_idx')) {
+        const index = store.index('consenterUserId_idx');
+        request = index.getAll(proxyId);
+      } else {
+        request = store.getAll();
+      }
 
       request.onsuccess = (event) => {
-        const allRecordsForUser = (event.target as IDBRequest<ConsentRecord[]>)
-          .result;
-        if (allRecordsForUser) {
-          const proxyRecords = allRecordsForUser.filter(
-            (record) => record.consenter && record.consenter.type === 'proxy',
+        const allRecords = (event.target as IDBRequest<ConsentRecord[]>).result;
+        if (allRecords) {
+          const proxyRecords = allRecords.filter(
+            (record) =>
+              record.consenter &&
+              record.consenter.type === 'proxy' &&
+              record.consenter.userId === proxyId,
           );
           resolve(proxyRecords);
         } else {
@@ -478,7 +487,7 @@ export class IndexedDBDataAdapter implements IDataAdapter {
 
       request.onerror = (event) => {
         console.error(
-          `Error fetching consents by proxyId ${proxyId} using index:`,
+          `Error fetching consents by proxyId ${proxyId}:`,
           (event.target as IDBRequest).error,
         );
         reject((event.target as IDBRequest).error);
