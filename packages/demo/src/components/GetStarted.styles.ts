@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { makeStyles, tokens } from '@fluentui/react-components';
 
 export const useStyles = makeStyles({

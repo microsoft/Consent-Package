@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useRef, useEffect, useState } from 'react';
 import type { ChangeEvent, FocusEvent } from 'react';
 import {

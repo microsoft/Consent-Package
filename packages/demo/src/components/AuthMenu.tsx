@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useNavigate } from 'react-router';
 import { Persona } from '@fluentui/react-components';
 import { useAuth } from '../utils/useAuth.js';

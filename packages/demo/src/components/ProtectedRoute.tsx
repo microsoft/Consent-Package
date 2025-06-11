@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router';
 import { useAuth } from '../utils/useAuth.js';

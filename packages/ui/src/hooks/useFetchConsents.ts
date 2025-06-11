@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useCallback } from 'react';
 import { deserializeConsentRecord } from '../utils/consentUtils.js';
 import type { ConsentRecord } from '@open-source-consent/types';

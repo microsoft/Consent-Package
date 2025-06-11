@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 // @ts-nocheck
 import { Card, Text, makeStyles } from '@fluentui/react-components';
 import {

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ConsentService } from '../services/ConsentService.js';
 import type {

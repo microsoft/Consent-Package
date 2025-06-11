@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useEffect, useState } from 'react';
 import { useOutletContext, useParams } from 'react-router';
 import { Text, Card, makeStyles, Spinner } from '@fluentui/react-components';

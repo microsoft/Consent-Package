@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import type { Policy } from './Policy.type.ts';
 import type { CreatePolicyInput } from './PolicyInputs.type.ts';
 

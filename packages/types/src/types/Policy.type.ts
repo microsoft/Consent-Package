@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 export interface PolicyScope {
   readonly key: string; // Unique machine-readable key (e.g., 'nutrition_log', 'genomic_data')
   readonly name: string; // Human-readable name (e.g., 'Nutrition Logs')

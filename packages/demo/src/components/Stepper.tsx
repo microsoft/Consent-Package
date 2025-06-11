@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useMemo } from 'react';
 import { Text, tokens } from '@fluentui/react-components';
 import { useStyles } from './GetStarted.styles.js';

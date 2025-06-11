@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import type { IDataAdapter } from '@open-source-consent/types';
 
 let globalDataAdapter: IDataAdapter | null = null;

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import React, { useState } from 'react';
 import { Button, Text } from '@fluentui/react-components';
 import { DatePicker } from '@fluentui/react-datepicker-compat';

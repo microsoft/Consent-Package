@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useState, useEffect } from 'react';
 import type {
   Policy,

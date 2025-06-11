@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 // First import the API switcher, mock vs real API
 import './utils/apiSwitcher.js';
 

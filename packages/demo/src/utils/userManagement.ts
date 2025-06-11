@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import type { ProfileData } from '@open-source-consent/ui';
 
 /**

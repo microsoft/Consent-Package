@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useState, useCallback } from 'react';
 
 export interface StatusState {

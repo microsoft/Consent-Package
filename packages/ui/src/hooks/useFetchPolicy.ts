@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useCallback } from 'react';
 import type { Policy } from '@open-source-consent/types';
 import { fetchWithConfig } from '../utils/fetchWithConfig.js';

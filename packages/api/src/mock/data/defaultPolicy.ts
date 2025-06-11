@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import type { Policy } from '@open-source-consent/types';
 
 export const defaultCorePolicyJson: Policy = {

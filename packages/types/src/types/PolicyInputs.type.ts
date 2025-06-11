@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import type { Policy } from './Policy.type.js';
 
 // Input type for creating a new Policy (initial version or subsequent)
