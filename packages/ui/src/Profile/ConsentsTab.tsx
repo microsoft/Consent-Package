@@ -226,18 +226,7 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
               <Text size={400} weight="semibold">
                 Policy ID: {consent.policyId}
               </Text>
-              <Badge
-                className="profile-consent-badge"
-                color={
-                  consent.status === 'granted'
-                    ? 'success'
-                    : consent.status === 'revoked'
-                      ? 'danger'
-                      : 'warning'
-                }
-              >
-                {consent.status}
-              </Badge>
+              <Badge className="profile-consent-badge">{consent.status}</Badge>
 
               {grantedDisplayScopes.length > 0 && (
                 <div className="profile-scopes-section-granted">
