@@ -10,7 +10,9 @@ import { fetchUserProfile } from '../utils/userManagement.js';
 const useStyles = makeStyles({
   root: {
     padding: '24px',
-    margin: '16px',
+    margin: '0 auto',
+    maxWidth: '1200px',
+    boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)',
     '@media (max-width: 768px)': {
       padding: '24px',
     },

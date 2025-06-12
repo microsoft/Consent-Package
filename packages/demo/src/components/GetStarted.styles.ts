@@ -6,6 +6,7 @@ export const useStyles = makeStyles({
   root: {
     padding: '24px 64px',
     margin: '0 auto',
+    maxWidth: '1200px',
     '@media (max-width: 768px)': {
       padding: '24px',
     },

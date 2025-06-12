@@ -1,7 +1,22 @@
 // Copyright (c) Microsoft Corporation. Licensed under the MIT license.
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Button, Text, Spinner, Title1 } from '@fluentui/react-components';
+import {
+  Button,
+  Text,
+  Spinner,
+  Title1,
+  Dialog,
+  DialogSurface,
+  DialogBody,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@fluentui/react-components';
+import type {
+  DialogOpenChangeData,
+  DialogOpenChangeEvent,
+} from '@fluentui/react-components';
 import {
   ConsentWelcome,
   ConsentScopes,
@@ -27,19 +42,19 @@ export type StepId = StepperStepId;
 const stepGroupsConfig: StepGroupsConfigType = {
   basicInfo: {
     label: 'Basic Information',
-    primaryColorToken: 'colorBrandForeground1',
+    primaryColorToken: '#103783',
   },
   programDetails: {
     label: 'Program Details',
-    primaryColorToken: 'colorPaletteGreenForeground2',
+    primaryColorToken: '#0f6cbd',
   },
   consent: {
     label: 'Consent',
-    primaryColorToken: 'colorPaletteDarkOrangeForeground2',
+    primaryColorToken: '#0061ff',
   },
   reviewAndAgree: {
     label: 'Review & Agree',
-    primaryColorToken: 'colorPaletteYellowForeground2',
+    primaryColorToken: '#595cff',
   },
 };
 
@@ -58,6 +73,7 @@ export default function GetStarted(): JSX.Element {
   const { isLoading: isAuthLoading, login } = useAuth();
 
   const isPageLoading = isLoading || isAuthLoading;
+  const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
 
   const [guardianConsentConfirmed, setGuardianConsentConfirmed] =
     useState(false);
@@ -218,6 +234,27 @@ export default function GetStarted(): JSX.Element {
     return getStepValidity(currentStepId);
   }, [currentStepId, currentStepIndex, getStepValidity]);
 
+  const executeFinish = useCallback(async (): Promise<void> => {
+    if (saveConsent) {
+      await saveConsent();
+      if (!error) {
+        try {
+          const subjectId = formData.name
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '.');
+          await login(subjectId);
+        } catch (err) {
+          console.error('Login failed:', err);
+          alert('Unable to login. Please contact support.');
+        }
+      }
+    } else {
+      console.error('saveConsent function is not available.');
+      alert('Unable to save consent. Please contact support.');
+    }
+  }, [saveConsent, error, formData, login]);
+
   const handleNext = async (): Promise<void> => {
     const nextIndex = currentStepIndex + 1;
     if (nextIndex < dynamicSteps.length) {
@@ -226,24 +263,7 @@ export default function GetStarted(): JSX.Element {
         window.scrollTo({ top: 0 });
       }, 0);
     } else {
-      if (saveConsent) {
-        await saveConsent();
-        if (!error) {
-          try {
-            const subjectId = formData.name
-              .trim()
-              .toLowerCase()
-              .replace(/\s+/g, '.');
-            await login(subjectId);
-          } catch (err) {
-            console.error('Login failed:', err);
-            alert('Unable to login. Please contact support.');
-          }
-        }
-      } else {
-        console.error('saveConsent function is not available.');
-        alert('Unable to save consent. Please contact support.');
-      }
+      setIsFinishDialogOpen(true);
     }
   };
 
@@ -519,6 +539,44 @@ export default function GetStarted(): JSX.Element {
           )}
         </Button>
       </div>
+
+      {isFinishDialogOpen && (
+        <Dialog
+          open={isFinishDialogOpen}
+          onOpenChange={(
+            _event: DialogOpenChangeEvent,
+            data: DialogOpenChangeData,
+          ) => {
+            if (!data.open) {
+              setIsFinishDialogOpen(false);
+            }
+          }}
+        >
+          <DialogSurface>
+            <DialogBody>
+              <DialogTitle>Consent Saved</DialogTitle>
+              <DialogContent>
+                <Text>
+                  You can now navigate to the user menu in the top right corner
+                  and click "View Profile" to view or edit any consents you have
+                  given. You can also click "Restart Demo" to start over.
+                </Text>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  appearance="primary"
+                  onClick={async () => {
+                    setIsFinishDialogOpen(false);
+                    await executeFinish();
+                  }}
+                >
+                  Confirm
+                </Button>
+              </DialogActions>
+            </DialogBody>
+          </DialogSurface>
+        </Dialog>
+      )}
     </div>
   );
 }

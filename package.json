@@ -45,6 +45,9 @@
       "allowedVersions": {
         "react": "18"
       }
+    },
+    "overrides": {
+      "brace-expansion": "^1.1.12"
     }
   },
   "engines": {
