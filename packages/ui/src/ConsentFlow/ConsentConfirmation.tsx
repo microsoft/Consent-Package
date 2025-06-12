@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import React, { useEffect, useRef } from 'react';
 import { makeStyles, tokens, Text, Checkbox } from '@fluentui/react-components';
 import type { CheckboxProps } from '@fluentui/react-components';

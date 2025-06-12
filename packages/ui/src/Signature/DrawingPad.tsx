@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import React, { useEffect, useRef, useState } from 'react';
 import { tokens, Button } from '@fluentui/react-components';
 import './index.css';

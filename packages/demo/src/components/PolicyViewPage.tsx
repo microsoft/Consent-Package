@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import React from 'react';
 import { useParams, Link } from 'react-router';
 import {
@@ -100,9 +102,11 @@ const PolicyViewPage: React.FC = () => {
           <Text as="h1" size={800} weight="semibold" className={styles.title}>
             {policy.title || 'Policy Details'}
           </Text>
-          <Link to={`/policy/edit/${policy.id}`}>
-            <Button appearance="primary">Edit Policy</Button>
-          </Link>
+          {policy.status !== 'archived' && (
+            <Link to={`/policy/edit/${policy.id}`}>
+              <Button appearance="primary">Edit Policy</Button>
+            </Link>
+          )}
         </div>
 
         <PolicyMetadataDisplay policy={policy} />

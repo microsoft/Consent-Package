@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { routes, createErrorResponse } from '@open-source-consent/api/mock';
 
 function shouldUseMockApi(): boolean {

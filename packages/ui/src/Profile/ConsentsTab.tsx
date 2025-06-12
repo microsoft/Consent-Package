@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import React, { useState } from 'react';
 import { Text, Badge, Button } from '@fluentui/react-components';
 import type { ConsentRecord } from '@open-source-consent/types';

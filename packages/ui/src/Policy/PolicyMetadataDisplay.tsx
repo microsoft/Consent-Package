@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import React from 'react';
 import { makeStyles, Text, Tag, tokens } from '@fluentui/react-components';
 import type { Policy } from '@open-source-consent/types';

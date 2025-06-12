@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useState } from 'react';
 import type { ProfileData } from '../Profile/Profile.type.js';
 

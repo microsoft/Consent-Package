@@ -25,7 +25,7 @@
     "@fluentui/react-icons": "^2.0.298",
     "@open-source-consent/types": "workspace:*",
     "react": "^18.2.0",
-    "react-quill": "^2.0.0"
+    "react-quill-new": "^3.4.6"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

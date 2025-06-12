@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 export * from './createConsent.js';
 export * from './standalone.js';
 export * from './getConsentById.js';

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { app } from '@azure/functions';
 
 app.http('hello', {

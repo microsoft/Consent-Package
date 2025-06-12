@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import React, { useState } from 'react';
 import {
   Input,
@@ -13,8 +15,8 @@ import {
 } from '@fluentui/react-components';
 import type { TabValue, TabListProps } from '@fluentui/react-components';
 import type { PolicyContentSection } from '@open-source-consent/types';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 const useStyles = makeStyles({
   sectionCard: {

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useNavigate } from 'react-router';
 import {
   makeStyles,
