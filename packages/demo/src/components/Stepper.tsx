@@ -89,7 +89,7 @@ export function Stepper({
               <Text
                 className={styles.groupLabelText}
                 style={{
-                  color: tokens[group.primaryColorToken as keyof typeof tokens],
+                  color: group.primaryColorToken,
                 }}
                 aria-hidden="true"
               >
@@ -102,8 +102,7 @@ export function Stepper({
       <div className={styles.stepper}>
         {steps.map((step, index) => {
           const isActive = currentStepId === step.id;
-          const stepPrimaryColor =
-            tokens[step.primaryColorToken as keyof typeof tokens];
+          const stepPrimaryColor = step.primaryColorToken;
 
           return (
             <div

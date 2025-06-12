@@ -42,19 +42,19 @@ export type StepId = StepperStepId;
 const stepGroupsConfig: StepGroupsConfigType = {
   basicInfo: {
     label: 'Basic Information',
-    primaryColorToken: 'colorBrandForeground1',
+    primaryColorToken: '#103783',
   },
   programDetails: {
     label: 'Program Details',
-    primaryColorToken: 'colorPaletteGreenForeground2',
+    primaryColorToken: '#0f6cbd',
   },
   consent: {
     label: 'Consent',
-    primaryColorToken: 'colorPaletteDarkOrangeForeground2',
+    primaryColorToken: '#0061ff',
   },
   reviewAndAgree: {
     label: 'Review & Agree',
-    primaryColorToken: 'colorPaletteYellowForeground2',
+    primaryColorToken: '#595cff',
   },
 };
 
