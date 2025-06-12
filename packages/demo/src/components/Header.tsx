@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router';
 import {

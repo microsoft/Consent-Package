@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useEffect, useCallback } from 'react';
 import { deserializeConsentRecord } from '../utils/consentUtils.js';
 import type { ProfileData } from '../Profile/Profile.type.js';

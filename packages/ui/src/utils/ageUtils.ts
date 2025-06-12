@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import type { AgeGroup } from '@open-source-consent/types';
 import type { ProfileData } from '../Profile/Profile.type.js';
 

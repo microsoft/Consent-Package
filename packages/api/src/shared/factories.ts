@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { ConsentService, PolicyService } from '@open-source-consent/core';
 import type {
   IDataAdapter,

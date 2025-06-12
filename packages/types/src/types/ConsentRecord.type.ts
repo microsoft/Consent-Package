@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import type { PolicyScope } from './Policy.type.js';
 
 export type ConsentStatus = 'granted' | 'revoked' | 'superseded';

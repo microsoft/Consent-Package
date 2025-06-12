@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { useRef, useEffect, useState } from 'react';
 import { makeStyles, Text, tokens } from '@fluentui/react-components';
 import Signature from '../Signature/index.js';

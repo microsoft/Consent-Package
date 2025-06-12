@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import './index.css';
 
 import useConsentFlow from './hooks/useConsentFlow.js';

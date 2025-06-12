@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import type { ConsentRecord } from './ConsentRecord.type.js';
 
 // Input for the very first creation of a consent for a subject+policy

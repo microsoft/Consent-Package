@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   TabList,

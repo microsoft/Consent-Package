@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { Outlet, ScrollRestoration } from 'react-router';
 import { Header } from './components/Header.js';
 import { Footer } from './components/Footer.js';

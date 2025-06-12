@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import React from 'react';
 import DrawingPadSignature from './DrawingPad.js';
 import DigitalSignature from './Digital.js';

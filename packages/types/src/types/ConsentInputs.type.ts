@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 export interface CreateConsentInput {
   subjectId: string;
   policyId: string;

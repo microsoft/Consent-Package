@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 import { PolicyService } from '@open-source-consent/core';
 import { getInitializedDataAdapter } from '../shared/dataAdapter.js';
 import type {
