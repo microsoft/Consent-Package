@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   makeStyles,
-  shorthands,
   tokens,
   Spinner,
   Text,
@@ -15,17 +14,12 @@ import { usePolicyList, PolicyTable } from '@open-source-consent/ui';
 
 const useStyles = makeStyles({
   root: {
-    padding: '24px 64px',
-    margin: '0 auto',
+    padding: '24px',
     maxWidth: '1200px',
+    margin: '0 auto',
     '@media (max-width: 768px)': {
       padding: '24px',
     },
-  },
-  card: {
-    ...shorthands.padding('20px'),
-    boxShadow: 'none',
-    borderRadius: tokens.borderRadiusMedium,
   },
   headerContainer: {
     display: 'flex',
@@ -78,26 +72,24 @@ const PolicyListPage: React.FC = () => {
   }
 
   return (
-    <div className={styles.root}>
-      <Card className={styles.card}>
-        <div className={styles.headerContainer}>
-          <Text as="h2" size={600} weight="semibold">
-            Manage Policies
-          </Text>
-          <Link to="/policy/new">
-            <Button appearance="primary" className={styles.createButton}>
-              Create New Policy
-            </Button>
-          </Link>
-        </div>
+    <Card className={styles.root}>
+      <div className={styles.headerContainer}>
+        <Text as="h1" size={600} weight="semibold" underline>
+          Manage Policies
+        </Text>
+        <Link to="/policy/new">
+          <Button appearance="primary" className={styles.createButton}>
+            Create New Policy
+          </Button>
+        </Link>
+      </div>
 
-        <PolicyTable
-          policies={policies}
-          onViewPolicy={(policyId) => void handleViewPolicy(policyId)}
-          onEditPolicy={(policyId) => void handleEditPolicy(policyId)}
-        />
-      </Card>
-    </div>
+      <PolicyTable
+        policies={policies}
+        onViewPolicy={(policyId) => void handleViewPolicy(policyId)}
+        onEditPolicy={(policyId) => void handleEditPolicy(policyId)}
+      />
+    </Card>
   );
 };
 
