@@ -302,7 +302,7 @@ const ConsentsTab: React.FC<ConsentsTabProps> = ({
                             </Text>
                           )}
                         </div>
-                        {scope.canBeGranted && (
+                        {scope.canBeGranted && consent.status !== 'revoked' && (
                           <Button
                             size="small"
                             appearance="outline"
