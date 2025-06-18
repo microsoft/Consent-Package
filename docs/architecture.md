@@ -1,83 +1,105 @@
-# Architecture (WIP)
+# Architecture
 
-## NOTE
+## Architecture & Structure
 
-As of 2025-05-22, This doc is now stale. Updates coming before 2025-05-28!
+A monorepo structure using `pnpm workspaces`.
 
-## Background
-
-1.  **Existing Landscape:** Commercial Consent Management Platforms (CMPs) focus heavily on cookie consent (Usercentrics, Osano, Segment Consent Manager, etc.). Open-source options are less common, especially for *medical research* data consent (granularity, proxies, audit) where no mature Open Source Software (OSS) solutions were found. Relevant: `Pryv.io` , `Kairon Consents`. Relevant commercial: `ConsentGrid`, `Osano`.
-2.  **Gap:** Opportunity exists for an OSS, developer-focused CMP for medical research using Microsoft tools.
-3.  **Key Needs:** Granular data types, proxy consent, age-specific flows, revocation/updates, auditability, extensibility.
-
-## Proposed Architecture & Structure
-
-A monorepo structure (`pnpm workspaces`).
-
-```markdown
-/msr-consent-platform           
+```
+/open-source-consent-package           
 ├── LICENSE                     # MIT
 ├── README.md                   # Overview, setup, contribution guide
 ├── package.json                # Monorepo root
 ├── docs/                       
-│   ├── architecture.md         # A finalized version of this file & further details
+│   ├── architecture.md         # This file - project architecture details
 │   ├── api.md                  # API endpoint definitions
-│   ├── customization.md        # Extensibility guide
-│   └── setup.md                # Installation/config guide
+│   ├── data.md                 # Data structures and types
+│   ├── usage_examples.md       # Usage examples
+│   └── local_development.md    # Local development setup guide
 ├── packages/                   
-│   ├── core/                   # Platform-agnostic core logic, types, interfaces
+│   ├── types/                  # Shared TypeScript types and interfaces
 │   │   ├── src/
-│   │   │   ├── index.ts
-│   │   │   ├── types/          # e.g., ConsentRecord, Policy interfaces
-│   │   │   ├── services/       # Business logic (ConsentService, PolicyService)
-│   │   │   └── errors/ 
+│   │   │   ├── types/          # Type definitions (ConsentRecord, Policy, etc.)
+│   │   │   │   ├── ConsentRecord.type.ts
+│   │   │   │   ├── ConsentInputs.type.ts
+│   │   │   │   ├── Policy.type.ts
+│   │   │   │   ├── PolicyInputs.type.ts
+│   │   │   │   ├── IConsentDataAdapter.type.ts
+│   │   │   │   ├── IPolicyDataAdapter.type.ts
+│   │   │   │   └── IDataAdapter.type.ts
+│   │   │   └── index.ts        # Exports all types
+│   │   └── package.json
+│   │
+│   ├── core/                   # Platform-agnostic core business logic
+│   │   ├── src/
+│   │   │   ├── services/       # Business logic services
+│   │   │   └── index.ts
 │   │   └── package.json
 │   │
 │   ├── api/                    # Backend: Azure Functions (Node.js/TypeScript)
 │   │   ├── src/
-│   │   │   ├── functions/      # HTTP Triggers (thin wrappers)
-│   │   │   ├── services/       # API-specific orchestration (uses core services)
-│   │   ├── middleware/     # Composable request validation, auth hooks
-│   │   └── lib/            # Shared API utilities
+│   │   │   ├── functions/      # HTTP Triggers
+│   │   │   │   ├── createConsent.ts
+│   │   │   │   ├── getConsentById.ts
+│   │   │   │   ├── findActiveConsentsBySubject.ts
+│   │   │   │   ├── getConsentsByProxy.ts
+│   │   │   │   ├── createPolicy.ts
+│   │   │   │   ├── getPolicyById.ts
+│   │   │   │   ├── listPolicies.ts
+│   │   │   │   ├── getAllPolicyVersionsByGroupId.ts
+│   │   │   │   └── getLatestActivePolicyByGroupId.ts
+│   │   │   ├── shared/         # Shared API utilities
+│   │   │   └── mock/           # Mock data for development
 │   │   ├── host.json           
-│   │   ├── local.settings.json.sample 
+│   │   ├── local.settings.json # Local development settings
 │   │   └── package.json
 │   │
-│   ├── ui/                     # Frontend: React/Fluent UI library
+│   ├── ui/                     # Frontend: React component library
 │   │   ├── src/
-│   │   │   ├── index.ts
-│   │   │   ├── AgeSelect/
-│   │   │   ├── ConsentFlow/    # Supporting steps components for stepping through the consent flow
-│   │   │   ├── hooks/          # e.g., useConsent*, usePolicy*
-│   │   │   ├── Policy/
-│   │   │   ├── Profile/        # Display Personal Information, Managed Proxies and status of Consents
-│   │   │   ├── RoleSelect/     
-│   │   │   ├── Signature/
+│   │   │   ├── AgeSelect/      # Age selection component
+│   │   │   ├── ConsentFlow/    # Consent flow components
+│   │   │   ├── hooks/          # React hooks for consent management
+│   │   │   ├── Policy/         # Policy display components
+│   │   │   ├── Profile/        # User profile and consent status
+│   │   │   ├── RoleSelect/     # Role selection (self/proxy)
+│   │   │   ├── Signature/      # Digital signature component
+│   │   │   ├── utils/          # UI utilities
 │   │   │   ├── index.css       # Base styles
-│   │   │   └── index.ts
+│   │   │   ├── index.ts        
+│   │   │   └── ThemeProvider.tsx # Theme customization
 │   │   └── package.json
 │   │
-│   ├── types / # Relevant types and interfaces
+│   ├── demo/                   # Demo application
+│   │   ├── src/                # Demo app source
+│   │   ├── index.html          # Demo app HTML
+│   │   └── package.json
+│   │
+│   ├── data-adapter-cosmosdb/  # Cosmos DB adapter implementation
 │   │   ├── src/
-│   │   │   ├── types/          # Defines various type interfaces and records
-│   │   │   └── index.ts        # Exports types from the types/ directory
+│   │   │   └── index.ts        # Implements data adapter interfaces
 │   │   └── package.json
 │   │
-│   └── data-adapter-cosmosdb/  # Cosmos DB adapter implementation
+│   └── data-adapter-indexeddb/ # IndexedDB adapter implementation
 │       ├── src/
-│       │   └── index.ts        # Implements IConsentDataAdapter 
+│       │   └── index.ts        # Implements data adapter interfaces
 │       └── package.json
-│
-└── tests/                      # Tests (may end up co-locating)
 ```
 
-### Tech Stack, Patterns
+### Tech Stack
 
-*   **TypeScript**
-*   **pnpm**
-*   **React**
-*   **Fluent UI**
-*   **Azure Functions**
-*   **Cosmos DB (SQL API)**
-*   **Adapter Pattern**
-*   **Monorepo**
+- **TypeScript** - Type-safe development across all packages
+- **pnpm** - Fast, space-efficient package manager with workspace support
+- **React** - UI component library framework
+- **Azure Functions** - Serverless backend API
+- **Cosmos DB** - Primary database for production environments
+- **IndexedDB** - Browser-based storage for local/offline scenarios
+- **Vitest** - Testing framework
+- **ESLint + Prettier** - Code quality and formatting
+
+### Architectural Patterns
+
+- **Monorepo** - Single repository with multiple related packages
+- **Adapter Pattern** - Database adapters for different storage backends
+- **Dependency Injection** - Services accept adapter interfaces
+- **Component Library** - Reusable UI components with theming support
+- **Immutable Records** - Consent records are versioned and immutable
+- **Event Sourcing** - Audit trail through versioned consent records

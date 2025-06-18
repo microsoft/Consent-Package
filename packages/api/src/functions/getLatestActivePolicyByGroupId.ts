@@ -55,5 +55,8 @@ app.http('getLatestActivePolicyByGroupId', {
   handler: createHttpHandler(
     createPolicyService,
     executeGetLatestActivePolicyByGroupIdLogic,
+    {
+      endpointName: 'getLatestActivePolicyByGroupId',
+    },
   ),
 });

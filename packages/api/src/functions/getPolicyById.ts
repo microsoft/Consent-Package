@@ -47,5 +47,7 @@ app.http('getPolicyById', {
   methods: ['GET'],
   route: 'policies/{policyId}',
   authLevel: 'anonymous',
-  handler: createHttpHandler(createPolicyService, executeGetPolicyByIdLogic),
+  handler: createHttpHandler(createPolicyService, executeGetPolicyByIdLogic, {
+    endpointName: 'getPolicyById',
+  }),
 });

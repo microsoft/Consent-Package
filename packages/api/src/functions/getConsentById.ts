@@ -44,6 +44,9 @@ app.http('getConsentById', {
   authLevel: 'anonymous',
   route: 'consent/{id}',
   handler: createHttpHandler(createConsentService, executeGetConsentByIdLogic, {
-    defaultMessage: 'An error occurred while retrieving the consent record.',
+    endpointName: 'getConsentById',
+    errorOptions: {
+      defaultMessage: 'An error occurred while retrieving the consent record.',
+    },
   }),
 });

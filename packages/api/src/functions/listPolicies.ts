@@ -33,5 +33,7 @@ app.http('listPolicies', {
   methods: ['GET'],
   route: 'policies',
   authLevel: 'anonymous',
-  handler: createHttpHandler(createPolicyService, executeListPoliciesLogic),
+  handler: createHttpHandler(createPolicyService, executeListPoliciesLogic, {
+    endpointName: 'listPolicies',
+  }),
 });

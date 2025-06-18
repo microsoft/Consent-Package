@@ -48,6 +48,9 @@ app.http('createConsent', {
   authLevel: 'anonymous',
   route: 'consent',
   handler: createHttpHandler(createConsentService, executeCreateConsentLogic, {
-    defaultMessage: 'An error occurred while creating the consent.',
+    endpointName: 'createConsent',
+    errorOptions: {
+      defaultMessage: 'An error occurred while creating the consent.',
+    },
   }),
 });
