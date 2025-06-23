@@ -51,5 +51,8 @@ app.http('getAllPolicyVersionsByGroupId', {
   handler: createHttpHandler(
     createPolicyService,
     executeGetAllPolicyVersionsByGroupIdLogic,
+    {
+      endpointName: 'getAllPolicyVersionsByGroupId',
+    },
   ),
 });

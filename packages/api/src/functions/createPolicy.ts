@@ -91,6 +91,9 @@ app.http('createPolicy', {
   route: 'policies',
   authLevel: 'anonymous',
   handler: createHttpHandler(createPolicyService, executeCreatePolicyLogic, {
-    defaultMessage: 'Policy creation failed:',
+    endpointName: 'createPolicy',
+    errorOptions: {
+      defaultMessage: 'Policy creation failed:',
+    },
   }),
 });

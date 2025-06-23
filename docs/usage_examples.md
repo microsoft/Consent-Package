@@ -1,57 +1,47 @@
 # Usage Examples
 
-## NOTE
+This documentation has been split into specialized guides for different use cases:
 
-As of 2025-05-22, This doc is now stale. Updates coming before 2025-05-28!
+## Frontend Development
 
-Subject to change as planning progresses. This example is presented to guide high-level planning.
+For frontend developers integrating the UI components and building consent management interfaces:
 
-```tsx
-import { useState } from 'react';
-import {
-  ConsentProvider,
-  useConsent,
-  ConsentWelcome,
-  ConsentDetails,
-  ConsentScopes,
-  ConsentReview
-} from '@open-source-consent-package/ui';
+**[Frontend Usage Examples](./frontend_usage_examples.md)**
 
-function App() {
-  return (
-    <ConsentProvider apiUrl={process.env.CONSENT_API_URL}>
-      <ConsentFlow policyId={policyId} userId={userId} />
-    </ConsentProvider>
-  );
-}
+Covers:
 
-function ConsentFlow({ policyId, userId }: { policyId: string; userId: string }) {
-  const { policy, consent, submit } = useConsent(policyId, userId);
-  const [step, setStep] = useState<'welcome' | 'risks' | 'data-types' | 'compensation' | 'scopes' | 'review'>('welcome');
-  const [grantedScopes, setGrantedScopes] = useState<string[]>(consent?.grantedScopes ?? []);
+- UI component setup and configuration
+- Theme customization
+- Consent flow components
+- Individual components (AgeSelect, RoleSelect, Profile, Signature)
+- Policy management components
+- React hooks usage
+- Complete integration examples
+- Error handling and accessibility
 
-  // ...
+## Backend Development
 
-  return (
-    <>
-      {step === 'welcome' && <ConsentWelcome policyTitle={policy.title}>}
-      {step === 'risks' && <ConsentDetails details={policy.contentSections.risks} />}
-      {step === 'data-types' && <ConsentDetails details={policy.contentSections.dataTypes} />}
-      {step === 'compensation' && <ConsentDetails details={policy.contentSections.compensation}/>}
-      {step === 'scopes' && (
-        <ConsentScopes
-          availableScopes={policy.scopes}
-          initialGrantedScopes={grantedScopes}
-          onChange={setGrantedScopes}
-        />
-      )}
-      {step === 'review' && (
-        <ConsentReview
-          policyDetails={policy}
-          grantedScopes={grantedScopes}
-        />
-      )}
-    </>
-  );
-}
-```
+For backend developers setting up the API and data storage:
+
+**[API Usage Examples](./api_usage_examples.md)**
+
+Covers:
+
+- API package configuration
+- Data adapter setup (Cosmos DB and IndexedDB)
+- Service integration patterns
+- Environment-specific configuration
+- Azure Functions integration
+- Production deployment considerations
+- Testing strategies
+- Error handling patterns
+
+## Quick Start
+
+For a rapid overview of both frontend and backend setup:
+
+1. **Backend Setup**: Configure your data adapter and start the API package
+2. **Frontend Setup**: Configure the API endpoint and start using UI components
+3. **Integration**: Connect your frontend components to the backend API
+
+See the respective detailed guides above for complete implementation examples.

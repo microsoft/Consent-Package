@@ -11,6 +11,8 @@ import type {
   IConsentDataAdapter,
   ConsentRecord,
 } from '@open-source-consent/types';
+import { createConsentService } from '../shared/factories.js';
+import { createHttpHandler } from '../shared/httpHandler.js';
 
 export async function getConsentsByProxy(
   request: HttpRequest,
@@ -65,5 +67,7 @@ app.http('getConsentsByProxy', {
   methods: ['GET'],
   authLevel: 'anonymous',
   route: 'proxies/{proxyId}/consents',
-  handler: getConsentsByProxy,
+  handler: createHttpHandler(createConsentService, getConsentsByProxy, {
+    endpointName: 'getConsentsByProxy',
+  }),
 });

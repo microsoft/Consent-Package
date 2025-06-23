@@ -44,8 +44,11 @@ app.http('findActiveConsentsBySubject', {
     createConsentService,
     executeFindActiveConsentsBySubjectLogic,
     {
-      defaultMessage:
-        'An error occurred while retrieving consent versions for subject.',
+      endpointName: 'findActiveConsentsBySubject',
+      errorOptions: {
+        defaultMessage:
+          'An error occurred while retrieving consent versions for subject.',
+      },
     },
   ),
 });

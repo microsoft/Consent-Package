@@ -1,148 +1,122 @@
 # Data Structures
 
-## NOTE
+The Open Source Consent Package uses a set of core data structures designed for auditability, compliance, and flexibility. All type definitions are located in the [`packages/types`](../packages/types/src/types/) directory.
 
-As of 2025-05-22, This doc is now stale. Updates coming before 2025-05-28! Refer to the types package for the latest definitions.
+## Core Types Overview
 
-## `ConsentRecord`
+### ConsentRecord
 
-Represents the state of consent for a specific subject regarding a specific policy version. This is the primary record stored and audited.
+**Location**: [`ConsentRecord.type.ts`](../packages/types/src/types/ConsentRecord.type.ts)
 
-```typescript
+The `ConsentRecord` is the central data structure representing a specific instance of consent given by a subject for a particular policy. Key characteristics:
 
-interface ConsentRecord {
-  readonly id: string; // Unique identifier for the consent record
-  readonly version: number; // Version number for optimistic concurrency control and audit trail
-  readonly subjectId: string; // Identifier for the individual whose data is concerned
-  readonly policyId: string; // Identifier for the specific policy version this consent applies to
-  readonly status: 'granted' | 'revoked' | 'superseded'; // Current status of the consent
-  readonly consentedAt: Date; // Timestamp when the consent was initially granted
-  readonly revokedAt?: Date; // Timestamp when the consent was revoked, if applicable
-  readonly consenter: {
-    readonly type: 'self' | 'proxy'; // Indicates if consent was given by the subject or a proxy
-    readonly userId: string; // Identifier of the individual *providing* the consent (subject or proxy)
-    readonly proxyDetails?: {
-      readonly relationship: string; // e.g., 'parent', 'legal_guardian', 'researcher'
-      readonly subjectAgeGroup: 'under13' | '13-17' | '18+'; // Age group of the subject, relevant for proxy rules
-    };
-  };
-  // Record of specific data scopes/categories granted within this consent instance
-  // Uses immutable collections if practical, otherwise treat as immutable
-  readonly grantedScopes: Readonly<Record<string, { grantedAt: Date }>>; // e.g., { "nutrition_log": { grantedAt: ... }, "activity_data": { grantedAt: ... } }
-  // Record of specific data scopes/categories explicitly revoked within this consent instance
-  readonly revokedScopes?: Readonly<Record<string, { revokedAt: Date }>>; // e.g., { "activity_data": { revokedAt: ... } }
-  // Metadata is useful for non-repudiation, can be optional
-  readonly metadata: {
-    readonly consentMethod: 'digital_form' | undefined;
-    readonly ipAddress?: string; // IP address associated with digital consent capture
-    readonly userAgent?: string; // User agent string associated with digital consent capture
-  };
-  readonly createdAt: Date; // Timestamp when the record was created in the system
-  readonly updatedAt: Date; // Timestamp when the record was last updated
-}
-```
+- **Immutable**: Once created, consent records are never modified; changes create new versions
+- **Versioned**: Each record has a version number for optimistic concurrency control
+- **Auditable**: Complete timestamp tracking of all consent decisions
+- **Granular**: Supports scope-based consent for different data categories
 
-## `Policy` / `PolicyDetails`
+The record tracks not only what was consented to, but also who provided the consent (including proxy scenarios), when it was given, and comprehensive metadata for compliance purposes.
 
-Represents a specific version of a consent policy document or agreement presented to the user. `PolicyDetails` is a subset or processed version of the full `Policy` structure, tailored for display or specific actions.
+**Key Relationships**:
+- Links to a specific `Policy` via `policyId`
+- Contains granted and revoked scopes with individual timestamps
+- Supports proxy consent with relationship details and age group validation
 
-```typescript
+### Policy
 
-interface Policy {
-  readonly id: string; // Unique identifier for this specific policy *version*
-  readonly policyGroupId: string; // Identifier linking different versions of the same logical policy
-  readonly version: number; // Version number of this policy document
-  readonly effectiveDate: Date; // Date when this policy version becomes active
-  readonly contentSections: ReadonlyArray<{ // Collection of distinct content sections
-    readonly title: string; // Section title
-    readonly description: string; // Section description
-    readonly content: string; // Rich text or HTML content for this section. Sanitized by the API.
-  }>;
-  // Defines the data scopes/categories covered by this policy
-  readonly availableScopes: Readonly<Array<{
-    readonly key: string; // Unique machine-readable key (e.g., 'nutrition_log', 'genomic_data')
-    readonly name: string; // Human-readable name (e.g., 'Nutrition Logs')
-    readonly description: string; // Explanation of what this scope entails
-    readonly required?: boolean; // Whether consent for this scope is mandatory for the policy
-  }>>;
-  readonly jurisdiction?: string; // e.g., 'EU', 'USA', 'CA-QC' - may influence required elements
-  readonly requiresProxyForMinors?: boolean; // Flag indicating if proxy consent is needed for specific age groups
-  readonly status: 'draft' | 'active' | 'archived'; // Lifecycle status of the policy version
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-}
+**Location**: [`Policy.type.ts`](../packages/types/src/types/Policy.type.ts)
 
-// Likely a projection or subset of the full Policy, possibly used by UI components
-interface PolicyDetails extends Pick<Policy, 'id' | 'version' | 'contentSections' | 'availableScopes'> {
-  // May include additional processed information for display
-  // e.g., pre-filtered required scopes
-}
+Policies define what users are consenting to. The system supports:
 
-```
+- **Versioned Policies**: Multiple versions of the same logical policy through `policyGroupId`
+- **Rich Content**: Structured content sections with HTML support
+- **Scope Definitions**: Available data categories that can be individually consented to
+- **Lifecycle Management**: Draft, active, and archived states
 
-## `IConsentDataAdapter`
+Policies are designed to be self-contained documents that fully describe what consent means for a particular use case, with built-in support for regulatory requirements like jurisdiction-specific rules.
 
-Defines the contract (interface) for how consent data is persisted and retrieved. Implementations (like `data-adapter-cosmosdb`) will conform to this interface.
+**Content Structure**:
 
-```typescript
+- **ContentSections**: Structured sections (title, description, content) for presenting information
+- **AvailableScopes**: Granular data categories users can consent to individually
+- **Metadata**: Effective dates, jurisdiction, proxy requirements, etc.
 
-interface IConsentDataAdapter {
-  // Creates a new consent record
-  createConsent(data: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt'>): Promise<ConsentRecord>;
+### Data Adapters
 
-  // Updates the status of an existing consent record, using version for optimistic concurrency
-  updateConsentStatus(id: string, status: ConsentRecord['status'], expectedVersion: number): Promise<ConsentRecord>;
+**Locations**:
 
-  // Retrieves a specific consent record by its unique ID
-  findConsentById(id: string): Promise<ConsentRecord | null>;
+- [`IConsentDataAdapter.type.ts`](../packages/types/src/types/IConsentDataAdapter.type.ts)
+- [`IPolicyDataAdapter.type.ts`](../packages/types/src/types/IPolicyDataAdapter.type.ts)
 
-  // Finds all consent records for a given subject ID
-  findConsentsBySubject(subjectId: string): Promise<ConsentRecord[]>;
+The adapter interfaces define how the system interacts with different storage backends. This abstraction allows the same business logic to work with:
 
-  // Finds the latest consent record for a given subject ID and policy ID
-  findLatestConsentBySubjectAndPolicy(subjectId: string, policyId: string): Promise<ConsentRecord | null>;
+- **Cosmos DB**: Production-ready cloud database
+- **IndexedDB**: Browser-based storage for offline/development scenarios
+- **Custom adapters**: Any storage system that implements the interface
 
-  // Finds all versions of consent records for a given subject ID and policy ID
-  findAllConsentVersionsBySubjectAndPolicy(subjectId: string, policyId: string): Promise<ConsentRecord[]>;
+**Design Principles**:
 
-  // Retrieves all consent records
-  getAllConsents(): Promise<ConsentRecord[]>;
-}
-```
+- **Storage Agnostic**: Business logic doesn't depend on specific database features
+- **Optimistic Concurrency**: Version-based conflict resolution
+- **Query Patterns**: Designed around common consent management use cases
 
-## `CreateConsentInput`
+### Input Types
+**Location**: [`ConsentInputs.type.ts`](../packages/types/src/types/ConsentInputs.type.ts), [`PolicyInputs.type.ts`](../packages/types/src/types/PolicyInputs.type.ts)
 
-Represents the necessary information required by the `ConsentService` to grant consent.
+Input types define the data required to create new records. These are separate from the stored records to:
 
-```typescript
+- **Exclude Generated Fields**: IDs, timestamps, and version numbers are generated by the system
+- **Validate Requirements**: Ensure all necessary data is provided
+- **Support Different Creation Patterns**: Initial creation vs. version updates
 
-interface CreateConsentInput {
-  subjectId: string;
-  policyId: string; // The specific policy version being consented to
-  consenter: {
-    type: 'self' | 'proxy';
-    userId: string;
-    proxyDetails?: {
-      relationship: string;
-      subjectAgeGroup: 'under13' | '13-17' | '18+';
-    };
-  };
-  grantedScopes: string[]; // Array of scope keys being granted
-  metadata: {
-    consentMethod: 'digital_form'; // Note: 'undefined' is not allowed by current type
-    ipAddress?: string;
-    userAgent?: string;
-    // Other relevant metadata for this specific grant action
-  };
-}
-```
+### Immutable Audit Trail
 
-### Example App Content Considerations (Common rule informed consent)
+The system maintains complete audit trails through immutable, versioned records:
 
-- Research purposes
-- Expected duration of the study
-- Research procedures
-- Risks and benefits
-- Confidentiality of records
-- Compensation
-- Contact Information
+1. **Initial Grant**: Creates version 1 with status 'granted'
+2. **Scope Changes**: New version with updated scopes, previous marked 'superseded'
+3. **Revocation**: New version with status 'revoked', previous marked 'superseded'
+4. **Historical Access**: All versions remain accessible for audit purposes
+
+### Granular Consent Management
+
+Rather than all-or-nothing consent, the system supports:
+
+- **Scope-Based Consent**: Users can consent to specific data categories
+- **Individual Timestamps**: Each scope tracks when it was granted/revoked
+- **Partial Revocation**: Users can revoke specific scopes while maintaining others
+- **Future Extensibility**: New scopes can be added to existing policies
+
+### Proxy Consent Support
+
+The system handles complex consent scenarios including:
+
+- **Age-Based Rules**: Different requirements for under-13, 13-17, and 18+ subjects
+- **Relationship Tracking**: Parent, guardian, researcher, etc.
+- **Validation Logic**: Ensures proxy consent is appropriate for the subject's age group
+- **Audit Requirements**: Full traceability of who provided consent on behalf of whom
+
+### Multi-Environment Flexibility
+
+The adapter pattern enables:
+
+- **Development**: IndexedDB for local development without infrastructure setup
+- **Testing**: In-memory or file-based adapters for unit tests
+- **Production**: Cosmos DB for scalable, distributed storage
+- **Hybrid**: Different adapters for different environments or use cases
+
+The architecture includes several technical safeguards:
+
+- **Optimistic Concurrency**: Prevents race conditions in consent updates
+- **Input Validation**: Type safety and runtime validation
+- **Immutability**: Prevents accidental modification of historical records
+- **Separation of Concerns**: Clear boundaries between different types of data
+
+## Usage Patterns
+
+For detailed examples of how to work with these data structures, see:
+
+- [Frontend Usage Examples](./frontend_usage_examples.md) - for UI integration
+- [API Usage Examples](./api_usage_examples.md) - for service and adapter configuration
+
+The type definitions themselves include JSDoc comments explaining field purposes and constraints.
