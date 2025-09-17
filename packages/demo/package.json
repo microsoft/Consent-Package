@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:local": "VITE_USE_MOCK_API=true vite",
-    "build:local": "tsc && VITE_USE_MOCK_API=true vite build",
-    "build": "tsc && VITE_USE_MOCK_API=true vite build",
+    "dev:local": "vite --mode dev-local",
+    "build:local": "tsc && vite build --mode dev-local",
+    "build": "tsc && vite build --mode dev-local",
     "preview:local": "VITE_USE_MOCK_API=true vite preview",
     "dev:remote": "VITE_USE_MOCK_API=false vite",
     "build:remote": "tsc && VITE_USE_MOCK_API=false vite build",
