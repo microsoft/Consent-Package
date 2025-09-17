@@ -82,7 +82,7 @@
    ```
 
    ```bash
-   # For windows (using Docker)
+   # For windows (using Docker for Windows without WSL)
    docker run --publish 8081:8081 --publish 1234:1234 --name cosmosdb-emulator --detach mcr.microsoft.com/cosmosdb/windows/azure-cosmos-emulator
    ```
 
