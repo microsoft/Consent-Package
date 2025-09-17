@@ -243,7 +243,7 @@ export default function GetStarted(): JSX.Element {
             .trim()
             .toLowerCase()
             .replace(/\s+/g, '.');
-          await login(subjectId);
+          await login({ id: subjectId, name: formData.name });
         } catch (err) {
           console.error('Login failed:', err);
           alert('Unable to login. Please contact support.');
