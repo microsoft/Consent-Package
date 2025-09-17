@@ -68,7 +68,7 @@
 
 ### 1. Start Cosmos DB Emulator
 
-1. Start the Cosmos DB Emulator
+1. [Start the Cosmos DB Emulator](https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-develop-emulator#start-the-emulator)
 
    ```bash
    # For macOS/Linux (using Docker)
@@ -79,6 +79,11 @@
     --name cosmosdb-emulator \
     --detach \
     mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+   ```
+
+   ```bash
+   # For windows (using Docker for Windows without WSL)
+   docker run --publish 8081:8081 --publish 1234:1234 --name cosmosdb-emulator --detach mcr.microsoft.com/cosmosdb/windows/azure-cosmos-emulator
    ```
 
 2. The emulator runs at `https://localhost:8081`
