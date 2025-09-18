@@ -163,7 +163,7 @@ export default function Home(): JSX.Element {
               size="large"
               onClick={() => {
                 if (currentUser) {
-                  void navigate(`/profile/${currentUser.id}`);
+                  void navigate(`/profile/${currentUser.name}`);
                 } else {
                   void navigate('/get-started');
                 }

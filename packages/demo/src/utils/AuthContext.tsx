@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 import type { ProfileData } from '@open-source-consent/ui';
+import type { BasicUserInfo } from './userManagement.js';
 import {
   getCurrentUserId,
   login as storeLogin,
@@ -19,7 +20,7 @@ import {
 interface AuthContextType {
   currentUser: ProfileData | null;
   isLoading: boolean;
-  login(subjectId: string): Promise<void>;
+  login(userInfo: BasicUserInfo): Promise<void>;
   logout(): void;
 }
 
@@ -81,10 +82,10 @@ export default function AuthProvider({
   }, [loadProfile]);
 
   const login = useCallback(
-    async (subjectId: string) => {
+    async (userInfo: BasicUserInfo) => {
       setIsLoading(true);
-      storeLogin(subjectId);
-      await loadProfile(subjectId);
+      storeLogin(userInfo);
+      await loadProfile(userInfo.id);
     },
     [loadProfile],
   );
