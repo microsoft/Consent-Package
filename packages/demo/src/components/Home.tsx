@@ -282,6 +282,7 @@ export default function Home(): JSX.Element {
               href="https://github.com/microsoft/Open-Source-Consent-Package"
               target="_blank"
               rel="noopener noreferrer"
+              className="inline-link"
             >
               Consent Package on GitHub
             </a>{' '}
