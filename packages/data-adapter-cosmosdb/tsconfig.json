@@ -6,12 +6,6 @@
     "declaration": true,
     "module": "NodeNext"
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "vitest.config.ts",
-    "src/index.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "vitest.config.ts", "src/index.ts"]
 }
