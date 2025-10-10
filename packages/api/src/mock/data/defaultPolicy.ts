@@ -28,7 +28,8 @@ export const defaultCorePolicyJson: Policy = {
     },
     {
       title: 'Purpose',
-      description: 'Expalining the purpose of the app/platform/project and how it relates to data collection.',
+      description:
+        'Expalining the purpose of the app/platform/project and how it relates to data collection.',
       content: `
         <p>This is an app that needs to collect data about you so that we can cusomize your experience. Otherwise, we may collect data to analyze to improve the application or experience. You can opt-in or opt-out of the optional data types.</p>
       `,
@@ -42,7 +43,8 @@ export const defaultCorePolicyJson: Policy = {
     },
     {
       title: 'Risks and Benefits',
-      description: 'Explaination of some of the risks and benefits of sharing your data.',
+      description:
+        'Explaination of some of the risks and benefits of sharing your data.',
       content: `
         <p>You have the right to access, modify, or delete your data at any time. You can also withdraw your consent at any point.</p>
         <h4>Risks:</h4>
@@ -64,7 +66,7 @@ export const defaultCorePolicyJson: Policy = {
        <p>We will limit and track who sees your data, only provide collaborators with the data needed to do their work and require them to sign a contract to protect your privacy.</p>
         `,
     },
-     {
+    {
       title: 'Contact',
       description: 'How you can reach us if you have questions.',
       content: `

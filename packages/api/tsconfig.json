@@ -12,13 +12,6 @@
     "rootDir": "./src",
     "noEmit": false
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "src/__tests__/**/*",
-    "vitest.config.ts"
-  ]
-} 
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "src/__tests__/**/*", "vitest.config.ts"]
+}
