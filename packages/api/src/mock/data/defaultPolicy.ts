@@ -13,79 +13,65 @@ export const defaultCorePolicyJson: Policy = {
   updatedAt: new Date('2025-05-20T00:00:00Z'),
   contentSections: [
     {
-      title: 'Data Collection',
-      description: 'How we collect your information.',
+      title: 'Consent Intro',
+      description: 'What to expect from the consent process.',
       content: `
-        <p>We collect only the information necessary to provide our services and ensure compliance with privacy regulations.</p>
-        <h4>Risks:</h4>
+        <p>The consent process is very important because it helps you understand what taking part in using this app means.</p>
+        <h4>Parts of the consent process:</h4>
         <ul>
-          <li>Your personal information may be temporarily stored in our secure systems</li>
-          <li>Data collection may require additional verification steps</li>
-          <li>Some data points may be mandatory for service provision</li>
-        </ul>
-        <h4>Data Types:</h4>
-        <ul>
-          <li>Personal identification information</li>
-          <li>Contact details and communication preferences</li>
-          <li>Account credentials and security information</li>
-        </ul>
-        <h4>Compensation/Benefits:</h4>
-        <ul>
-          <li>Access to personalized service features</li>
-          <li>Enhanced account security measures</li>
-          <li>Priority customer support access</li>
+          <li> We will provide you with information about what you are consenting to: research purposes, expected duration of the study, risks and benefits, confidentiality of records, and contact information.</li>
+          <li> After that you will have to decide whether you'd like to opt in or opt out for yourself, or your proxy. We will guide you through that process now.</li>
+          <li>This should take less than 5 minutes to complete.</li>
+          <li>You can change your mind and revoke consent at any time. To do so go to your profile and revoke consent on any non-required scope.</li>
         </ul>
       `,
     },
     {
-      title: 'Data Usage',
-      description: 'How we use your information.',
+      title: 'Purpose',
+      description:
+        'Expalining the purpose of the app/platform/project and how it relates to data collection.',
       content: `
-        <p>Your data is used solely for the purposes you consent to, and we never sell or share your information with third parties without your explicit permission.</p>
-        <h4>Risks:</h4>
-        <ul>
-          <li>Data may be used for service improvement and analytics</li>
-          <li>Information may be shared with service providers under strict confidentiality</li>
-          <li>Data may be retained for legal compliance purposes</li>
-        </ul>
-        <h4>Data Types:</h4>
-        <ul>
-          <li>Usage patterns and preferences</li>
-          <li>Service interaction logs</li>
-          <li>Analytics and performance data</li>
-        </ul>
-        <h4>Compensation/Benefits:</h4>
-        <ul>
-          <li>Improved service recommendations</li>
-          <li>Customized user experience</li>
-          <li>Early access to new features</li>
-        </ul>
+        <p>This is an app that needs to collect data about you so that we can cusomize your experience. Otherwise, we may collect data to analyze to improve the application or experience. You can opt-in or opt-out of the optional data types.</p>
       `,
     },
     {
-      title: 'Your Rights',
-      description: 'Your rights regarding your information.',
+      title: 'Duration',
+      description: 'Expected duration of data storage.',
+      content: `
+        <p>We store your data for varying lengths of time, keeping some data indefinitely for operational, legal, or safety reasons. When you delete your account, your content is typically scheduled for removal, but this process can take up to 90 days.</p>
+      `,
+    },
+    {
+      title: 'Risks and Benefits',
+      description:
+        'Explaination of some of the risks and benefits of sharing your data.',
       content: `
         <p>You have the right to access, modify, or delete your data at any time. You can also withdraw your consent at any point.</p>
         <h4>Risks:</h4>
         <ul>
-          <li>Withdrawing consent may limit access to certain features</li>
-          <li>Data deletion requests may take up to 30 days to process</li>
+          <li>There is a risk that an unauthorized person could get access to the stored health data. We believe the chance this will happen is very small and we will do everything we reasonably can to protect your privacy. There may also be other risks that we currently don’t know about. </li>
+          <li>Data deletion requests may take up to 90 days to process.</li>
           <li>Some data may be retained for legal or regulatory requirements</li>
         </ul>
-        <h4>Data Types:</h4>
+        <h4>Benefits:</h4>
         <ul>
-          <li>Consent management records</li>
-          <li>Data access and modification history</li>
-          <li>Privacy preference settings</li>
-        </ul>
-        <h4>Compensation/Benefits:</h4>
-        <ul>
-          <li>Full control over data management</li>
-          <li>Transparent data usage reporting</li>
-          <li>Flexible consent options</li>
-        </ul>
+          <li>Customization of experience</li>
+          <li>Ongoing improvement of the application and its functionality</li>
       `,
+    },
+    {
+      title: 'Confidentiality',
+      description: 'How we keep your data confidential.',
+      content: `
+       <p>We will limit and track who sees your data, only provide collaborators with the data needed to do their work and require them to sign a contract to protect your privacy.</p>
+        `,
+    },
+    {
+      title: 'Contact',
+      description: 'How you can reach us if you have questions.',
+      content: `
+       <p>If you have any questions you can contact us at example@example.com</p>
+          `,
     },
   ],
   availableScopes: [

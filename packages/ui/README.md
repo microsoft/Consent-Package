@@ -17,7 +17,7 @@ Note: This only currently applies to the AgeSelect, Profile, RoleSelect and Sign
 ### Basic Usage
 
 ```tsx
-import { ThemeProvider } from '@open-source-consent/ui'
+import { ThemeProvider } from '@open-source-consent/ui';
 
 function App() {
   return (
@@ -32,7 +32,7 @@ function App() {
     >
       {/* Your app components */}
     </ThemeProvider>
-  )
+  );
 }
 ```
 
@@ -41,6 +41,7 @@ function App() {
 The theme system includes the following categories of properties:
 
 #### Color System
+
 - `primary`: Primary brand color
 - `primaryHover`: Primary color hover state
 - `primaryDisabled`: Primary color disabled state
@@ -52,17 +53,20 @@ The theme system includes the following categories of properties:
 - `dangerDisabled`: Danger color disabled state
 
 #### Background Colors
+
 - `bgPrimary`: Primary background color
 - `bgSecondary`: Secondary background color
 - `bgTertiary`: Tertiary background color
 
 #### Text Colors
+
 - `textPrimary`: Primary text color
 - `textSecondary`: Secondary text color
 - `textTertiary`: Tertiary text color
 - `textDisabled`: Disabled text color
 
 #### Border Colors
+
 - `borderPrimary`: Primary border color
 - `borderSecondary`: Secondary border color
 - `borderTertiary`: Tertiary border color
@@ -87,7 +91,7 @@ Each component in the library is designed to work with the theme system. Compone
 Example:
 
 ```tsx
-import { ConsentFlow, ThemeProvider } from '@open-source-consent/ui'
+import { ConsentFlow, ThemeProvider } from '@open-source-consent/ui';
 
 function App() {
   return (
@@ -98,10 +102,10 @@ function App() {
       }}
     >
       <ConsentFlow
-        // ... component props
+      // ... component props
       />
     </ThemeProvider>
-  )
+  );
 }
 ```
 
