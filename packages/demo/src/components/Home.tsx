@@ -147,13 +147,25 @@ export default function Home(): JSX.Element {
             Build consent into your project with confidence!
           </Title1>
           <Text className={styles.description}>
-            The <b>Consent Package is a Software Development Kit</b> providing a customizable set of packages that allows developers to implement     auditable, traceable, privacy-focused functionality for managing and sharing consent data. The Consent Package is a flexible starting point for managing consent in applications, with features that prioritize transparency, user control, and privacy.  
+            The <b>Consent Package is a Software Development Kit</b> providing a
+            customizable set of packages that allows developers to implement
+            auditable, traceable, privacy-focused functionality for managing and
+            sharing consent data. The Consent Package is a flexible starting
+            point for managing consent in applications, with features that
+            prioritize transparency, user control, and privacy.
             <br />
             <br />
-            The Consent Package contains functionality for building consent management systems with audit trails, granular permissions, revocability, proxy consent, and flexible storage backends. Please visit the Consent Package on GitHub to integrate consent into your own work!
+            The Consent Package contains functionality for building consent
+            management systems with audit trails, granular permissions,
+            revocability, proxy consent, and flexible storage backends. Please
+            visit the Consent Package on GitHub to integrate consent into your
+            own work!
             <br />
             <br />
-            This site demonstrates how the UI component library and backend packages, including the API, core services, and database packages, might be used in a real-world context. Get started with the Consent or Admin demos below! 
+            This site demonstrates how the UI component library and backend
+            packages, including the API, core services, and database packages,
+            might be used in a real-world context. Get started with the Consent
+            or Admin demos below!
           </Text>
           <div className={styles.buttonContainer}>
             <Button
@@ -230,13 +242,20 @@ export default function Home(): JSX.Element {
             What is on this site?
           </Title2>
           <Text className={styles.infoDescription}>
-            This site is designed to provide an example of a consent flow that was built using the Consent Package. There are two demo experiences on the site – one for the user providing consent and one for an admin setting up the content and data requirements within a particular consent flow.
+            This site is designed to provide an example of a consent flow that
+            was built using the Consent Package. There are two demo experiences
+            on the site – one for the user providing consent and one for an
+            admin setting up the content and data requirements within a
+            particular consent flow.
             <br />
             <br />
-            Everything you see on this site is included in the Consent Package and can be used to build similar flows in your projects.
+            Everything you see on this site is included in the Consent Package
+            and can be used to build similar flows in your projects.
             <br />
             <br />
-            The Playground section of this demo site provides examples of how the UI components in the Consent Package can be used. New components and current component updates can be viewed there.
+            The Playground section of this demo site provides examples of how
+            the UI components in the Consent Package can be used. New components
+            and current component updates can be viewed there.
           </Text>
         </div>
       </section>
@@ -300,7 +319,8 @@ export default function Home(): JSX.Element {
               className="inline-link"
             >
               Microsoft Research's Project Resolve
-            </a>{' '},{' '}
+            </a>{' '}
+            ,{' '}
             <a
               href="https://flok.org/"
               target="_blank"
@@ -308,9 +328,10 @@ export default function Home(): JSX.Element {
               className="inline-link"
             >
               flok
-            </a>, an organization whose mission is
-            to rally the inherited metabolic disorder community to continuously
-            improve our care and accelerate scientific progress, and{' '}
+            </a>
+            , an organization whose mission is to rally the inherited metabolic
+            disorder community to continuously improve our care and accelerate
+            scientific progress, and{' '}
             <a
               href="https://www.bocoup.com/"
               target="_blank"
@@ -318,8 +339,8 @@ export default function Home(): JSX.Element {
               className="inline-link"
             >
               Microsoft Research's Project Resolve
-            </a>, a
-            worker-owned technology consultancy committed to building
+            </a>
+            , a worker-owned technology consultancy committed to building
             technologies that that resist capture, safeguard privacy, and
             interoperate intentionally.
           </Text>
