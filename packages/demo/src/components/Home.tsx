@@ -144,18 +144,28 @@ export default function Home(): JSX.Element {
       <section className={styles.hero}>
         <div className={styles.heroContent}>
           <Title1 as="h1" className={styles.title}>
-            Share Consent with Confidence
+            Build consent into your project with confidence!
           </Title1>
           <Text className={styles.description}>
-            The Consent Package provides an auditable, traceable,
-            privacy-focused solution for managing and sharing consent data.
-            Built with transparency and user control at its core, it helps
-            organizations maintain compliance while respecting user privacy.
+            The <b>Consent Package is a Software Development Kit</b> providing a
+            customizable set of packages that allows developers to implement
+            auditable, traceable, privacy-focused functionality for managing and
+            sharing consent data. The Consent Package is a flexible starting
+            point for managing consent in applications, with features that
+            prioritize transparency, user control, and privacy.
             <br />
             <br />
-            This site provides context, examples, and two demos for how the
-            package works and our documentation shows you how to implement it
-            yourself. Get started with the Consent or Admin demos below!
+            The Consent Package contains functionality for building consent
+            management systems with audit trails, granular permissions,
+            revocability, proxy consent, and flexible storage backends. Please
+            visit the Consent Package on GitHub to integrate consent into your
+            own work!
+            <br />
+            <br />
+            This site demonstrates how the UI component library and backend
+            packages, including the API, core services, and database packages,
+            might be used in a real-world context. Get started with the Consent
+            or Admin demos below!
           </Text>
           <div className={styles.buttonContainer}>
             <Button
@@ -232,14 +242,19 @@ export default function Home(): JSX.Element {
             What is on this site?
           </Title2>
           <Text className={styles.infoDescription}>
-            The demos on this site are broken down into two experiences. The
-            Consent Demo engages in the process of providing consent for data to
-            be used in an application. The Admin Demo outlines how an admin
-            would set up a consent framework's consent and data requirements.
+            This site is designed to provide an example of a consent flow that
+            was built using the Consent Package. There are two demo experiences
+            on the site – one for the user providing consent and one for an
+            admin setting up the content and data requirements within a
+            particular consent flow.
+            <br />
+            <br />
+            Everything you see on this site is included in the Consent Package
+            and can be used to build similar flows in your projects.
             <br />
             <br />
             The Playground section of this demo site provides examples of how
-            the components in the Consent Package can be used. New components
+            the UI components in the Consent Package can be used. New components
             and current component updates can be viewed there.
           </Text>
         </div>
@@ -296,31 +311,38 @@ export default function Home(): JSX.Element {
             About the Project
           </Title2>
           <Text className={styles.infoDescription}>
-            The Consent Package was created collaboration between Microsoft
-            Research's Project Resolve, flok, an organization whose mission is
-            to rally the inherited metabolic disorder community to continuously
-            improve our care and accelerate scientific progress, and Bocoup, a
-            worker-owned technology consultancy committed to building
+            The Consent Package was created collaboration between{' '}
+            <a
+              href="https://www.microsoft.com/en-us/research/project/project-resolve/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-link"
+            >
+              Microsoft Research's Project Resolve
+            </a>{' '}
+            ,{' '}
+            <a
+              href="https://flok.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-link"
+            >
+              flok
+            </a>
+            , an organization whose mission is to rally the inherited metabolic
+            disorder community to continuously improve our care and accelerate
+            scientific progress, and{' '}
+            <a
+              href="https://www.bocoup.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-link"
+            >
+              Microsoft Research's Project Resolve
+            </a>
+            , a worker-owned technology consultancy committed to building
             technologies that that resist capture, safeguard privacy, and
             interoperate intentionally.
-            <br />
-            <br />
-            Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque
-            faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi
-            pretium tellus duis convallis. Tempus leo eu aenean sed diam urna
-            tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas.
-            Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut
-            hendrerit semper vel class aptent taciti sociosqu. Ad litora
-            torquent per conubia nostra inceptos himenaeos.
-            <br />
-            <br />
-            Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque
-            faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi
-            pretium tellus duis convallis. Tempus leo eu aenean sed diam urna
-            tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas.
-            Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut
-            hendrerit semper vel class aptent taciti sociosqu. Ad litora
-            torquent per conubia nostra inceptos himenaeos.
           </Text>
         </div>
       </section>
